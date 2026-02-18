@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   LayoutDashboard, ClipboardList, Calendar, Clock, BarChart3, Settings,
   HardHat, ChevronLeft, ChevronRight, Plus, Lock
@@ -104,8 +104,17 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <><ChevronLeft className="w-4 h-4" /><span>Collapse</span></>}
         </button>
       </div>
+          {/* LLD_DEV_LOGO_FOOTER */}
+      <div className="mt-auto pt-6 flex justify-center opacity-70 hover:opacity-100 transition">
+        <img
+          src="/long-line-developer-logo.png"
+          alt="Long Line Developer"
+          className="w-16 h-auto"
+        />
+      </div>
     </aside>
   );
 };
 
 export default Sidebar;
+
