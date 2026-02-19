@@ -3,9 +3,9 @@ import {
   Settings, Save, Check, BarChart3, Cloud, Users, ClipboardCheck,
   FileText, RefreshCw, Brain, Bell, Building2, Clock, Shield, HardHat, AlertCircle, User
 } from 'lucide-react';
-import type { AppSettings, UserRole } from '@/lib/sitecommand-types';
-import { DEFAULT_SETTINGS, USER_ROLES } from '@/lib/sitecommand-types';
-import { fetchSettings, saveSettings } from '@/lib/sitecommand-store';
+import type { AppSettings, UserRole } from '@/lib/Long Line Diary-types';
+import { DEFAULT_SETTINGS, USER_ROLES } from '@/lib/Long Line Diary-types';
+import { fetchSettings, saveSettings } from '@/lib/Long Line Diary-store';
 import { useAuth } from '@/lib/auth';
 
 const inputCls = 'w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:border-amber-500';
@@ -331,4 +331,3 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
-

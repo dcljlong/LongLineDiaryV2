@@ -4,8 +4,8 @@ import {
   AlertCircle, CheckCircle, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import type { UserRole } from '@/lib/sitecommand-types';
-import { USER_ROLES } from '@/lib/sitecommand-types';
+import type { UserRole } from '@/lib/Long Line Diary-types';
+import { USER_ROLES } from '@/lib/Long Line Diary-types';
 
 interface AuthModalProps {
   open: boolean;
@@ -312,4 +312,3 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 };
 
 export default AuthModal;
-
