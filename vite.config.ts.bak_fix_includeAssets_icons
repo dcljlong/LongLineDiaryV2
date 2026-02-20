@@ -13,7 +13,7 @@ export default defineConfig(() => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["icons/ll-developer-logo.png"],
+      includeAssets: ["ll-developer-logo.png"],
       manifest: {
         name: "Long Line Diary",
         short_name: "LLD",
@@ -44,5 +44,4 @@ export default defineConfig(() => ({
     },
   },
 }));
-
 
