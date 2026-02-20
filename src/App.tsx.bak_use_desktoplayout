@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/lib/auth";
 import { AppProvider } from "@/contexts/AppContext";
 
-import DesktopLayout from "@/components/DesktopLayout";
+import AppLayout from "@/components/AppLayout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +24,7 @@ const App = () => (
             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/*" element={<DesktopLayout />} />
+                <Route path="/*" element={<AppLayout />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
@@ -36,4 +36,3 @@ const App = () => (
 );
 
 export default App;
-
