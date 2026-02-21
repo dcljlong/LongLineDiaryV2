@@ -6,7 +6,15 @@ import { BRAND_CONFIG } from "./brand.config";
 
 export default defineConfig(() => ({
   base: BRAND_CONFIG.base,
-  server: {
+
+  define: {
+    __BRAND_APP_NAME__: JSON.stringify(BRAND_CONFIG.appName),
+    __BRAND_SHORT_NAME__: JSON.stringify(BRAND_CONFIG.shortName),
+    __BRAND_DEVELOPER_NAME__: JSON.stringify(BRAND_CONFIG.developerName),
+    __BRAND_DESCRIPTION__: JSON.stringify(BRAND_CONFIG.description),
+    __BRAND_LOGO_FILE__: JSON.stringify(BRAND_CONFIG.logoFile),
+  },
+server: {
     host: "::",
     port: 8080,
   },
@@ -51,3 +59,4 @@ export default defineConfig(() => ({
     },
   },
 }));
+
