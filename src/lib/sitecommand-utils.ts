@@ -1,4 +1,4 @@
-import { differenceInDays, format, parseISO, addDays as dfnsAddDays, startOfWeek, endOfWeek, eachDayOfInterval, isToday, isSameDay } from 'date-fns';
+﻿import { differenceInDays, format, parseISO, addDays as dfnsAddDays, startOfWeek, endOfWeek, eachDayOfInterval, isToday, isSameDay } from 'date-fns';
 
 export type PriorityLevel = 'high' | 'medium' | 'low';
 
@@ -103,7 +103,7 @@ export function calculateHours(start: string, finish: string, lunchMinutes: numb
   if (!/^\d{2}:\d{2}$/.test(start) || !/^\d{2}:\d{2}$/.test(finish)) return 0;
   const [sh, sm] = start.split(':').map(Number);
   const [fh, fm] = finish.split(':').map(Number);
-  let startMins = sh * 60 + sm;
+  const startMins = sh * 60 + sm;
   let finishMins = fh * 60 + fm;
   if (finishMins < startMins) finishMins += 24 * 60;
   const total = Math.max(0, finishMins - startMins - lunchMinutes);

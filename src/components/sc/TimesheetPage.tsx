@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+﻿import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Trash2, Download, FileSpreadsheet } from 'lucide-react';
 import { format, addDays, subDays, parseISO } from 'date-fns';
 import type { AppSettings } from '@/lib/sitecommand-types';
@@ -131,7 +131,7 @@ const TimesheetPage: React.FC = () => {
         if (parsed.staffSignOff) setStaffSignOff(parsed.staffSignOff);
         if (parsed.managerSignOff) setManagerSignOff(parsed.managerSignOff);
         if (parsed.days) setDays(parsed.days);
-      } catch {}
+      } catch { /* ignore invalid localStorage */ }
     }
   }, []);
 
@@ -270,9 +270,9 @@ const TimesheetPage: React.FC = () => {
                             onChange={e => updateLine(dayIdx, line.id, { analysisCode: e.target.value })}
                             className={`w-40 ${inputCls}`}
                           >
-                            <option value="">—</option>
+                            <option value="">â€”</option>
                             {ANALYSIS_CODES.map(a => (
-                              <option key={a.code} value={a.code}>{a.code} — {a.label}</option>
+                              <option key={a.code} value={a.code}>{a.code} â€” {a.label}</option>
                             ))}
                           </select>
                         </td>

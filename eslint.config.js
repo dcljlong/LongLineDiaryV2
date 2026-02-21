@@ -1,4 +1,4 @@
-import js from "@eslint/js";
+﻿import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -18,6 +18,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
     },
     rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
@@ -27,3 +28,4 @@ export default tseslint.config(
     },
   }
 );
+

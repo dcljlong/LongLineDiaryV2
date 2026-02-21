@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+*.bak*
+
+
+scripts/*.bak*
+
+
+package.json.bak_*
+
