@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import { BRAND } from '@/lib/brand';
 import {
   LayoutDashboard, ClipboardList, Calendar, Clock, BarChart3, Settings,
   HardHat, ChevronLeft, ChevronRight, Plus, Lock
@@ -107,6 +107,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
 };
 
 export default Sidebar;
+
+
+
 
 
 

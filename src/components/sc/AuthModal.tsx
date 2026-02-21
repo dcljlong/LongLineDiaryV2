@@ -1,4 +1,5 @@
-﻿import React, { useState } from 'react';
+﻿import { BRAND } from '@/lib/brand';
+import React, { useState } from 'react';
 import {
   X, Mail, Lock, User, Shield, HardHat, Eye, EyeOff,
   AlertCircle, CheckCircle, Loader2
@@ -312,4 +313,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 };
 
 export default AuthModal;
+
+
+
+
 
