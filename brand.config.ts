@@ -1,4 +1,5 @@
 ﻿export const BRAND_CONFIG = {
+  pwaVersion: "1.2.3",
   appName: "Long Line Diary",
   shortName: "LLD",
   developerName: "Long Line Developer",
@@ -9,4 +10,5 @@
   // Repo base path for GitHub Pages
   base: "/LongLineDiaryV2/",
 } as const;
+
 
