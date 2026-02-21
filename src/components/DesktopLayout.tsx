@@ -1,15 +1,16 @@
-﻿import React, { useState, useCallback, useEffect } from 'react';
+﻿import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
 import { ROLE_ACCESS, USER_ROLES } from '@/lib/sitecommand-types';
 import { useAuth } from '@/lib/auth';
 import Sidebar from './sc/Sidebar';
-import DashboardPage from './sc/DashboardPage';
-import DailyLogsPage from './sc/DailyLogsPage';
-import CalendarPage from './sc/CalendarPage';
-import TimesheetPage from './sc/TimesheetPage';
-import ReportsPage from './sc/ReportsPage';
-import SettingsPage from './sc/SettingsPage';
+
+const DashboardPage = lazy(() => import('./sc/DashboardPage'));
+const DailyLogsPage = lazy(() => import('./sc/DailyLogsPage'));
+const CalendarPage = lazy(() => import('./sc/CalendarPage'));
+const TimesheetPage = lazy(() => import('./sc/TimesheetPage'));
+const ReportsPage = lazy(() => import('./sc/ReportsPage'));
+const SettingsPage = lazy(() => import('./sc/SettingsPage'));
 import JobFormDialog from './sc/JobFormDialog';
 import AuthModal from './sc/AuthModal';
 import { fetchDashboardStats } from '@/lib/sitecommand-store';
@@ -234,7 +235,10 @@ const AppLayout: React.FC = () => {
 
         {/* Page content */}
         <div className="p-4 lg:p-6">
-          {renderPage()}
+          <Suspense fallback={
+  <div className="p-6 text-slate-300 text-sm">Loading…</div>
+}>
+  {renderPage()}</Suspense>
         </div>
       </main>
 
@@ -255,6 +259,11 @@ const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+
+
+
+
+
 
 
 
