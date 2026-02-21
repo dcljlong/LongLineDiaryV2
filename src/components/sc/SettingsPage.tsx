@@ -91,7 +91,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure your Long Line Diary preferences</p>
+          <p className="text-slate-400 text-sm mt-1">Configure your {BRAND.appName} preferences</p>
         </div>
         <button
           onClick={handleSave}
@@ -331,6 +331,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
 
 
 

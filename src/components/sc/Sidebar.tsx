@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
         <img src={import.meta.env.BASE_URL + "icons/ll-developer-logo.png"} alt="Long Line Developer" className="w-16 h-16 object-contain flex-shrink-0" />
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="text-base font-bold text-white tracking-tight leading-none">Long Line Diary</h1>
+            <h1 className="text-base font-bold text-white tracking-tight leading-none">{BRAND.appName}</h1>
             <p className="text-[10px] text-slate-400 mt-0.5">Construction Diary</p>
           </div>
         )}
@@ -107,6 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
 };
 
 export default Sidebar;
+
 
 
 

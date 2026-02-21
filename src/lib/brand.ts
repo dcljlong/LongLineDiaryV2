@@ -1,9 +1,12 @@
 ﻿export const BRAND = {
   appName: "Long Line Diary",
-  appShortName: "LLD",
+  shortName: "LLD",
   developerName: "Long Line Developer",
+  description: "Construction Site Diary & Project Tracking",
+
   // Use BASE_URL so GitHub Pages + local dev both work
-  developerLogoPath: `${import.meta.env.BASE_URL}icons/ll-developer-logo.png`,
+  logoPath: `${import.meta.env.BASE_URL}icons/ll-developer-logo.png`,
+
   // Keep dark enterprise look aligned with LLT
   theme: {
     bg: "slate-900",
