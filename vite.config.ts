@@ -18,6 +18,25 @@ server: {
     host: "::",
     port: 8080,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id || !id.includes('node_modules')) return;
+
+          // Keep large/clear vendor groups separate. Do NOT force React into its own chunk (can create cycles).
+          if (id.includes('react-router')) return 'router';
+          if (id.includes('@tanstack')) return 'tanstack';
+          if (id.includes('@radix-ui')) return 'radix';
+          if (id.includes('supabase')) return 'supabase';
+          if (id.includes('lucide-react')) return 'icons';
+
+          return 'vendor';
+        },
+      },
+    },
+  },
+
   plugins: [
     react(),
     VitePWA({
@@ -59,4 +78,6 @@ server: {
     },
   },
 }));
+
+
 
