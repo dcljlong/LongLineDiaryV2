@@ -52,22 +52,9 @@ server: {
         start_url: BRAND_CONFIG.base,
         scope: BRAND_CONFIG.base,
         icons: [
-          {
-            src: `${BRAND_CONFIG.base}${BRAND_CONFIG.logoFile}`,
-            sizes: "192x192",
-            type: "image/png"
-          },
-          {
-            src: `${BRAND_CONFIG.base}${BRAND_CONFIG.logoFile}`,
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "maskable"
-          },
-          {
-            src: `${BRAND_CONFIG.base}${BRAND_CONFIG.logoFile}`,
-            sizes: "512x512",
-            type: "image/png"
-          }
+          { src: "/LongLineDiaryV2/icons/lld-icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "/LongLineDiaryV2/icons/lld-icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+          { src: "/LongLineDiaryV2/icons/lld-icon-512.png", sizes: "512x512", type: "image/png" },
         ]
       }
     })
@@ -78,6 +65,8 @@ server: {
     },
   },
 }));
+
+
 
 
 
