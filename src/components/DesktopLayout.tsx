@@ -94,7 +94,7 @@ const AppLayout: React.FC = () => {
   const roleLabel = userRole ? USER_ROLES.find(r => r.value === userRole)?.label || '' : '';
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-background">
       {/* Mobile overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
@@ -132,70 +132,70 @@ const AppLayout: React.FC = () => {
         }`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-3">
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-slate-800 text-slate-400"
+                className="lg:hidden p-2 rounded-lg hover:bg-card text-muted-foreground"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-              <h2 className="text-sm font-semibold text-slate-300 capitalize">
+              <h2 className="text-sm font-semibold text-muted-foreground capitalize">
                 {currentPage.replace('-', ' ')}
               </h2>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500 hidden sm:inline">
+              <span className="text-xs text-muted-foreground hidden sm:inline">
                 {new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
 
               {/* Auth section */}
               {authLoading ? (
-                <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
+                <div className="w-8 h-8 rounded-full bg-card animate-pulse" />
               ) : user ? (
                 /* Logged in - User menu */
                 <div className="relative">
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowUserMenu(!showUserMenu); }}
-                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/50 hover:border-slate-600 transition-all"
+                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-card/80 border border-border/50 hover:border-border transition-all"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                      <span className="text-xs font-bold text-slate-900">
+                    <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                      <span className="text-xs font-bold text-foreground">
                         {displayName.charAt(0).toUpperCase() || 'U'}
                       </span>
                     </div>
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-medium text-white leading-none">{displayName}</p>
-                      <p className="text-[10px] text-slate-400 leading-none mt-0.5">{roleLabel}</p>
+                      <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{roleLabel}</p>
                     </div>
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
                   </button>
 
                   {/* Dropdown */}
                   {showUserMenu && (
                     <div
-                      className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700/50 rounded-xl shadow-2xl overflow-hidden"
+                      className="absolute right-0 top-full mt-2 w-64 bg-card border border-border/50 rounded-xl shadow-2xl overflow-hidden"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* User info */}
-                      <div className="px-4 py-3 border-b border-slate-700/50">
+                      <div className="px-4 py-3 border-b border-border/50">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                            <span className="text-sm font-bold text-slate-900">
+                          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                            <span className="text-sm font-bold text-foreground">
                               {displayName.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-white truncate">{displayName}</p>
-                            <p className="text-xs text-slate-400 truncate">{displayEmail}</p>
+                            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg bg-slate-700/50 w-fit">
-                          <RoleIcon className="w-3 h-3 text-amber-400" />
-                          <span className="text-[10px] font-medium text-amber-400">{roleLabel}</span>
+                        <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg bg-card/50 w-fit">
+                          <RoleIcon className="w-3 h-3 text-primary" />
+                          <span className="text-[10px] font-medium text-primary">{roleLabel}</span>
                         </div>
                       </div>
 
@@ -203,7 +203,7 @@ const AppLayout: React.FC = () => {
                       <div className="p-1.5">
                         <button
                           onClick={() => { setShowUserMenu(false); handleNavigate('settings'); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-card/50 hover:text-white transition-colors"
                         >
                           <User className="w-4 h-4" />
                           <span>Profile & Settings</span>
@@ -223,7 +223,7 @@ const AppLayout: React.FC = () => {
                 /* Not logged in - Sign In button */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-xs transition-all shadow-lg shadow-amber-500/20"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-foreground font-semibold text-xs transition-all shadow-lg shadow-primary/20"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Sign In</span>
@@ -236,7 +236,7 @@ const AppLayout: React.FC = () => {
         {/* Page content */}
         <div className="p-4 lg:p-6">
           <Suspense fallback={
-  <div className="p-6 text-slate-300 text-sm">Loading…</div>
+  <div className="p-6 text-muted-foreground text-sm">Loading…</div>
 }>
   {renderPage()}</Suspense>
         </div>
@@ -259,6 +259,9 @@ const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+
+
+
 
 
 

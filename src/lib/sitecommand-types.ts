@@ -1,4 +1,4 @@
-export interface Project {
+﻿export interface Project {
   id: string;
   name: string;
   job_number: string;
@@ -206,7 +206,7 @@ export const NOTE_TYPES = [
   { value: 'reminder', label: 'Reminder', color: 'bg-purple-500' },
   { value: 'meeting', label: 'Meeting', color: 'bg-indigo-500' },
   { value: 'deadline', label: 'Deadline', color: 'bg-red-500' },
-  { value: 'inspection', label: 'Inspection', color: 'bg-amber-500' },
+  { value: 'inspection', label: 'Inspection', color: 'bg-primary' },
   { value: 'delivery', label: 'Delivery', color: 'bg-green-500' },
 ];
 
@@ -236,3 +236,4 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'daily-logs', 'calendar', 'reports'],
 };
+

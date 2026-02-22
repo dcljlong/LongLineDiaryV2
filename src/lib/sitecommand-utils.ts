@@ -16,7 +16,7 @@ export function calculatePriority(dueDate: string | null | undefined): PriorityL
 export function getPriorityColor(priority: PriorityLevel): string {
   switch (priority) {
     case 'high': return 'text-red-500';
-    case 'medium': return 'text-amber-500';
+    case 'medium': return 'text-primary';
     case 'low': return 'text-emerald-500';
   }
 }
@@ -24,7 +24,7 @@ export function getPriorityColor(priority: PriorityLevel): string {
 export function getPriorityBg(priority: PriorityLevel): string {
   switch (priority) {
     case 'high': return 'bg-red-500/10 border-red-500/30 text-red-400';
-    case 'medium': return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+    case 'medium': return 'bg-primary/10 border-primary/30 text-primary';
     case 'low': return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
   }
 }
@@ -32,7 +32,7 @@ export function getPriorityBg(priority: PriorityLevel): string {
 export function getPriorityDot(priority: PriorityLevel): string {
   switch (priority) {
     case 'high': return 'bg-red-500';
-    case 'medium': return 'bg-amber-500';
+    case 'medium': return 'bg-primary';
     case 'low': return 'bg-emerald-500';
   }
 }
@@ -143,3 +143,4 @@ export function getCalendarGrid(year: number, month: number): (Date | null)[][] 
   
   return grid;
 }
+

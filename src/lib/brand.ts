@@ -20,9 +20,10 @@ export const BRAND = {
   logoPath: `${import.meta.env.BASE_URL}${logoFile}`,
 
   theme: {
-    bg: "slate-900",
-    panel: "slate-800",
-    border: "slate-700/50",
-    accent: "amber-500",
+    bg: "background",
+    panel: "card",
+    border: "border/50",
+    accent: "primary",
   },
 } as const;
+
