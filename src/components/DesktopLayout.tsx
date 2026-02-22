@@ -1,4 +1,6 @@
-﻿import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
+﻿import { useTheme } from '@/hooks/useTheme';
+import { Sun, Moon } from 'lucide-react';
+import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
 import { ROLE_ACCESS, USER_ROLES } from '@/lib/sitecommand-types';
@@ -135,6 +137,14 @@ const AppLayout: React.FC = () => {
         <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+<button
+  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+  className='p-2 rounded-lg border border-border hover:bg-card transition-colors'
+>
+  {theme === 'dark'
+    ? <Sun className='w-4 h-4 text-foreground' />
+    : <Moon className='w-4 h-4 text-foreground' />}
+</button>
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -148,6 +158,14 @@ const AppLayout: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
+<button
+  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+  className='p-2 rounded-lg border border-border hover:bg-card transition-colors'
+>
+  {theme === 'dark'
+    ? <Sun className='w-4 h-4 text-foreground' />
+    : <Moon className='w-4 h-4 text-foreground' />}
+</button>
               <span className="text-xs text-muted-foreground hidden sm:inline">
                 {new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
@@ -183,6 +201,14 @@ const AppLayout: React.FC = () => {
                       {/* User info */}
                       <div className="px-4 py-3 border-b border-border/50">
                         <div className="flex items-center gap-3">
+<button
+  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+  className='p-2 rounded-lg border border-border hover:bg-card transition-colors'
+>
+  {theme === 'dark'
+    ? <Sun className='w-4 h-4 text-foreground' />
+    : <Moon className='w-4 h-4 text-foreground' />}
+</button>
                           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                             <span className="text-sm font-bold text-foreground">
                               {displayName.charAt(0).toUpperCase() || 'U'}
@@ -259,6 +285,9 @@ const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+
+
+
 
 
 
