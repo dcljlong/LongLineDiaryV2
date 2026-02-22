@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
 
@@ -112,3 +112,4 @@ export default {
     typography,
   ],
 } satisfies Config;
+

@@ -1,4 +1,5 @@
-﻿import { Toaster } from "@/components/ui/toaster";
+﻿import SettingsSimple from '@/pages/SettingsSimple'
+import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,7 +27,8 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/*" element={<DesktopLayout />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
+                <Route path='/settings' element={<SettingsSimple />} />
+</Routes>
             </BrowserRouter>
           </AppProvider>
         </AuthProvider>
@@ -36,4 +38,6 @@ const App = () => (
 );
 
 export default App;
+
+
 
