@@ -13,7 +13,6 @@ export default defineConfig(() => ({
     __BRAND_DEVELOPER_NAME__: JSON.stringify(BRAND_CONFIG.developerName),
     __BRAND_DESCRIPTION__: JSON.stringify(BRAND_CONFIG.description),
     __BRAND_LOGO_FILE__: JSON.stringify(BRAND_CONFIG.logoFile),
-    __PWA_VERSION__: JSON.stringify((BRAND_CONFIG as any).pwaVersion ?? "1.0.0"),
   },
 server: {
     host: "::",
@@ -79,7 +78,6 @@ server: {
     },
   },
 }));
-
 
 
 
