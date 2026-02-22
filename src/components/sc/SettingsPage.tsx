@@ -1,4 +1,5 @@
-﻿import { BRAND } from '@/lib/brand';
+﻿import React, { useState, useEffect } from 'react';
+import { BRAND } from '@/lib/brand';
 import {
   Settings, Save, Check, BarChart3, Cloud, Users, ClipboardCheck,
   FileText, RefreshCw, Brain, Bell, Building2, Clock, Shield, HardHat, AlertCircle, User
@@ -331,6 +332,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
 
 
 
