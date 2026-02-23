@@ -297,3 +297,233 @@
   }
 
 }
+
+
+/* LLD_PREMIUM_THEME_BEGIN */
+
+@layer base {
+
+  /* ===== PREMIUM GLOBAL CHROME (applies across the app) ===== */
+
+  body {
+    background: hsl(var(--background));
+    background-image:
+      radial-gradient(1200px 700px at 15% 10%, hsl(var(--primary) / 0.14), transparent 55%),
+      radial-gradient(900px 600px at 85% 15%, hsl(var(--primary) / 0.10), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Depth + crisp borders everywhere tokens are used */
+  .bg-card {
+    border-color: hsl(var(--border));
+    box-shadow:
+      0 1px 0 hsl(var(--border) / 0.6),
+      0 12px 32px hsl(var(--foreground) / 0.06),
+      0 10px 26px hsl(var(--primary) / 0.06);
+  }
+
+  /* Inputs/selects: premium contrast + focus */
+  input, select, textarea {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--border));
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 3px hsl(var(--ring) / 0.30),
+      0 0 0 1px hsl(var(--ring) / 0.55);
+    border-color: hsl(var(--ring));
+  }
+
+  /* Buttons: primary reads premium + consistent */
+  .bg-primary {
+    box-shadow:
+      0 10px 22px hsl(var(--primary) / 0.18),
+      0 1px 0 hsl(var(--primary) / 0.35);
+  }
+
+  /* Hover tint across lists/rows */
+  .hover\:bg-muted:hover {
+    background-color: hsl(var(--muted));
+  }
+
+  /* Subtle “active” rail wherever nav uses borders */
+  .border-border {
+    border-color: hsl(var(--border));
+  }
+}
+
+@layer base {
+
+  /* ===== THEME PRESETS (controlled by data-theme) ===== */
+  /* NOTE: your JS sets documentElement.dataset.theme and toggles .dark class */
+
+  /* ---------- DARK: NAVY PREMIUM (DEFAULT) ---------- */
+  .dark[data-theme='dark-navy'] {
+    --background: 222 58% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 52% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 52% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --muted: 222 40% 14%;
+    --muted-foreground: 215 20% 72%;
+
+    --border: 222 32% 20%;
+    --input: 222 32% 20%;
+
+    --primary: 217 92% 62%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 217 92% 70%;
+
+    --secondary: 222 40% 14%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 222 40% 14%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+  }
+
+  /* ---------- DARK: CHARCOAL LUX ---------- */
+  .dark[data-theme='dark-charcoal'] {
+    --background: 240 6% 5%;
+    --foreground: 240 10% 98%;
+
+    --card: 240 6% 9%;
+    --card-foreground: 240 10% 98%;
+
+    --popover: 240 6% 9%;
+    --popover-foreground: 240 10% 98%;
+
+    --muted: 240 6% 13%;
+    --muted-foreground: 240 6% 74%;
+
+    --border: 240 7% 18%;
+    --input: 240 7% 18%;
+
+    --primary: 217 92% 62%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 217 92% 70%;
+
+    --secondary: 240 6% 13%;
+    --secondary-foreground: 240 10% 98%;
+
+    --accent: 240 6% 13%;
+    --accent-foreground: 240 10% 98%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+  }
+
+  /* ---------- LIGHT: SOFT PREMIUM (SHADED PAGE, WHITE FIELDS) ---------- */
+  :root[data-theme='light-soft'] {
+    --background: 220 24% 95%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --muted: 220 18% 90%;
+    --muted-foreground: 215 18% 38%;
+
+    --border: 214 22% 78%;
+    --input: 214 22% 82%;
+
+    --primary: 217 92% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 217 92% 52%;
+
+    --secondary: 220 18% 90%;
+    --secondary-foreground: 222 47% 11%;
+
+    --accent: 220 18% 90%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+  }
+
+  /* ---------- LIGHT: BLUE TINT PREMIUM ---------- */
+  :root[data-theme='light-blue'] {
+    --background: 214 45% 95%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --muted: 214 28% 90%;
+    --muted-foreground: 215 18% 38%;
+
+    --border: 214 24% 78%;
+    --input: 214 24% 82%;
+
+    --primary: 217 92% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 217 92% 52%;
+  }
+
+  /* ---------- LIGHT: GREEN ACCENT PREMIUM ---------- */
+  :root[data-theme='light-green'] {
+    --background: 210 18% 95%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --muted: 210 16% 90%;
+    --muted-foreground: 215 18% 38%;
+
+    --border: 214 22% 78%;
+    --input: 214 22% 82%;
+
+    --primary: 100 55% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 100 55% 40%;
+  }
+
+  /* ---------- LIGHT: HIGH CONTRAST ---------- */
+  :root[data-theme='light-contrast'] {
+    --background: 220 25% 94%;
+    --foreground: 222 47% 9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 9%;
+
+    --muted: 220 18% 88%;
+    --muted-foreground: 215 18% 32%;
+
+    --border: 214 25% 72%;
+    --input: 214 25% 76%;
+
+    --primary: 217 92% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --ring: 217 92% 48%;
+  }
+}
+
+/* LLD_PREMIUM_THEME_END */
