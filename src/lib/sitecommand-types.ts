@@ -202,7 +202,7 @@ export const ANALYSIS_CODES = [
 export const WEATHER_OPTIONS = ['Clear', 'Partly Cloudy', 'Overcast', 'Light Rain', 'Heavy Rain', 'Wind', 'Storm', 'Snow', 'Fog', 'Hot', 'Cold'];
 
 export const NOTE_TYPES = [
-  { value: 'note', label: 'General Note', color: 'bg-blue-500' },
+  { value: 'note', label: 'General Note', color: 'bg-primary' },
   { value: 'reminder', label: 'Reminder', color: 'bg-purple-500' },
   { value: 'meeting', label: 'Meeting', color: 'bg-indigo-500' },
   { value: 'deadline', label: 'Deadline', color: 'bg-red-500' },
@@ -236,4 +236,5 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'daily-logs', 'calendar', 'reports'],
 };
+
 
