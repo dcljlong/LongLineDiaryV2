@@ -1,0 +1,16 @@
+﻿<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      (function () {
+        var l = window.location;
+        var base = '/LongLineDiaryV2';
+        var path = l.pathname;
+        // Redirect deep links back to app root with route stored in query param
+        l.replace(l.origin + base + '/?p=' + encodeURIComponent(path.replace(base, '')) + (l.search || '') + (l.hash || ''));
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
