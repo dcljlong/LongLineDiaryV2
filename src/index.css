@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-  --background: 210 40% 98%;
+  --background: 210 45% 97%;
   --foreground: 222 47% 11%;
 
   --card: 0 0% 100%;
@@ -19,20 +19,20 @@
   --primary: 217 91% 55%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 30% 94%;
+  --secondary: 210 35% 93%;
   --secondary-foreground: 222 47% 11%;
 
-  --muted: 210 30% 94%;
-  --muted-foreground: 215 20% 40%;
+  --muted: 210 35% 93%;
+  --muted-foreground: 215 20% 42%;
 
-  --accent: 210 30% 94%;
+  --accent: 210 35% 93%;
   --accent-foreground: 222 47% 11%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 214 25% 88%;
-  --input: 214 25% 88%;
+  --border: 210 30% 88%;
+  --input: 210 30% 90%;
   --ring: 217 91% 60%;
 
   --radius: 0.5rem;
@@ -121,6 +121,8 @@
 .markdown-preview ol {
   @apply my-4 ml-6;
 }
+
+
 
 
 
