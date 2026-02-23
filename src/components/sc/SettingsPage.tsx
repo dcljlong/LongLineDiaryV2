@@ -9,8 +9,8 @@ import { DEFAULT_SETTINGS, USER_ROLES } from '@/lib/sitecommand-types';
 import { fetchSettings, saveSettings } from '@/lib/sitecommand-store';
 import { useAuth } from '@/lib/auth';
 
-const inputCls = 'w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:border-amber-500';
-const labelCls = 'block text-xs font-medium text-slate-400 mb-1';
+const inputCls = 'w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-primary';
+const labelCls = 'block text-xs font-medium text-muted-foreground mb-1';
 
 const roleIcons: Record<string, React.ElementType> = {
   site_manager: Shield,
@@ -84,21 +84,21 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
   ];
 
   if (loading) {
-    return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400" /></div>;
+    return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" /></div>;
   }
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure your {BRAND.appName} preferences</p>
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground text-sm mt-1">Configure your {BRAND.appName} preferences</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-            saved ? 'bg-emerald-500 text-white' : 'bg-amber-500 hover:bg-amber-400 text-slate-900'
+            saved ? 'bg-emerald-500 text-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'
           } disabled:opacity-50`}
         >
           {saved ? <><Check className="w-4 h-4" /> Saved</> : saving ? 'Saving...' : <><Save className="w-4 h-4" /> Save Settings</>}
@@ -107,10 +107,10 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
       {/* User Profile Section */}
       {user && (
-        <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+        <div className="bg-card border border-border rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-5 h-5 text-amber-400" />
-            <h2 className="text-sm font-bold text-white">Your Profile</h2>
+            <User className="w-5 h-5 text-primary" />
+            <h2 className="text-sm font-bold text-foreground">Your Profile</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -146,18 +146,18 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                     onClick={() => setProfileRole(r.value)}
                     className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
                       selected
-                        ? 'bg-amber-500/10 border-amber-500/50'
-                        : 'bg-slate-700/40 border-slate-600/50 hover:border-slate-500'
+                        ? 'bg-primary/10 border-primary/50'
+                        : 'bg-muted border-border hover:border-border'
                     }`}
                   >
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                      selected ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-slate-400'
+                      selected ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
                     }`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className={`text-sm font-medium ${selected ? 'text-amber-400' : 'text-slate-300'}`}>{r.label}</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">{r.description.split(',')[0]}</p>
+                      <p className={`text-sm font-medium ${selected ? 'text-primary' : 'text-muted-foreground'}`}>{r.label}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{r.description.split(',')[0]}</p>
                     </div>
                   </button>
                 );
@@ -169,7 +169,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             onClick={handleProfileSave}
             disabled={profileSaving}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              profileSaved ? 'bg-emerald-500 text-white' : 'bg-amber-500 hover:bg-amber-400 text-slate-900'
+              profileSaved ? 'bg-emerald-500 text-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             } disabled:opacity-50`}
           >
             {profileSaved ? <><Check className="w-3 h-3" /> Profile Saved</> : profileSaving ? 'Saving...' : <><Save className="w-3 h-3" /> Update Profile</>}
@@ -179,20 +179,20 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
       {/* Not logged in notice */}
       {!user && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center gap-3">
-          <Shield className="w-5 h-5 text-amber-400 flex-shrink-0" />
+        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-center gap-3">
+          <Shield className="w-5 h-5 text-primary flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-amber-400">Sign in to manage your profile</p>
-            <p className="text-xs text-slate-400">Create an account to save your settings and access role-based features.</p>
+            <p className="text-sm font-medium text-primary">Sign in to manage your profile</p>
+            <p className="text-xs text-muted-foreground">Create an account to save your settings and access role-based features.</p>
           </div>
         </div>
       )}
 
       {/* Company Settings */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+      <div className="bg-card border border-border rounded-xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Building2 className="w-5 h-5 text-amber-400" />
-          <h2 className="text-sm font-bold text-white">Company Details</h2>
+          <Building2 className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Company Details</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -212,16 +212,16 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
               className={inputCls}
               placeholder="https://example.com/logo.png"
             />
-            <p className="text-[10px] text-slate-500 mt-1">Used on PDF/Excel exports</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Used on PDF/Excel exports</p>
           </div>
         </div>
       </div>
 
       {/* Timesheet Settings */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+      <div className="bg-card border border-border rounded-xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Clock className="w-5 h-5 text-amber-400" />
-          <h2 className="text-sm font-bold text-white">Timesheet Configuration</h2>
+          <Clock className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Timesheet Configuration</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -230,7 +230,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
               {([1, 2] as const).map(p => (
                 <button key={p} onClick={() => setSettings({ ...settings, timesheetPeriod: p })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    settings.timesheetPeriod === p ? 'bg-amber-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    settings.timesheetPeriod === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
                   }`}>{p} Week{p > 1 ? 's' : ''}</button>
               ))}
             </div>
@@ -249,7 +249,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
               {([30, 60] as const).map(m => (
                 <button key={m} onClick={() => setSettings({ ...settings, lunchDefaultMinutes: m })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    settings.lunchDefaultMinutes === m ? 'bg-amber-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    settings.lunchDefaultMinutes === m ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
                   }`}>{m} min</button>
               ))}
             </div>
@@ -261,7 +261,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             {[5, 10, 15, 30].map(r => (
               <button key={r} onClick={() => setSettings({ ...settings, roundingMinutes: r })}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  settings.roundingMinutes === r ? 'bg-amber-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  settings.roundingMinutes === r ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
                 }`}>{r} min</button>
             ))}
           </div>
@@ -269,11 +269,11 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Feature Toggles */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+      <div className="bg-card border border-border rounded-xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Settings className="w-5 h-5 text-amber-400" />
-          <h2 className="text-sm font-bold text-white">Features</h2>
-          <span className="text-[10px] text-slate-500 ml-2">Toggle features on/off</span>
+          <Settings className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Features</h2>
+          <span className="text-[10px] text-muted-foreground ml-2">Toggle features on/off</span>
         </div>
         <div className="space-y-3">
           {featureToggles.map(ft => {
@@ -281,18 +281,18 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             const enabled = settings.features[ft.key];
             return (
               <div key={ft.key} className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
-                enabled ? 'bg-slate-700/30 border-slate-600/50' : 'bg-slate-800/30 border-slate-700/30 opacity-60'
+                enabled ? 'bg-muted border-border' : 'bg-card border-border opacity-60'
               }`}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  enabled ? 'bg-amber-500/15 text-amber-400' : 'bg-slate-700 text-slate-500'
+                  enabled ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
                 }`}><Icon className="w-5 h-5" /></div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-white">{ft.label}</h3>
-                  <p className="text-xs text-slate-400">{ft.description}</p>
+                  <h3 className="text-sm font-semibold text-foreground">{ft.label}</h3>
+                  <p className="text-xs text-muted-foreground">{ft.description}</p>
                 </div>
                 <button onClick={() => updateFeature(ft.key, !enabled)}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-amber-500' : 'bg-slate-600'}`}>
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                  className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-primary' : 'bg-muted'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-foreground transition-transform ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
             );
@@ -301,26 +301,26 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Role Access Info */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
-        <h2 className="text-sm font-bold text-white mb-3">Role Access Levels</h2>
-        <p className="text-xs text-slate-400 mb-3">Each role has different access to features:</p>
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h2 className="text-sm font-bold text-foreground mb-3">Role Access Levels</h2>
+        <p className="text-xs text-muted-foreground mb-3">Each role has different access to features:</p>
         <div className="space-y-2">
           {USER_ROLES.map(r => {
             const Icon = roleIcons[r.value] || User;
             const isCurrent = userRole === r.value;
             return (
               <div key={r.value} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                isCurrent ? 'bg-amber-500/10 border-amber-500/20' : 'bg-slate-700/20 border-slate-700/30'
+                isCurrent ? 'bg-primary/10 border-primary/20' : 'bg-muted/20 border-border'
               }`}>
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                  isCurrent ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-slate-400'
+                  isCurrent ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
                 }`}><Icon className="w-4 h-4" /></div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${isCurrent ? 'text-amber-400' : 'text-white'}`}>{r.label}</span>
-                    {isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-medium">Current</span>}
+                    <span className={`text-sm font-semibold ${isCurrent ? 'text-primary' : 'text-foreground'}`}>{r.label}</span>
+                    {isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-medium">Current</span>}
                   </div>
-                  <p className="text-xs text-slate-400">{r.description}</p>
+                  <p className="text-xs text-muted-foreground">{r.description}</p>
                 </div>
               </div>
             );
@@ -332,6 +332,8 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
+
 
 
 
