@@ -214,3 +214,86 @@
     --ring: 213 94% 68%;
   }
 }
+
+@layer base {
+
+  /* ===== GLOBAL VISUAL ENHANCEMENTS ===== */
+
+  body {
+    background: hsl(var(--background));
+    background-image: radial-gradient(
+      circle at 20% 20%,
+      hsl(var(--primary) / 0.06),
+      transparent 40%
+    );
+  }
+
+  /* Header accent line */
+  header {
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: hsl(var(--primary));
+    opacity: 0.35;
+  }
+
+  /* Cards feel more alive */
+  .bg-card {
+    box-shadow: 0 2px 8px hsl(var(--primary) / 0.04);
+  }
+
+  /* Section titles stronger */
+  h1, h2 {
+    position: relative;
+  }
+
+  h2::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 16px;
+    border-radius: 4px;
+    background: hsl(var(--primary));
+    opacity: 0.6;
+  }
+
+  /* Table / row hover */
+  tr:hover {
+    background: hsl(var(--primary) / 0.06);
+  }
+
+}
+
+@layer base {
+
+  :root[data-theme='light-blue'] {
+    background-color: hsl(210 45% 97%);
+  }
+
+  :root[data-theme='light-green'] {
+    background-color: hsl(210 20% 96%);
+  }
+
+  :root[data-theme='light-contrast'] {
+    background-color: hsl(210 25% 95%);
+  }
+
+  .dark[data-theme='dark-charcoal'] {
+    background-image: radial-gradient(
+      circle at 20% 20%,
+      hsl(var(--primary) / 0.08),
+      transparent 50%
+    );
+  }
+
+}
