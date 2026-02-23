@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { useTheme, type ThemeId } from '@/hooks/useTheme';
 import { BRAND } from '@/lib/brand';
 import {
   Settings, Save, Check, BarChart3, Cloud, Users, ClipboardCheck,
@@ -20,6 +21,7 @@ const roleIcons: Record<string, React.ElementType> = {
 
 const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) => {
   const { user, profile, updateProfile } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -94,7 +96,42 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground text-sm mt-1">Configure your {BRAND.appName} preferences</p>
         </div>
-        <button
+        
+      {/* Theme Presets */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-foreground">Theme</h2>
+          <p className="text-xs text-muted-foreground mt-1">Choose a preset (applies instantly)</p>
+        </div>
+
+        {([
+          { id: 'dark-navy', label: 'Dark — Navy (Default)', desc: 'LLD navy, low glare' },
+          { id: 'dark-charcoal', label: 'Dark — Charcoal', desc: 'Neutral dark, higher contrast' },
+          { id: 'light-soft', label: 'Light — Soft', desc: 'Professional grey background, white fields' },
+          { id: 'light-blue', label: 'Light — Blue Tint', desc: 'Subtle blue tone, white fields' },
+          { id: 'light-green', label: 'Light — Green Accent', desc: 'Green primary accents, white fields' },
+          { id: 'light-contrast', label: 'Light — High Contrast', desc: 'Crisp borders + stronger contrast' },
+        ] as { id: ThemeId; label: string; desc: string }[]).map((t) => {
+          const selected = theme === t.id
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTheme(t.id)}
+              className={
+                selected
+                  ? "w-full p-3 rounded-xl border border-primary/30 bg-primary/10 text-left transition-colors"
+                  : "w-full p-3 rounded-xl border border-border bg-card hover:bg-muted text-left transition-colors"
+              }
+            >
+              <div className="text-sm font-semibold text-foreground">{t.label}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">{t.desc}</div>
+            </button>
+          )
+        })}
+
+      </div>
+<button
           onClick={handleSave}
           disabled={saving}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
@@ -332,6 +369,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
 
 
 
