@@ -1,7 +1,8 @@
-﻿import { BRAND } from '@/lib/brand';
+﻿import React from 'react';
+import { BRAND } from '@/lib/brand';
 import {
   LayoutDashboard, ClipboardList, Calendar, Clock, BarChart3, Settings,
-  HardHat, ChevronLeft, ChevronRight, Plus, Lock
+  ChevronLeft, ChevronRight, Plus, Lock
 } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
 import { ROLE_ACCESS } from '@/lib/sitecommand-types';
@@ -30,17 +31,21 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full z-40 flex flex-col bg-slate-900 border-r border-slate-700/50 transition-all duration-300 ${
+      className={`fixed left-0 top-0 h-full z-40 flex flex-col bg-card border-r border-border transition-all duration-300 ${
         collapsed ? 'w-16' : 'w-60'
       }`}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-700/50">
-        <img src={import.meta.env.BASE_URL + "icons/ll-developer-logo.png"} alt="Long Line Developer" className="w-16 h-16 object-contain flex-shrink-0" />
+      <div className="flex items-center gap-3 px-4 h-16 border-b border-border">
+        <img
+          src={import.meta.env.BASE_URL + "icons/ll-developer-logo.png"}
+          alt="Long Line Developer"
+          className="w-16 h-16 object-contain flex-shrink-0"
+        />
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="text-base font-bold text-white tracking-tight leading-none">{BRAND.appName}</h1>
-            <p className="text-[10px] text-slate-400 mt-0.5">Construction Diary</p>
+            <h1 className="text-base font-bold text-foreground tracking-tight leading-none">{BRAND.appName}</h1>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Construction Diary</p>
           </div>
         )}
       </div>
@@ -50,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
         <div className="px-3 mt-4">
           <button
             onClick={onQuickAdd}
-            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm transition-colors ${
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition ${
               collapsed ? 'justify-center' : ''
             }`}
           >
@@ -66,25 +71,27 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
           const isActive = currentPage === key;
           const showBadge = key === 'dashboard' && stats && stats.overdue > 0;
           const isLocked = !allowedPages.includes(key);
+
+          const base = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all relative border';
+          const locked = 'text-muted-foreground/50 cursor-not-allowed border-transparent opacity-60';
+          const active = 'bg-primary/10 text-primary border-primary/20';
+          const idle = 'text-muted-foreground hover:text-foreground hover:bg-muted border-transparent';
+
           return (
             <button
               key={key}
               onClick={() => !isLocked && onNavigate(key)}
               disabled={isLocked}
               title={isLocked ? `${label} requires a higher role` : label}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all relative ${
-                isLocked
-                  ? 'text-slate-600 cursor-not-allowed border border-transparent'
-                  : isActive
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent'
-              } ${collapsed ? 'justify-center' : ''}`}
+              className={`${base} ${isLocked ? locked : isActive ? active : idle} ${collapsed ? 'justify-center' : ''}`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
               {!collapsed && <span>{label}</span>}
-              {isLocked && !collapsed && <Lock className="w-3 h-3 ml-auto text-slate-600" />}
+              {isLocked && !collapsed && <Lock className="w-3 h-3 ml-auto text-muted-foreground/60" />}
               {showBadge && !isLocked && (
-                <span className={`${collapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1`}>
+                <span
+                  className={`${collapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1`}
+                >
                   {stats.overdue}
                 </span>
               )}
@@ -97,24 +104,22 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
       <div className="px-3 pb-4">
         <button
           onClick={onToggle}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors text-sm"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition text-sm"
         >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <><ChevronLeft className="w-4 h-4" /><span>Collapse</span></>}
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <>
+              <ChevronLeft className="w-4 h-4" />
+              <span>Collapse</span>
+            </>
+          )}
         </button>
       </div>
-          </aside>
+    </aside>
   );
 };
 
 export default Sidebar;
-
-
-
-
-
-
-
-
-
 
 

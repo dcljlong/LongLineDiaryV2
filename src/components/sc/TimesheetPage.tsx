@@ -29,7 +29,7 @@ interface SignOff {
   date: string;
 }
 
-const inputCls = 'px-2 py-1.5 rounded-lg bg-slate-700 border border-slate-600 text-white text-xs focus:outline-none focus:border-amber-500';
+const inputCls = 'lld-input px-2 py-1.5 rounded-lg text-xs';
 
 const makeLine = (lunchDefault: number): TimesheetLine => ({
   id: uuid(),
@@ -270,9 +270,9 @@ const TimesheetPage: React.FC = () => {
                             onChange={e => updateLine(dayIdx, line.id, { analysisCode: e.target.value })}
                             className={`w-40 ${inputCls}`}
                           >
-                            <option value="">â€”</option>
+                            <option value="">—</option>
                             {ANALYSIS_CODES.map(a => (
-                              <option key={a.code} value={a.code}>{a.code} â€” {a.label}</option>
+                              <option key={a.code} value={a.code}>{a.code} — {a.label}</option>
                             ))}
                           </select>
                         </td>
@@ -366,3 +366,6 @@ const TimesheetPage: React.FC = () => {
 };
 
 export default TimesheetPage;
+
+
+

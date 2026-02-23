@@ -2,6 +2,9 @@
 import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
 import "./index.css";
+import { initTheme } from './lib/theme-runtime';
+
+initTheme();
 
 // Register service worker
 registerSW({
@@ -9,3 +12,5 @@ registerSW({
 });
 
 createRoot(document.getElementById("root")!).render(<App />);
+
+

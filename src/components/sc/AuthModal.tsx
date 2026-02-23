@@ -13,7 +13,7 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-const inputCls = 'w-full pl-10 pr-4 py-3 rounded-xl bg-slate-700/80 border border-slate-600 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all';
+const inputCls = 'lld-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all';
 
 const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const { signIn, signUp } = useAuth();
@@ -83,35 +83,35 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-slate-800 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header gradient */}
-        <div className="relative bg-gradient-to-br from-amber-500/20 via-slate-800 to-slate-800 px-6 pt-6 pb-4">
+        <div className="relative bg-surface-2/60 px-6 pt-6 pb-4">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Logo */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <HardHat className="w-5 h-5 text-slate-900" />
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/15">
+              <HardHat className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">{BRAND.appName}</h2>
-              <p className="text-xs text-slate-400">Construction Management Platform</p>
+              <p className="text-xs text-muted-foreground">Construction Management Platform</p>
             </div>
           </div>
 
           {/* Tab switcher */}
-          <div className="flex bg-slate-700/50 rounded-xl p-1">
+          <div className="flex bg-surface-2 rounded-xl p-1">
             <button
               onClick={() => switchMode('signin')}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                 mode === 'signin'
-                  ? 'bg-amber-500 text-slate-900 shadow-lg shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/15'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Sign In
@@ -120,8 +120,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
               onClick={() => switchMode('signup')}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                 mode === 'signup'
-                  ? 'bg-amber-500 text-slate-900 shadow-lg shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/15'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Create Account
@@ -149,7 +149,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
             <form onSubmit={handleSignIn} className="space-y-4">
               {/* Email */}
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="email"
                   placeholder="Email address"
@@ -162,7 +162,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
               {/* Password */}
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Password"
@@ -174,7 +174,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -183,7 +183,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-sm transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all shadow-lg shadow-primary/15 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 {loading ? 'Signing in...' : 'Sign In'}
@@ -193,7 +193,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
             <form onSubmit={handleSignUp} className="space-y-4">
               {/* Full Name */}
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Full name"
@@ -206,7 +206,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
               {/* Email */}
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="email"
                   placeholder="Email address"
@@ -219,7 +219,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
               {/* Role selector */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2">Your Role</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-2">Your Role</label>
                 <div className="grid grid-cols-3 gap-2">
                   {USER_ROLES.map(r => {
                     const Icon = roleIcons[r.value];
@@ -231,8 +231,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
                         onClick={() => setRole(r.value)}
                         className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center ${
                           selected
-                            ? 'bg-amber-500/10 border-amber-500/50 text-amber-400'
-                            : 'bg-slate-700/40 border-slate-600/50 text-slate-400 hover:border-slate-500'
+                            ? 'bg-primary/10 border-primary/40 text-primary'
+                            : 'bg-surface-2/70 border-border/50 text-muted-foreground hover:border-border'
                         }`}
                       >
                         <Icon className="w-5 h-5" />
@@ -241,14 +241,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
                     );
                   })}
                 </div>
-                <p className="text-xs text-slate-500 mt-1.5">
+                <p className="text-xs text-muted-foreground/80 mt-1.5">
                   {USER_ROLES.find(r => r.value === role)?.description}
                 </p>
               </div>
 
               {/* Password */}
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Password (min 6 characters)"
@@ -260,7 +260,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -268,7 +268,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
               {/* Confirm Password */}
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Confirm password"
@@ -282,7 +282,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-sm transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all shadow-lg shadow-primary/15 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 {loading ? 'Creating account...' : 'Create Account'}
@@ -291,16 +291,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           )}
 
           {/* Footer */}
-          <p className="text-center text-xs text-slate-500 mt-4">
+          <p className="text-center text-xs text-muted-foreground/80 mt-4">
             {mode === 'signin' ? (
               <>Don't have an account?{' '}
-                <button onClick={() => switchMode('signup')} className="text-amber-400 hover:text-amber-300 font-medium">
+                <button onClick={() => switchMode('signup')} className="text-primary hover:text-primary/90 font-medium">
                   Create one
                 </button>
               </>
             ) : (
               <>Already have an account?{' '}
-                <button onClick={() => switchMode('signin')} className="text-amber-400 hover:text-amber-300 font-medium">
+                <button onClick={() => switchMode('signin')} className="text-primary hover:text-primary/90 font-medium">
                   Sign in
                 </button>
               </>
@@ -313,6 +313,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 };
 
 export default AuthModal;
+
+
+
 
 
 

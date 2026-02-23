@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
   Search, Filter, Download, Calendar, BarChart3, TrendingUp,
   Users, Package, Activity, AlertTriangle, CheckCircle2
@@ -71,7 +71,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
     return { total, high, medium, low, withSafety, withCritical, uniqueProjects };
   }, [filteredLogs]);
 
-  const inputCls = 'px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:border-amber-500';
+  const inputCls = 'lld-input px-3 py-2 rounded-lg text-sm';
 
   if (loading) {
     return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400" /></div>;
@@ -173,17 +173,17 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
                     className="border-b border-slate-700/20 hover:bg-slate-700/20 cursor-pointer transition-colors"
                   >
                     <td className="py-3 px-4 text-xs text-white font-medium">{formatDate(log.log_date)}</td>
-                    <td className="py-3 px-4 text-xs text-slate-300">{log.project?.name || '—'}</td>
+                    <td className="py-3 px-4 text-xs text-slate-300">{log.project?.name || 'â€”'}</td>
                     <td className="py-3 px-4">
                       <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
-                        {log.project?.job_number || '—'}
+                        {log.project?.job_number || 'â€”'}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-xs text-slate-400">{log.weather || '—'} {log.temperature}</td>
+                    <td className="py-3 px-4 text-xs text-slate-400">{log.weather || 'â€”'} {log.temperature}</td>
                     <td className="py-3 px-4"><PriorityBadge priority={log.priority} size="sm" showIcon={false} /></td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.safety_incidents || '—'}</td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.critical_items || '—'}</td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[150px] truncate">{log.notes || '—'}</td>
+                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.safety_incidents || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.critical_items || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[150px] truncate">{log.notes || 'â€”'}</td>
                   </tr>
                 ))
               )}
@@ -196,3 +196,4 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
 };
 
 export default ReportsPage;
+

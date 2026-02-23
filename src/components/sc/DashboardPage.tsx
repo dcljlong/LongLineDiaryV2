@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
   HardHat, Users, Package, AlertTriangle, Clock, CheckCircle2,
   Plus, ArrowRight, Briefcase, Shield, TrendingUp, Activity,
@@ -99,8 +99,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   const statCards = stats ? [
     { label: 'Active Projects', value: stats.activeProjects, icon: Briefcase, color: 'from-blue-500 to-blue-600', textColor: 'text-blue-400' },
-    { label: 'High Priority', value: stats.highPriorityLogs, icon: AlertTriangle, color: 'from-red-500 to-red-600', textColor: 'text-red-400' },
-    { label: 'Overdue Items', value: stats.totalOverdue, icon: Clock, color: 'from-amber-500 to-orange-500', textColor: 'text-amber-400' },
+    { label: 'High Priority', value: stats.highPriorityLogs, icon: AlertTriangle, color: 'from-red-500 to-red-600', textColor: 'text-danger' },
+    { label: 'Overdue Items', value: stats.totalOverdue, icon: Clock, color: 'from-primary to-primary', textColor: 'text-primary' },
     { label: 'Pending Materials', value: stats.pendingMaterials, icon: Package, color: 'from-purple-500 to-purple-600', textColor: 'text-purple-400' },
     { label: 'Safety Incidents', value: stats.safetyIncidents, icon: Shield, color: 'from-emerald-500 to-emerald-600', textColor: 'text-emerald-400' },
     { label: 'Total Logs', value: stats.totalLogs, icon: ClipboardList, color: 'from-indigo-500 to-indigo-600', textColor: 'text-indigo-400' },
@@ -109,7 +109,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const quickActions = [
     { label: 'Work Activity', icon: Activity, color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', action: () => onNavigate('daily-logs', { tab: 'activities' }) },
     { label: 'Materials', icon: Package, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20', action: () => onNavigate('daily-logs', { tab: 'materials' }) },
-    { label: 'Equipment', icon: Wrench, color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
+    { label: 'Equipment', icon: Wrench, color: 'bg-primary/10 text-primary border-primary/20', action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
     { label: 'Crew', icon: UserCheck, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', action: () => onNavigate('daily-logs', { tab: 'crew' }) },
     { label: 'Visitor', icon: Eye, color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20', action: () => onNavigate('daily-logs', { tab: 'visitors' }) },
     { label: 'Delivery', icon: Truck, color: 'bg-rose-500/10 text-rose-400 border-rose-500/20', action: () => onNavigate('calendar', { type: 'delivery' }) },
@@ -132,7 +132,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
       </div>
     );
   }
@@ -142,12 +142,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Command Center</h1>
-          <p className="text-slate-400 text-sm mt-1">{formatDate(todayStr())} — {todayLogs.length} job{todayLogs.length !== 1 ? 's' : ''} logged today</p>
+          <h1 className="text-2xl font-bold text-foreground">Command Center</h1>
+          <p className="text-muted-foreground text-sm mt-1">{formatDate(todayStr())} — {todayLogs.length} job{todayLogs.length !== 1 ? 's' : ''} logged today</p>
         </div>
         <button
           onClick={onQuickAdd}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Job
@@ -159,14 +159,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {statCards.map((s, i) => {
           const Icon = s.icon;
           return (
-            <div key={i} className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-slate-600/50 transition-colors">
+            <div key={i} className="bg-card border border-border rounded-xl p-4 hover:border-border/50 transition-colors">
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center`}>
-                  <Icon className="w-4 h-4 text-white" />
+                  <Icon className="w-4 h-4 text-foreground" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white">{s.value}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{s.label}</div>
+              <div className="text-2xl font-bold text-foreground">{s.value}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
             </div>
           );
         })}
@@ -174,7 +174,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Quick Add</h2>
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Quick Add</h2>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
           {quickActions.map((a, i) => {
             const Icon = a.icon;
@@ -196,17 +196,17 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {/* Active Projects */}
         <div className="lg:col-span-1">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Active Projects</h2>
-            <button onClick={() => onNavigate('daily-logs')} className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Active Projects</h2>
+            <button onClick={() => onNavigate('daily-logs')} className="text-xs text-primary hover:text-primary/90 flex items-center gap-1">
               View All <ArrowRight className="w-3 h-3" />
             </button>
           </div>
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
             {projects.filter(p => p.status === 'active').length === 0 ? (
-              <div className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-6 text-center">
-                <HardHat className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-sm text-slate-400">No active projects</p>
-                <button onClick={onQuickAdd} className="mt-2 text-xs text-amber-400 hover:text-amber-300">
+              <div className="bg-card border border-border rounded-xl p-6 text-center">
+                <HardHat className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No active projects</p>
+                <button onClick={onQuickAdd} className="mt-2 text-xs text-primary hover:text-primary/90">
                   Create your first job
                 </button>
               </div>
@@ -217,17 +217,17 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                   <button
                     key={p.id}
                     onClick={() => onNavigate('daily-logs', { project_id: p.id })}
-                    className="w-full text-left bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-amber-500/30 transition-colors"
+                    className="w-full text-left bg-card border border-border rounded-xl p-4 hover:border-primary/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                          <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                             {p.job_number || '#'}
                           </span>
                         </div>
-                        <h3 className="text-sm font-semibold text-white mt-1 truncate">{p.name}</h3>
-                        <p className="text-xs text-slate-400 truncate">{p.location || p.client || 'No location'}</p>
+                        <h3 className="text-sm font-semibold text-foreground mt-1 truncate">{p.name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{p.location || p.client || 'No location'}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1 ml-2">
                         {projectLogs.length > 0 && (
@@ -247,7 +247,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {/* Priority Items Feed */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Priority Items</h2>
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Priority Items</h2>
             <div className="flex gap-1">
               {(['all', 'high', 'medium', 'low'] as const).map(f => (
                 <button
@@ -255,11 +255,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                   onClick={() => setPriorityFilter(f)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                     priorityFilter === f
-                      ? f === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                        : f === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : f === 'low' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-slate-700 text-white border border-slate-600'
-                      : 'text-slate-400 hover:text-slate-300 border border-transparent'
+                      ? f === 'high' ? 'bg-danger/15 text-danger border border-danger/30'
+                        : f === 'medium' ? 'bg-primary/20 text-primary border border-primary/30'
+                        : f === 'low' ? 'bg-success/15 text-success border border-success/30'
+                        : 'bg-muted text-foreground border border-border'
+                      : 'text-muted-foreground hover:text-foreground border border-transparent'
                   }`}
                 >
                   {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -276,10 +276,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
             {allIncompleteFlat.length === 0 ? (
-              <div className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-8 text-center">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
-                <p className="text-sm text-slate-300 font-medium">All clear!</p>
-                <p className="text-xs text-slate-500 mt-1">No outstanding items to show</p>
+              <div className="bg-card border border-border rounded-xl p-8 text-center">
+                <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
+                <p className="text-sm text-foreground font-medium">All clear!</p>
+                <p className="text-xs text-muted-foreground mt-1">No outstanding items to show</p>
               </div>
             ) : (
               allIncompleteFlat.slice(0, 20).map((item, i) => {
@@ -287,28 +287,28 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                 return (
                   <div
                     key={`${item._type}-${item.id}-${i}`}
-                    className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 hover:border-slate-600/50 transition-colors"
+                    className="bg-card border border-border rounded-xl p-3 hover:border-border/50 transition-colors"
                   >
                     <div className="flex items-start gap-3">
                       <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getPriorityDot(item._priority)}`} />
-                      <TypeIcon className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
+                      <TypeIcon className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-white truncate">
+                          <span className="text-sm font-medium text-foreground truncate">
                             {item.description || item.equipment_name || item.worker_name || 'Unnamed'}
                           </span>
                           <PriorityBadge priority={item._priority} size="sm" showIcon={false} />
-                          <span className="text-[10px] text-slate-500 bg-slate-700/50 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                             {typeLabels[item._type]}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                           <span>{item._project}</span>
-                          {item._jobNumber && <span className="font-mono text-amber-400/60">#{item._jobNumber}</span>}
+                          {item._jobNumber && <span className="font-mono text-primary/60">#{item._jobNumber}</span>}
                           {item._dueDate && <span>Due: {formatDate(item._dueDate)}</span>}
                         </div>
                         {item.notes && (
-                          <p className="text-xs text-slate-500 mt-1 truncate">{item.notes}</p>
+                          <p className="text-xs text-muted-foreground mt-1 truncate">{item.notes}</p>
                         )}
                       </div>
                     </div>
@@ -323,28 +323,28 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       {/* Today's Jobs */}
       {todayLogs.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Today's Jobs</h2>
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Today's Jobs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {todayLogs.map(log => (
               <button
                 key={log.id}
                 onClick={() => onNavigate('daily-logs', { logId: log.id })}
-                className="text-left bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-amber-500/30 transition-colors"
+                className="text-left bg-card border border-border rounded-xl p-4 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                     {log.project?.job_number || '#'}
                   </span>
                   <PriorityBadge priority={log.priority} size="sm" />
                 </div>
-                <h3 className="text-sm font-semibold text-white">{log.project?.name || 'Unknown Project'}</h3>
-                <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                <h3 className="text-sm font-semibold text-foreground">{log.project?.name || 'Unknown Project'}</h3>
+                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                   {log.weather && <span>{log.weather}</span>}
                   {log.temperature && <span>{log.temperature}</span>}
                 </div>
                 {log.critical_items && (
-                  <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <p className="text-xs text-red-400 line-clamp-2">{log.critical_items}</p>
+                  <div className="mt-2 p-2 rounded-lg bg-danger/10 border border-danger/20">
+                    <p className="text-xs text-danger line-clamp-2">{log.critical_items}</p>
                   </div>
                 )}
               </button>
@@ -357,4 +357,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
+
+
+
+
+
 

@@ -1,5 +1,4 @@
 ﻿import { useEffect } from 'react';
-import SettingsSimple from '@/pages/SettingsSimple'
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import { AppProvider } from "@/contexts/AppContext";
 
 import DesktopLayout from "@/components/DesktopLayout";
 import NotFound from "./pages/NotFound";
+import SettingsPage from '@/components/sc/SettingsPage';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +28,7 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/*" element={<DesktopLayout />} />
                 <Route path="*" element={<NotFound />} />
-                <Route path='/settings' element={<SettingsSimple />} />
+                <Route path='/settings' element={<SettingsPage />} />
 </Routes>
             </BrowserRouter>
           </AppProvider>
@@ -39,6 +39,9 @@ const App = () => (
 );
 
 export default App;
+
+
+
 
 
 

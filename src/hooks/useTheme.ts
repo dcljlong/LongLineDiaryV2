@@ -1,66 +1,69 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
+import { THEMES } from '@/lib/theme-themes'
 
 export type ThemeId =
-  | 'dark-navy'
-  | 'dark-charcoal'
-  | 'light-soft'
-  | 'light-blue'
-  | 'light-green'
-  | 'light-contrast'
+  | 'ceilings-light'
+  | 'ceilings-dark'
+  | 'future-grid'
+  | 'ivory-corporate'
+  | 'graphite-pro'
 
-const KEY_NEW = 'lld-theme'
-const KEY_OLD = 'theme'
+const STORAGE_KEY = 'lld-theme'
 
 function isDark(t: ThemeId) {
-  return t.startsWith('dark-')
+  return t === 'ceilings-dark' || t === 'graphite-pro' || t === 'future-grid'
 }
 
 function safeTheme(v: string | null): ThemeId | null {
   if (!v) return null
-  const allowed: ThemeId[] = ['dark-navy','dark-charcoal','light-soft','light-blue','light-green','light-contrast']
+  const allowed: ThemeId[] = [
+    'ceilings-light',
+    'ceilings-dark',
+    'future-grid',
+    'ivory-corporate',
+    'graphite-pro'
+  ]
   return (allowed as string[]).includes(v) ? (v as ThemeId) : null
 }
 
 function applyTheme(theme: ThemeId) {
   const root = document.documentElement
+  const def = THEMES.find(t => t.id === theme)
+  if (!def) return
 
-  // dataset drives token overrides
   root.dataset.theme = theme
 
-  // dark class drives shadcn dark selectors
-  if (isDark(theme)) root.classList.add('dark')
+  if (def.mode === 'dark') root.classList.add('dark')
   else root.classList.remove('dark')
+
+  for (const [k, v] of Object.entries(def.tokens)) {
+    root.style.setProperty(k, v)
+  }
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeId>('dark-navy')
+  const [theme, setThemeState] = useState<ThemeId>('ceilings-dark')
 
   useEffect(() => {
-    // migrate old key if present
-    const migrated = safeTheme(localStorage.getItem(KEY_NEW)) ?? safeTheme(localStorage.getItem(KEY_OLD))
-    const initial: ThemeId = migrated ?? 'dark-navy'
+    const stored = safeTheme(localStorage.getItem(STORAGE_KEY))
+    const initial: ThemeId = stored ?? 'ceilings-dark'
 
     setThemeState(initial)
     applyTheme(initial)
-
-    // ensure persisted in new key
-    localStorage.setItem(KEY_NEW, initial)
+    localStorage.setItem(STORAGE_KEY, initial)
   }, [])
 
   const setTheme = (t: ThemeId) => {
     setThemeState(t)
-    localStorage.setItem(KEY_NEW, t)
+    localStorage.setItem(STORAGE_KEY, t)
     applyTheme(t)
   }
 
   const toggle = () => {
-    // toggle between current dark + last light (remembered), default light-soft
-    const lastLight = safeTheme(localStorage.getItem('lld-last-light')) ?? 'light-soft'
-    if (isDark(theme)) {
-      setTheme(lastLight)
+    if (theme === 'ceilings-dark') {
+      setTheme('ceilings-light')
     } else {
-      localStorage.setItem('lld-last-light', theme)
-      setTheme('dark-navy')
+      setTheme('ceilings-dark')
     }
   }
 

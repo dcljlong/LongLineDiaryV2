@@ -5,12 +5,13 @@ import {
   Settings, Save, Check, BarChart3, Cloud, Users, ClipboardCheck,
   FileText, RefreshCw, Brain, Bell, Building2, Clock, Shield, HardHat, AlertCircle, User
 } from 'lucide-react';
+import { THEMES } from '@/lib/theme-themes';
 import type { AppSettings, UserRole } from '@/lib/sitecommand-types';
 import { DEFAULT_SETTINGS, USER_ROLES } from '@/lib/sitecommand-types';
 import { fetchSettings, saveSettings } from '@/lib/sitecommand-store';
 import { useAuth } from '@/lib/auth';
 
-const inputCls = 'w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-primary';
+const inputCls = 'lld-input w-full px-3 py-2 rounded-lg text-sm';
 const labelCls = 'block text-xs font-medium text-muted-foreground mb-1';
 
 const roleIcons: Record<string, React.ElementType> = {
@@ -22,17 +23,21 @@ const roleIcons: Record<string, React.ElementType> = {
 const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) => {
   const { user, profile, updateProfile } = useAuth();
   const { theme, setTheme } = useTheme();
+
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const [profileName, setProfileName] = useState('');
   const [profileRole, setProfileRole] = useState<UserRole>('foreman');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
 
   useEffect(() => {
-    fetchSettings().then(s => { setSettings(s); setLoading(false); }).catch(() => setLoading(false));
+    fetchSettings()
+      .then(s => { setSettings(s); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -86,60 +91,55 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
   ];
 
   if (loading) {
-    return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" /></div>;
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
+      {/* Header + Save */}
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground text-sm mt-1">Configure your {BRAND.appName} preferences</p>
         </div>
-        
-      {/* Theme Presets */}
-      <div className="bg-card border border-border rounded-xl p-5">
-        <div className="mb-4">
-          <h2 className="text-sm font-bold text-foreground">Theme</h2>
-          <p className="text-xs text-muted-foreground mt-1">Choose a preset (applies instantly)</p>
-        </div>
 
-        {([
-          { id: 'dark-navy', label: 'Dark — Navy (Default)', desc: 'LLD navy, low glare' },
-          { id: 'dark-charcoal', label: 'Dark — Charcoal', desc: 'Neutral dark, higher contrast' },
-          { id: 'light-soft', label: 'Light — Soft', desc: 'Professional grey background, white fields' },
-          { id: 'light-blue', label: 'Light — Blue Tint', desc: 'Subtle blue tone, white fields' },
-          { id: 'light-green', label: 'Light — Green Accent', desc: 'Green primary accents, white fields' },
-          { id: 'light-contrast', label: 'Light — High Contrast', desc: 'Crisp borders + stronger contrast' },
-        ] as { id: ThemeId; label: string; desc: string }[]).map((t) => {
-          const selected = theme === t.id
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTheme(t.id)}
-              className={
-                selected
-                  ? "w-full p-3 rounded-xl border border-primary/30 bg-primary/10 text-left transition-colors"
-                  : "w-full p-3 rounded-xl border border-border bg-card hover:bg-muted text-left transition-colors"
-              }
-            >
-              <div className="text-sm font-semibold text-foreground">{t.label}</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">{t.desc}</div>
-            </button>
-          )
-        })}
-
-      </div>
-<button
+        <button
           onClick={handleSave}
           disabled={saving}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-            saved ? 'bg-emerald-500 text-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-          } disabled:opacity-50`}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${saved ? 'bg-emerald-500 text-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'} disabled:opacity-50`}
         >
           {saved ? <><Check className="w-4 h-4" /> Saved</> : saving ? 'Saving...' : <><Save className="w-4 h-4" /> Save Settings</>}
         </button>
+      </div>
+
+      {/* Theme */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Settings className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Theme</h2>
+          <span className="text-[10px] text-muted-foreground ml-2">Applies instantly (saved on this device)</span>
+        </div>
+
+        <label className={labelCls}>Theme palette</label>
+        <select
+          className={inputCls}
+          value={theme}
+          onChange={(e) => setTheme(e.target.value as ThemeId)}
+        >
+          {THEMES.map(t => (
+            <option key={t.id} value={t.id}>
+              {t.name} ({t.mode})
+            </option>
+          ))}
+        </select>
+
+        <div className="mt-2 text-xs text-muted-foreground">
+          Note: Only colours/tokens. Does not change your logo.
+        </div>
       </div>
 
       {/* User Profile Section */}
@@ -149,6 +149,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             <User className="w-5 h-5 text-primary" />
             <h2 className="text-sm font-bold text-foreground">Your Profile</h2>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className={labelCls}>Full Name</label>
@@ -182,9 +183,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                     type="button"
                     onClick={() => setProfileRole(r.value)}
                     className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
-                      selected
-                        ? 'bg-primary/10 border-primary/50'
-                        : 'bg-muted border-border hover:border-border'
+                      selected ? 'bg-primary/10 border-primary/50' : 'bg-muted border-border hover:border-border'
                     }`}
                   >
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
@@ -265,41 +264,63 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             <label className={labelCls}>Timesheet Period</label>
             <div className="flex gap-2">
               {([1, 2] as const).map(p => (
-                <button key={p} onClick={() => setSettings({ ...settings, timesheetPeriod: p })}
+                <button
+                  key={p}
+                  onClick={() => setSettings({ ...settings, timesheetPeriod: p })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
                     settings.timesheetPeriod === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
-                  }`}>{p} Week{p > 1 ? 's' : ''}</button>
+                  }`}
+                >
+                  {p} Week{p > 1 ? 's' : ''}
+                </button>
               ))}
             </div>
           </div>
+
           <div>
             <label className={labelCls}>Week Ending Day</label>
-            <select value={settings.weekEndingDay} onChange={e => setSettings({ ...settings, weekEndingDay: e.target.value as any })} className={inputCls}>
+            <select
+              value={settings.weekEndingDay}
+              onChange={e => setSettings({ ...settings, weekEndingDay: e.target.value as any })}
+              className={inputCls}
+            >
               {['Sunday', 'Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday'].map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}
             </select>
           </div>
+
           <div>
             <label className={labelCls}>Default Lunch</label>
             <div className="flex gap-2">
               {([30, 60] as const).map(m => (
-                <button key={m} onClick={() => setSettings({ ...settings, lunchDefaultMinutes: m })}
+                <button
+                  key={m}
+                  onClick={() => setSettings({ ...settings, lunchDefaultMinutes: m })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
                     settings.lunchDefaultMinutes === m ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
-                  }`}>{m} min</button>
+                  }`}
+                >
+                  {m} min
+                </button>
               ))}
             </div>
           </div>
         </div>
+
         <div className="mt-4">
           <label className={labelCls}>Rounding (minutes)</label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {[5, 10, 15, 30].map(r => (
-              <button key={r} onClick={() => setSettings({ ...settings, roundingMinutes: r })}
+              <button
+                key={r}
+                onClick={() => setSettings({ ...settings, roundingMinutes: r })}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   settings.roundingMinutes === r ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
-                }`}>{r} min</button>
+                }`}
+              >
+                {r} min
+              </button>
             ))}
           </div>
         </div>
@@ -317,18 +338,25 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             const Icon = ft.icon;
             const enabled = settings.features[ft.key];
             return (
-              <div key={ft.key} className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
-                enabled ? 'bg-muted border-border' : 'bg-card border-border opacity-60'
-              }`}>
+              <div
+                key={ft.key}
+                className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
+                  enabled ? 'bg-muted border-border' : 'bg-card border-border opacity-60'
+                }`}
+              >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   enabled ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
-                }`}><Icon className="w-5 h-5" /></div>
+                }`}>
+                  <Icon className="w-5 h-5" />
+                </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-foreground">{ft.label}</h3>
                   <p className="text-xs text-muted-foreground">{ft.description}</p>
                 </div>
-                <button onClick={() => updateFeature(ft.key, !enabled)}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-primary' : 'bg-muted'}`}>
+                <button
+                  onClick={() => updateFeature(ft.key, !enabled)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-primary' : 'bg-muted'}`}
+                >
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-foreground transition-transform ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
@@ -346,12 +374,17 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             const Icon = roleIcons[r.value] || User;
             const isCurrent = userRole === r.value;
             return (
-              <div key={r.value} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                isCurrent ? 'bg-primary/10 border-primary/20' : 'bg-muted/20 border-border'
-              }`}>
+              <div
+                key={r.value}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                  isCurrent ? 'bg-primary/10 border-primary/20' : 'bg-muted/20 border-border'
+                }`}
+              >
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                   isCurrent ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
-                }`}><Icon className="w-4 h-4" /></div>
+                }`}>
+                  <Icon className="w-4 h-4" />
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-semibold ${isCurrent ? 'text-primary' : 'text-foreground'}`}>{r.label}</span>
@@ -369,12 +402,3 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
-
-
-
-
-
-
-
-
-

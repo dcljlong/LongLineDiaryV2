@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import {
   ChevronLeft, ChevronRight, Plus, Trash2, Save, Check, X,
   Users, Activity, Package, Wrench, Eye, FileText,
@@ -19,7 +19,7 @@ interface DailyLogsPageProps {
   initialData?: any;
 }
 
-const inputCls = 'w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:border-amber-500';
+const inputCls = 'lld-input w-full px-3 py-2 rounded-lg text-sm';
 const labelCls = 'block text-xs font-medium text-slate-400 mb-1';
 const btnPrimary = 'px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-semibold transition-colors';
 const btnSecondary = 'px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium transition-colors';
@@ -225,13 +225,13 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
-                    #{currentLog.project?.job_number || '—'}
+                    #{currentLog.project?.job_number || 'â€”'}
                   </span>
                   <PriorityBadge priority={currentLog.priority} />
                 </div>
                 <h2 className="text-lg font-bold text-white mt-1">{currentLog.project?.name || 'Unknown'}</h2>
                 <p className="text-xs text-slate-400">
-                  {currentLog.project?.location} {currentLog.project?.client ? `• ${currentLog.project.client}` : ''}
+                  {currentLog.project?.location} {currentLog.project?.client ? `â€¢ ${currentLog.project.client}` : ''}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -281,7 +281,7 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
   );
 };
 
-// ─── General Tab ───
+// â”€â”€â”€ General Tab â”€â”€â”€
 const GeneralTab: React.FC<{ log: DailyLog; onUpdate: (field: string, value: any) => void }> = ({ log, onUpdate }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
@@ -293,7 +293,7 @@ const GeneralTab: React.FC<{ log: DailyLog; onUpdate: (field: string, value: any
     </div>
     <div>
       <label className={labelCls}>Temperature</label>
-      <input value={log.temperature || ''} onChange={e => onUpdate('temperature', e.target.value)} className={inputCls} placeholder="e.g. 18°C" />
+      <input value={log.temperature || ''} onChange={e => onUpdate('temperature', e.target.value)} className={inputCls} placeholder="e.g. 18Â°C" />
     </div>
     <div>
       <label className={labelCls}>Wind</label>
@@ -326,7 +326,7 @@ const GeneralTab: React.FC<{ log: DailyLog; onUpdate: (field: string, value: any
   </div>
 );
 
-// ─── Inline Item Row Component ───
+// â”€â”€â”€ Inline Item Row Component â”€â”€â”€
 interface InlineRowProps<T> {
   item: T;
   fields: { key: string; label: string; type: 'text' | 'select' | 'number' | 'date' | 'time' | 'checkbox'; options?: string[]; width?: string }[];
@@ -365,7 +365,7 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
           {editing ? (
             f.type === 'select' ? (
               <select value={draft[f.key] || ''} onChange={e => setDraft({ ...draft, [f.key]: e.target.value })} className="w-full px-2 py-1 rounded bg-slate-600 border border-slate-500 text-white text-xs">
-                <option value="">—</option>
+                <option value="">â€”</option>
                 {f.options?.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             ) : f.type === 'checkbox' ? (
@@ -380,7 +380,7 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
             )
           ) : (
             <span className={`text-xs ${item.is_completed ? 'line-through text-slate-500' : 'text-slate-300'}`}>
-              {(item as any)[f.key] || '—'}
+              {(item as any)[f.key] || 'â€”'}
             </span>
           )}
         </td>
@@ -407,7 +407,7 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
   );
 }
 
-// ─── Crew Tab ───
+// â”€â”€â”€ Crew Tab â”€â”€â”€
 const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ worker_name: '', trade: '', start_time: '07:00', finish_time: '16:30', lunch_minutes: 30, due_date: '', notes: '' });
@@ -439,7 +439,7 @@ const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRe
       {adding && (
         <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <div><label className={labelCls}>Name *</label><input value={form.worker_name} onChange={e => setForm({ ...form, worker_name: e.target.value })} className={inputCls} /></div>
-          <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">—</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
+          <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">â€”</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
           <div><label className={labelCls}>Start</label><input type="time" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Finish</label><input type="time" value={form.finish_time} onChange={e => setForm({ ...form, finish_time: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Due Date</label><input type="date" value={form.due_date} onChange={e => setForm({ ...form, due_date: e.target.value })} className={inputCls} /></div>
@@ -482,7 +482,7 @@ const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRe
   );
 };
 
-// ─── Activities Tab ───
+// â”€â”€â”€ Activities Tab â”€â”€â”€
 const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ description: '', location: '', trade: '', progress_pct: 0, due_date: '', notes: '' });
@@ -514,7 +514,7 @@ const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log
         <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
           <div><label className={labelCls}>Description *</label><input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Location</label><input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputCls} /></div>
-          <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">—</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
+          <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">â€”</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
           <div><label className={labelCls}>Progress %</label><input type="number" min={0} max={100} value={form.progress_pct} onChange={e => setForm({ ...form, progress_pct: Number(e.target.value) })} className={inputCls} /></div>
           <div><label className={labelCls}>Due Date</label><input type="date" value={form.due_date} onChange={e => setForm({ ...form, due_date: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Notes</label><input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className={inputCls} /></div>
@@ -556,7 +556,7 @@ const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log
   );
 };
 
-// ─── Materials Tab ───
+// â”€â”€â”€ Materials Tab â”€â”€â”€
 const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ description: '', quantity: '', unit: '', supplier: '', required_date: '', status: 'pending', notes: '' });
@@ -589,7 +589,7 @@ const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
         <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <div><label className={labelCls}>Description *</label><input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Quantity</label><input value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} className={inputCls} /></div>
-          <div><label className={labelCls}>Unit</label><input value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className={inputCls} placeholder="e.g. m², sheets" /></div>
+          <div><label className={labelCls}>Unit</label><input value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className={inputCls} placeholder="e.g. mÂ², sheets" /></div>
           <div><label className={labelCls}>Supplier</label><input value={form.supplier} onChange={e => setForm({ ...form, supplier: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Required Date</label><input type="date" value={form.required_date} onChange={e => setForm({ ...form, required_date: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Status</label><select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className={inputCls}><option value="pending">Pending</option><option value="ordered">Ordered</option><option value="in-transit">In Transit</option><option value="delivered">Delivered</option></select></div>
@@ -632,7 +632,7 @@ const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
   );
 };
 
-// ─── Equipment Tab ───
+// â”€â”€â”€ Equipment Tab â”€â”€â”€
 const EquipmentTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ equipment_name: '', equipment_type: '', hours_used: 0, condition: 'good', due_date: '', notes: '' });
@@ -706,7 +706,7 @@ const EquipmentTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
   );
 };
 
-// ─── Visitors Tab ───
+// â”€â”€â”€ Visitors Tab â”€â”€â”€
 const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ visitor_name: '', company: '', purpose: '', time_in: '', time_out: '', due_date: '', notes: '' });
@@ -783,3 +783,4 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
 };
 
 export default DailyLogsPage;
+
