@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
@@ -30,20 +30,10 @@ export function ThemeProvider({
   })
 
   useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove("light", "dark")
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light"
-      root.classList.add(systemTheme)
-      return
-    }
-
-    root.classList.add(theme)
-  }, [theme])
+  const root = window.document.documentElement
+  root.classList.remove("dark")
+  root.classList.add("light")
+}, [])
 
   const value: ThemeContextType = {
     theme,
@@ -67,3 +57,5 @@ export const useTheme = (): ThemeContextType => {
   }
   return context
 }
+
+

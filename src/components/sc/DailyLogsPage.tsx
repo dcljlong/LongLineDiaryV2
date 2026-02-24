@@ -20,11 +20,11 @@ interface DailyLogsPageProps {
 }
 
 const inputCls = 'lld-input w-full px-3 py-2 rounded-lg text-sm';
-const labelCls = 'block text-xs font-medium text-slate-400 mb-1';
-const btnPrimary = 'px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-semibold transition-colors';
-const btnSecondary = 'px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium transition-colors';
+const labelCls = 'block text-xs font-semibold text-muted-foreground mb-1';
+const btnPrimary = 'px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-foreground text-xs font-semibold transition-colors';
+const btnSecondary = 'px-3 py-1.5 rounded-lg bg-muted hover:bg-muted text-foreground text-xs font-semibold transition-colors';
 const btnDanger = 'p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors';
-const checkCls = 'w-4 h-4 rounded border-slate-500 bg-slate-700 text-amber-500 focus:ring-amber-500';
+const checkCls = 'w-4 h-4 rounded border-border bg-muted text-amber-500 focus:ring-amber-500';
 
 const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
   const [calMonth, setCalMonth] = useState(new Date());
@@ -121,33 +121,33 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-5rem)]">
       {/* Mobile date picker */}
-      <div className="lg:hidden flex items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-xl p-3">
+      <div className="lg:hidden flex items-center gap-2 bg-card border border-border rounded-xl p-3">
         <CalendarIcon className="w-4 h-4 text-amber-400" />
         <input
           type="date"
           value={selectedDate}
           onChange={e => { setSelectedDate(e.target.value); setSelectedLogId(null); }}
-          className="flex-1 px-3 py-1.5 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:border-amber-500"
+          className="flex-1 px-3 py-1.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-amber-500"
         />
-        <span className="text-xs text-slate-400">{logs.length} job{logs.length !== 1 ? 's' : ''}</span>
+        <span className="text-xs text-muted-foreground">{logs.length} job{logs.length !== 1 ? 's' : ''}</span>
       </div>
 
       {/* Calendar Sidebar - desktop only */}
-      <div className="hidden lg:block w-64 flex-shrink-0 bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 overflow-y-auto">
+      <div className="hidden lg:block w-64 flex-shrink-0 bg-card border border-border rounded-xl p-3 overflow-y-auto">
 
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => setCalMonth(subMonths(calMonth, 1))} className="p-1 rounded hover:bg-slate-700 text-slate-400">
+          <button onClick={() => setCalMonth(subMonths(calMonth, 1))} className="p-1 rounded hover:bg-muted text-muted-foreground">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-sm font-semibold text-white">{format(calMonth, 'MMMM yyyy')}</span>
-          <button onClick={() => setCalMonth(addMonths(calMonth, 1))} className="p-1 rounded hover:bg-slate-700 text-slate-400">
+          <span className="text-sm font-semibold text-foreground">{format(calMonth, 'MMMM yyyy')}</span>
+          <button onClick={() => setCalMonth(addMonths(calMonth, 1))} className="p-1 rounded hover:bg-muted text-muted-foreground">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
           {['S','M','T','W','T','F','S'].map((d, i) => (
-            <div key={i} className="text-[10px] text-slate-500 font-medium py-1">{d}</div>
+            <div key={i} className="text-[10px] text-muted-foreground font-semibold py-1">{d}</div>
           ))}
         </div>
 
@@ -164,9 +164,8 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
                   key={di}
                   onClick={() => { setSelectedDate(dateStr); setSelectedLogId(null); }}
                   className={`relative w-full aspect-square flex items-center justify-center rounded-lg text-xs transition-colors ${
-                    isSelected ? 'bg-amber-500 text-slate-900 font-bold'
-                    : isToday ? 'bg-slate-700 text-white font-semibold'
-                    : 'text-slate-300 hover:bg-slate-700/50'
+                    isSelected ? 'bg-primary text-primary-foreground font-extrabold' : isToday ? 'bg-primary/15 text-primary font-bold'
+                    : 'text-foreground hover:bg-muted/50'
                   }`}
                 >
                   {day.getDate()}
@@ -182,10 +181,10 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
         {/* Date's logs list */}
         <div className="mt-4 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">
+            <span className="text-xs text-muted-foreground font-semibold">
               {format(parseISO(selectedDate), 'EEE, dd MMM')}
             </span>
-            <span className="text-[10px] text-slate-500">{logs.length} job{logs.length !== 1 ? 's' : ''}</span>
+            <span className="text-[10px] text-muted-foreground">{logs.length} job{logs.length !== 1 ? 's' : ''}</span>
           </div>
           {logs.map(log => (
             <button
@@ -194,15 +193,15 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
               className={`w-full text-left p-2 rounded-lg text-xs transition-colors ${
                 selectedLogId === log.id
                   ? 'bg-amber-500/15 border border-amber-500/30 text-amber-300'
-                  : 'bg-slate-700/30 border border-transparent text-slate-300 hover:bg-slate-700/50'
+                  : 'bg-muted/60 border border-transparent text-foreground hover:bg-muted/50'
               }`}
             >
               <div className="flex items-center gap-1.5">
                 <span className={`w-1.5 h-1.5 rounded-full ${getPriorityDot(log.priority)}`} />
-                <span className="font-medium truncate">{log.project?.name || 'Unknown'}</span>
+                <span className="font-semibold truncate">{log.project?.name || 'Unknown'}</span>
               </div>
               {log.project?.job_number && (
-                <span className="text-[10px] text-slate-500 ml-3">#{log.project.job_number}</span>
+                <span className="text-[10px] text-muted-foreground ml-3">#{log.project.job_number}</span>
               )}
             </button>
           ))}
@@ -214,14 +213,14 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
         {!currentLog ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">Select a job from the calendar or create a new one</p>
+              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground text-sm">Select a job from the calendar or create a new one</p>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             {/* Job Header */}
-            <div className="flex items-center justify-between bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-center justify-between bg-card border border-border rounded-xl p-4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
@@ -229,8 +228,8 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
                   </span>
                   <PriorityBadge priority={currentLog.priority} />
                 </div>
-                <h2 className="text-lg font-bold text-white mt-1">{currentLog.project?.name || 'Unknown'}</h2>
-                <p className="text-xs text-slate-400">
+                <h2 className="text-lg font-bold text-foreground mt-1">{currentLog.project?.name || 'Unknown'}</h2>
+                <p className="text-xs text-muted-foreground">
                   {currentLog.project?.location} {currentLog.project?.client ? `â€¢ ${currentLog.project.client}` : ''}
                 </p>
               </div>
@@ -249,16 +248,16 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
                   <button
                     key={t.key}
                     onClick={() => setSubTab(t.key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                       subTab === t.key
                         ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {t.label}
                     {t.count !== undefined && t.count > 0 && (
-                      <span className="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full text-[10px]">{t.count}</span>
+                      <span className="bg-muted text-foreground px-1.5 py-0.5 rounded-full text-[10px]">{t.count}</span>
                     )}
                   </button>
                 );
@@ -266,7 +265,7 @@ const DailyLogsPage: React.FC<DailyLogsPageProps> = ({ initialData }) => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+            <div className="bg-card border border-border rounded-xl p-4">
               {subTab === 'general' && <GeneralTab log={currentLog} onUpdate={handleUpdateLog} />}
               {subTab === 'crew' && <CrewTab log={currentLog} onRefresh={loadLogDetail} />}
               {subTab === 'activities' && <ActivitiesTab log={currentLog} onRefresh={loadLogDetail} />}
@@ -351,7 +350,7 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
   const priority = calculatePriority((item as any).due_date || (item as any).required_date);
 
   return (
-    <tr className={`border-b border-slate-700/30 ${item.is_completed ? 'opacity-50' : ''}`}>
+    <tr className={`border-b border-border/60 ${item.is_completed ? 'opacity-50' : ''}`}>
       <td className="py-2 px-2">
         <input
           type="checkbox"
@@ -364,7 +363,7 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
         <td key={f.key} className="py-2 px-2">
           {editing ? (
             f.type === 'select' ? (
-              <select value={draft[f.key] || ''} onChange={e => setDraft({ ...draft, [f.key]: e.target.value })} className="w-full px-2 py-1 rounded bg-slate-600 border border-slate-500 text-white text-xs">
+              <select value={draft[f.key] || ''} onChange={e => setDraft({ ...draft, [f.key]: e.target.value })} className="w-full px-2 py-1 rounded bg-muted border border-border text-foreground text-xs">
                 <option value="">â€”</option>
                 {f.options?.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
@@ -375,11 +374,11 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
                 type={f.type}
                 value={draft[f.key] || ''}
                 onChange={e => setDraft({ ...draft, [f.key]: f.type === 'number' ? Number(e.target.value) : e.target.value })}
-                className="w-full px-2 py-1 rounded bg-slate-600 border border-slate-500 text-white text-xs"
+                className="w-full px-2 py-1 rounded bg-muted border border-border text-foreground text-xs"
               />
             )
           ) : (
-            <span className={`text-xs ${item.is_completed ? 'line-through text-slate-500' : 'text-slate-300'}`}>
+            <span className={`text-xs ${item.is_completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
               {(item as any)[f.key] || 'â€”'}
             </span>
           )}
@@ -393,11 +392,11 @@ function InlineRow<T extends { id: string; is_completed: boolean }>({ item, fiel
           {editing ? (
             <>
               <button onClick={handleSave} className="p-1 rounded hover:bg-emerald-500/20 text-emerald-400"><Check className="w-3.5 h-3.5" /></button>
-              <button onClick={() => { setEditing(false); setDraft({ ...item }); }} className="p-1 rounded hover:bg-slate-600 text-slate-400"><X className="w-3.5 h-3.5" /></button>
+              <button onClick={() => { setEditing(false); setDraft({ ...item }); }} className="p-1 rounded hover:bg-muted text-muted-foreground"><X className="w-3.5 h-3.5" /></button>
             </>
           ) : (
             <>
-              <button onClick={() => setEditing(true)} className="p-1 rounded hover:bg-slate-600 text-slate-400 text-xs">Edit</button>
+              <button onClick={() => setEditing(true)} className="p-1 rounded hover:bg-muted text-muted-foreground text-xs">Edit</button>
               <button onClick={() => onDelete(item.id)} className={btnDanger}><Trash2 className="w-3.5 h-3.5" /></button>
             </>
           )}
@@ -432,12 +431,12 @@ const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRe
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Crew Attendance</h3>
+        <h3 className="text-sm font-semibold text-foreground">Crew Attendance</h3>
         <button onClick={() => setAdding(!adding)} className={btnPrimary}><Plus className="w-3 h-3 inline mr-1" />Add</button>
       </div>
 
       {adding && (
-        <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="bg-muted/60 border border-border rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <div><label className={labelCls}>Name *</label><input value={form.worker_name} onChange={e => setForm({ ...form, worker_name: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">â€”</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
           <div><label className={labelCls}>Start</label><input type="time" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })} className={inputCls} /></div>
@@ -454,11 +453,11 @@ const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRe
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-8"></th>
-              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-slate-500 uppercase">{f.label}</th>)}
-              <th className="py-2 px-2 text-[10px] text-slate-500">Priority</th>
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-20"></th>
+            <tr className="border-b border-border">
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-8"></th>
+              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-foreground/80 uppercase">{f.label}</th>)}
+              <th className="py-2 px-2 text-[10px] text-muted-foreground">Priority</th>
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -475,7 +474,7 @@ const CrewTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, onRe
           </tbody>
         </table>
         {(!log.crew || log.crew.length === 0) && (
-          <p className="text-xs text-slate-500 text-center py-4">No crew recorded. Click Add to start.</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No crew recorded. Click Add to start.</p>
         )}
       </div>
     </div>
@@ -506,12 +505,12 @@ const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Work Activities</h3>
+        <h3 className="text-sm font-semibold text-foreground">Work Activities</h3>
         <button onClick={() => setAdding(!adding)} className={btnPrimary}><Plus className="w-3 h-3 inline mr-1" />Add</button>
       </div>
 
       {adding && (
-        <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="bg-muted/60 border border-border rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
           <div><label className={labelCls}>Description *</label><input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Location</label><input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Trade</label><select value={form.trade} onChange={e => setForm({ ...form, trade: e.target.value })} className={inputCls}><option value="">â€”</option>{TRADES.map(t => <option key={t}>{t}</option>)}</select></div>
@@ -528,11 +527,11 @@ const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-8"></th>
-              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-slate-500 uppercase">{f.label}</th>)}
-              <th className="py-2 px-2 text-[10px] text-slate-500">Priority</th>
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-20"></th>
+            <tr className="border-b border-border">
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-8"></th>
+              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-foreground/80 uppercase">{f.label}</th>)}
+              <th className="py-2 px-2 text-[10px] text-muted-foreground">Priority</th>
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -549,7 +548,7 @@ const ActivitiesTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log
           </tbody>
         </table>
         {(!log.activities || log.activities.length === 0) && (
-          <p className="text-xs text-slate-500 text-center py-4">No activities recorded. Click Add to start.</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No activities recorded. Click Add to start.</p>
         )}
       </div>
     </div>
@@ -581,12 +580,12 @@ const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Materials</h3>
+        <h3 className="text-sm font-semibold text-foreground">Materials</h3>
         <button onClick={() => setAdding(!adding)} className={btnPrimary}><Plus className="w-3 h-3 inline mr-1" />Add</button>
       </div>
 
       {adding && (
-        <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="bg-muted/60 border border-border rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <div><label className={labelCls}>Description *</label><input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Quantity</label><input value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Unit</label><input value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className={inputCls} placeholder="e.g. mÂ², sheets" /></div>
@@ -604,11 +603,11 @@ const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-8"></th>
-              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-slate-500 uppercase">{f.label}</th>)}
-              <th className="py-2 px-2 text-[10px] text-slate-500">Priority</th>
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-20"></th>
+            <tr className="border-b border-border">
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-8"></th>
+              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-foreground/80 uppercase">{f.label}</th>)}
+              <th className="py-2 px-2 text-[10px] text-muted-foreground">Priority</th>
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -625,7 +624,7 @@ const MaterialsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
           </tbody>
         </table>
         {(!log.materials || log.materials.length === 0) && (
-          <p className="text-xs text-slate-500 text-center py-4">No materials recorded. Click Add to start.</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No materials recorded. Click Add to start.</p>
         )}
       </div>
     </div>
@@ -656,12 +655,12 @@ const EquipmentTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Equipment</h3>
+        <h3 className="text-sm font-semibold text-foreground">Equipment</h3>
         <button onClick={() => setAdding(!adding)} className={btnPrimary}><Plus className="w-3 h-3 inline mr-1" />Add</button>
       </div>
 
       {adding && (
-        <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="bg-muted/60 border border-border rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
           <div><label className={labelCls}>Equipment *</label><input value={form.equipment_name} onChange={e => setForm({ ...form, equipment_name: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Type</label><input value={form.equipment_type} onChange={e => setForm({ ...form, equipment_type: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Hours Used</label><input type="number" value={form.hours_used} onChange={e => setForm({ ...form, hours_used: Number(e.target.value) })} className={inputCls} /></div>
@@ -678,11 +677,11 @@ const EquipmentTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-8"></th>
-              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-slate-500 uppercase">{f.label}</th>)}
-              <th className="py-2 px-2 text-[10px] text-slate-500">Priority</th>
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-20"></th>
+            <tr className="border-b border-border">
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-8"></th>
+              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-foreground/80 uppercase">{f.label}</th>)}
+              <th className="py-2 px-2 text-[10px] text-muted-foreground">Priority</th>
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -699,7 +698,7 @@ const EquipmentTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log,
           </tbody>
         </table>
         {(!log.equipment || log.equipment.length === 0) && (
-          <p className="text-xs text-slate-500 text-center py-4">No equipment recorded. Click Add to start.</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No equipment recorded. Click Add to start.</p>
         )}
       </div>
     </div>
@@ -731,12 +730,12 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Visitors</h3>
+        <h3 className="text-sm font-semibold text-foreground">Visitors</h3>
         <button onClick={() => setAdding(!adding)} className={btnPrimary}><Plus className="w-3 h-3 inline mr-1" />Add</button>
       </div>
 
       {adding && (
-        <div className="bg-slate-700/30 border border-slate-600/50 rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="bg-muted/60 border border-border rounded-lg p-3 mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <div><label className={labelCls}>Name *</label><input value={form.visitor_name} onChange={e => setForm({ ...form, visitor_name: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Company</label><input value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} className={inputCls} /></div>
           <div><label className={labelCls}>Purpose</label><input value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} className={inputCls} /></div>
@@ -754,11 +753,11 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-8"></th>
-              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-slate-500 uppercase">{f.label}</th>)}
-              <th className="py-2 px-2 text-[10px] text-slate-500">Priority</th>
-              <th className="py-2 px-2 text-[10px] text-slate-500 w-20"></th>
+            <tr className="border-b border-border">
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-8"></th>
+              {fields.map(f => <th key={f.key} className="py-2 px-2 text-[10px] text-foreground/80 uppercase">{f.label}</th>)}
+              <th className="py-2 px-2 text-[10px] text-muted-foreground">Priority</th>
+              <th className="py-2 px-2 text-[10px] text-muted-foreground w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -775,7 +774,7 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
           </tbody>
         </table>
         {(!log.visitors || log.visitors.length === 0) && (
-          <p className="text-xs text-slate-500 text-center py-4">No visitors recorded. Click Add to start.</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No visitors recorded. Click Add to start.</p>
         )}
       </div>
     </div>
@@ -783,4 +782,13 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
 };
 
 export default DailyLogsPage;
+
+
+
+
+
+
+
+
+
 

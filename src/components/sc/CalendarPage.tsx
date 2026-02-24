@@ -105,7 +105,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Calendar</h1>
+        <h1 className="text-2xl font-bold text-foreground">Calendar</h1>
         <button
           onClick={() => setShowAddNote(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-colors"
@@ -119,11 +119,11 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
         {/* Calendar Grid */}
         <div className="lg:col-span-2 bg-card border border-border rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setMonth(subMonths(month, 1))} className="p-2 rounded-lg hover:bg-slate-700 text-muted-foreground">
+            <button onClick={() => setMonth(subMonths(month, 1))} className="p-2 rounded-lg hover:bg-muted text-muted-foreground">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <h2 className="text-lg font-bold text-white">{format(month, 'MMMM yyyy')}</h2>
-            <button onClick={() => setMonth(addMonths(month, 1))} className="p-2 rounded-lg hover:bg-slate-700 text-muted-foreground">
+            <h2 className="text-lg font-bold text-foreground">{format(month, 'MMMM yyyy')}</h2>
+            <button onClick={() => setMonth(addMonths(month, 1))} className="p-2 rounded-lg hover:bg-muted text-muted-foreground">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -153,11 +153,11 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                     onClick={() => setSelectedDate(dateStr)}
                     className={`aspect-square p-1 rounded-lg flex flex-col items-start transition-colors relative ${
                       isSelected ? 'bg-primary/20 border-2 border-primary/50'
-                      : isToday ? 'bg-slate-700/50 border border-slate-600'
-                      : 'hover:bg-slate-700/30 border border-transparent'
+                      : isToday ? 'bg-muted/70 border border-border'
+                      : 'hover:bg-muted/30 border border-transparent'
                     }`}
                   >
-                    <span className={`text-xs font-medium ${isSelected ? 'text-primary' : isToday ? 'text-white' : 'text-foreground'}`}>
+                    <span className={`text-xs font-medium ${isSelected ? 'text-primary' : isToday ? 'text-foreground' : 'text-foreground'}`}>
                       {day.getDate()}
                     </span>
                     <div className="flex gap-0.5 mt-auto flex-wrap">
@@ -187,14 +187,14 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 
         {/* Selected Date Panel */}
         <div className="bg-card border border-border rounded-xl p-4 overflow-y-auto max-h-[700px]">
-          <h3 className="text-sm font-bold text-white mb-3">
+          <h3 className="text-sm font-bold text-foreground mb-3">
             {format(parseISO(selectedDate), 'EEEE, dd MMMM yyyy')}
           </h3>
 
           {/* Jobs for this date */}
           {selectedItems.logs.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Jobs</h4>
+              <h4 className="text-xs font-semibold text-foreground/80 uppercase mb-2">Jobs</h4>
               <div className="space-y-2">
                 {selectedItems.logs.map(log => (
                   <button
@@ -206,7 +206,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                       <span className="text-xs font-mono text-primary">#{log.project?.job_number || 'â€”'}</span>
                       <PriorityBadge priority={log.priority} size="sm" showIcon={false} />
                     </div>
-                    <p className="text-sm font-medium text-white mt-1">{log.project?.name || 'Unknown'}</p>
+                    <p className="text-sm font-medium text-foreground mt-1">{log.project?.name || 'Unknown'}</p>
                     {log.weather && <p className="text-xs text-muted-foreground mt-1">{log.weather} {log.temperature}</p>}
                   </button>
                 ))}
@@ -217,7 +217,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
           {/* Notes for this date */}
           {selectedItems.notes.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Notes & Reminders</h4>
+              <h4 className="text-xs font-semibold text-foreground/80 uppercase mb-2">Notes & Reminders</h4>
               <div className="space-y-2">
                 {selectedItems.notes.map(note => {
                   const NoteIcon = noteTypeIcon[note.note_type] || StickyNote;
@@ -225,7 +225,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                     <div
                       key={note.id}
                       className={`p-3 rounded-lg border transition-colors ${
-                        note.is_completed ? 'bg-card/30 border-border opacity-60' : 'bg-slate-700/30 border-slate-600/50'
+                        note.is_completed ? 'bg-card/30 border-border opacity-60' : 'bg-muted/60 border-border'
                       }`}
                     >
                       <div className="flex items-start gap-2">
@@ -233,12 +233,12 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                           type="checkbox"
                           checked={note.is_completed}
                           onChange={e => handleToggleNote(note.id, e.target.checked)}
-                          className="w-4 h-4 mt-0.5 rounded border-slate-500 bg-slate-700 text-amber-500"
+                          className="w-4 h-4 mt-0.5 rounded border-border bg-muted text-amber-500"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <NoteIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span className={`text-sm font-medium ${note.is_completed ? 'line-through text-muted-foreground' : 'text-white'}`}>
+                            <span className={`text-sm font-medium ${note.is_completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                               {note.title}
                             </span>
                           </div>
@@ -263,7 +263,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 
           {selectedItems.logs.length === 0 && selectedItems.notes.length === 0 && (
             <div className="text-center py-8">
-              <CalIcon className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <CalIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">Nothing scheduled</p>
               <button onClick={() => setShowAddNote(true)} className="mt-2 text-xs text-primary hover:text-primary/90">
                 Add a note or reminder
@@ -276,10 +276,10 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
       {/* Add Note Dialog */}
       {showAddNote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowAddNote(false)}>
-          <div className="bg-card border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <h2 className="text-lg font-bold text-white">Add Note</h2>
-              <button onClick={() => setShowAddNote(false)} className="p-1 rounded-lg hover:bg-slate-700 text-muted-foreground">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-bold text-foreground">Add Note</h2>
+              <button onClick={() => setShowAddNote(false)} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -320,7 +320,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowAddNote(false)} className="flex-1 py-2.5 rounded-lg bg-slate-700 text-foreground hover:bg-slate-600 text-sm font-medium">Cancel</button>
+                <button onClick={() => setShowAddNote(false)} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
                 <button onClick={handleAddNote} disabled={!noteForm.title.trim()} className="flex-1 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold disabled:opacity-50">Add Note</button>
               </div>
             </div>
@@ -332,5 +332,12 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 };
 
 export default CalendarPage;
+
+
+
+
+
+
+
 
 

@@ -171,7 +171,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-              <h2 className="text-sm font-semibold text-muted-foreground capitalize">
+              <h2 className="text-sm font-bold text-primary capitalize">
                 {currentPage.replace('-', ' ')}
               </h2>
             </div>
@@ -197,7 +197,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                     </div>
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-medium text-white leading-none">{displayName}</p>
-                      <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{roleLabel}</p>
+                      <p className="text-[10px] text-foreground leading-none mt-0.5">{roleLabel}</p>
                     </div>
                     <ChevronDown className="w-3 h-3 text-muted-foreground" />
                   </button>
@@ -230,7 +230,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                       <div className="p-1.5">
                         <button
                           onClick={() => { setShowUserMenu(false); handleNavigate('settings'); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-card/50 hover:text-white transition-colors"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-card/50 hover:text-foreground transition-colors"
                         >
                           <User className="w-4 h-4" />
                           <span>Profile & Settings</span>
@@ -286,6 +286,11 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
+
+
+
 
 
 

@@ -33,20 +33,18 @@ function applyTheme(theme: ThemeId) {
 
   root.dataset.theme = theme
 
-  if (def.mode === 'dark') root.classList.add('dark')
-  else root.classList.remove('dark')
-
-  for (const [k, v] of Object.entries(def.tokens)) {
+  root.classList.remove('dark', 'light')
+for (const [k, v] of Object.entries(def.tokens)) {
     root.style.setProperty(k, v)
   }
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeId>('ceilings-dark')
+  const [theme, setThemeState] = useState<ThemeId>('ivory-corporate')
 
   useEffect(() => {
     const stored = safeTheme(localStorage.getItem(STORAGE_KEY))
-    const initial: ThemeId = stored ?? 'ceilings-dark'
+    const initial: ThemeId = stored ?? 'ivory-corporate'
 
     setThemeState(initial)
     applyTheme(initial)
@@ -71,3 +69,6 @@ export function useTheme() {
 
   return { theme, setTheme, toggle, isDark: isDarkMode }
 }
+
+
+

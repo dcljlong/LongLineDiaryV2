@@ -106,7 +106,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
               <HardHat className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">{BRAND.appName}</h2>
+              <h2 className="text-lg font-bold text-foreground">{BRAND.appName}</h2>
               <p className="text-xs text-muted-foreground">Construction Management Platform</p>
             </div>
           </div>
@@ -320,6 +320,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 };
 
 export default AuthModal;
+
 
 
 

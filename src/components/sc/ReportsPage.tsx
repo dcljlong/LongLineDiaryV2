@@ -80,7 +80,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Reports</h1>
+        <h1 className="text-2xl font-bold text-foreground">Reports</h1>
         <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium hover:bg-blue-500/20 transition-colors">
           <Download className="w-4 h-4" />
           Export
@@ -88,10 +88,10 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Filters */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+      <div className="bg-card border border-border rounded-xl p-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-2 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -133,35 +133,35 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
         ].map((s, i) => {
           const Icon = s.icon;
           return (
-            <div key={i} className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 text-center">
+            <div key={i} className="bg-card border border-border rounded-xl p-3 text-center">
               <Icon className={`w-5 h-5 mx-auto mb-1 ${s.color}`} />
-              <div className="text-xl font-bold text-white">{s.value}</div>
-              <div className="text-[10px] text-slate-400">{s.label}</div>
+              <div className="text-xl font-bold text-foreground">{s.value}</div>
+              <div className="text-[10px] text-muted-foreground">{s.label}</div>
             </div>
           );
         })}
       </div>
 
       {/* Logs Table */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-slate-700/50">
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Date</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Project</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Job #</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Weather</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Priority</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Safety</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Critical</th>
-                <th className="py-3 px-4 text-xs font-semibold text-slate-400">Notes</th>
+              <tr className="border-b border-border">
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Date</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Project</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Job #</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Weather</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Priority</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Safety</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Critical</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Notes</th>
               </tr>
             </thead>
             <tbody>
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-sm text-slate-500">
+                  <td colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
                     No logs found matching your filters
                   </td>
                 </tr>
@@ -170,20 +170,20 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
                   <tr
                     key={log.id}
                     onClick={() => onNavigate('daily-logs', { logId: log.id })}
-                    className="border-b border-slate-700/20 hover:bg-slate-700/20 cursor-pointer transition-colors"
+                    className="border-b border-border/60 hover:bg-muted/60 cursor-pointer transition-colors"
                   >
-                    <td className="py-3 px-4 text-xs text-white font-medium">{formatDate(log.log_date)}</td>
-                    <td className="py-3 px-4 text-xs text-slate-300">{log.project?.name || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-foreground font-medium">{formatDate(log.log_date)}</td>
+                    <td className="py-3 px-4 text-xs text-foreground/80">{log.project?.name || 'â€”'}</td>
                     <td className="py-3 px-4">
                       <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
                         {log.project?.job_number || 'â€”'}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-xs text-slate-400">{log.weather || 'â€”'} {log.temperature}</td>
+                    <td className="py-3 px-4 text-xs text-muted-foreground">{log.weather || 'â€”'} {log.temperature}</td>
                     <td className="py-3 px-4"><PriorityBadge priority={log.priority} size="sm" showIcon={false} /></td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.safety_incidents || 'â€”'}</td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[120px] truncate">{log.critical_items || 'â€”'}</td>
-                    <td className="py-3 px-4 text-xs text-slate-400 max-w-[150px] truncate">{log.notes || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-muted-foreground max-w-[120px] truncate">{log.safety_incidents || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-muted-foreground max-w-[120px] truncate">{log.critical_items || 'â€”'}</td>
+                    <td className="py-3 px-4 text-xs text-muted-foreground max-w-[150px] truncate">{log.notes || 'â€”'}</td>
                   </tr>
                 ))
               )}
@@ -196,4 +196,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
 };
 
 export default ReportsPage;
+
+
+
 

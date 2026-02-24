@@ -156,7 +156,7 @@ function buildThemeFromOrderedHex(id: string, name: string, ordered: string[]): 
     "--secondary-foreground": hexToHslTriplet(pickForegroundFor(secondary)),
 
     "--muted": hexToHslTriplet(mode === "dark" ? mixHex(background, surface2, 0.55) : mixHex(background, surface2, 0.45)),
-    "--muted-foreground": hexToHslTriplet(mode === "dark" ? mixHex(foreground, "#94A3B8", 0.55) : mixHex(foreground, "#475569", 0.55)),
+    "--muted-foreground": hexToHslTriplet(mode === "dark" ? mixHex(foreground, "#94A3B8", 0.55) : mixHex(foreground, "#334155", 0.55)),
 
     "--accent": hexToHslTriplet(secondary),
     "--accent-foreground": hexToHslTriplet(pickForegroundFor(secondary)),
@@ -259,3 +259,4 @@ export const THEMES: ThemeDef[] = [
   )
 
 ];
+

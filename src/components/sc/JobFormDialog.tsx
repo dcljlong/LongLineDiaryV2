@@ -100,7 +100,7 @@ const JobFormDialog: React.FC<JobFormDialogProps> = ({ open, onClose, onCreated 
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-bold text-white">New Job Entry</h2>
+          <h2 className="text-lg font-bold text-foreground">New Job Entry</h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-surface-3/60 text-muted-foreground hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
@@ -294,5 +294,6 @@ const JobFormDialog: React.FC<JobFormDialogProps> = ({ open, onClose, onCreated 
 };
 
 export default JobFormDialog;
+
 
 

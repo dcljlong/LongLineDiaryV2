@@ -107,12 +107,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   ] : [];
 
   const quickActions = [
-    { label: 'Work Activity', icon: Activity, color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', action: () => onNavigate('daily-logs', { tab: 'activities' }) },
-    { label: 'Materials', icon: Package, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20', action: () => onNavigate('daily-logs', { tab: 'materials' }) },
-    { label: 'Equipment', icon: Wrench, color: 'bg-primary/10 text-primary border-primary/20', action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
-    { label: 'Crew', icon: UserCheck, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', action: () => onNavigate('daily-logs', { tab: 'crew' }) },
-    { label: 'Visitor', icon: Eye, color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20', action: () => onNavigate('daily-logs', { tab: 'visitors' }) },
-    { label: 'Delivery', icon: Truck, color: 'bg-rose-500/10 text-rose-400 border-rose-500/20', action: () => onNavigate('calendar', { type: 'delivery' }) },
+    { label: 'Work Activity', icon: Activity, color: 'bg-blue-500/20 text-blue-600 border-blue-500/30', action: () => onNavigate('daily-logs', { tab: 'activities' }) },
+    { label: 'Materials', icon: Package, color: 'bg-purple-500/20 text-purple-600 border-purple-500/30', action: () => onNavigate('daily-logs', { tab: 'materials' }) },
+    { label: 'Equipment', icon: Wrench, color: 'bg-primary/20 text-primary border-primary/30', action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
+    { label: 'Crew', icon: UserCheck, color: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/30', action: () => onNavigate('daily-logs', { tab: 'crew' }) },
+    { label: 'Visitor', icon: Eye, color: 'bg-indigo-500/20 text-indigo-600 border-indigo-500/30', action: () => onNavigate('daily-logs', { tab: 'visitors' }) },
+    { label: 'Delivery', icon: Truck, color: 'bg-rose-500/20 text-rose-600 border-rose-500/30', action: () => onNavigate('calendar', { type: 'delivery' }) },
   ];
 
   const typeIcons: Record<string, React.ElementType> = {
@@ -357,6 +357,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
 
 
 

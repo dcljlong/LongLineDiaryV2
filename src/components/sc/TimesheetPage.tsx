@@ -143,15 +143,15 @@ const TimesheetPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Timesheet</h1>
-          <p className="text-slate-400 text-sm mt-1">{settings.timesheetPeriod === 2 ? 'Fortnightly' : 'Weekly'} timesheet</p>
+          <h1 className="text-2xl font-bold text-foreground">Timesheet</h1>
+          <p className="text-muted-foreground text-sm mt-1">{settings.timesheetPeriod === 2 ? 'Fortnightly' : 'Weekly'} timesheet</p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors">
+          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary border border-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
             <FileSpreadsheet className="w-4 h-4" />
             Export Excel
           </button>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors">
+          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary border border-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
             <Download className="w-4 h-4" />
             Export PDF
           </button>
@@ -159,42 +159,42 @@ const TimesheetPage: React.FC = () => {
       </div>
 
       {/* Header fields */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+      <div className="bg-card border border-border rounded-xl p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Employee Name</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Employee Name</label>
             <input value={employeeName} onChange={e => setEmployeeName(e.target.value)} className={`w-full ${inputCls}`} placeholder="Your name" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Week Ending</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Week Ending</label>
             <input type="date" value={weekEnding} onChange={e => setWeekEnding(e.target.value)} className={`w-full ${inputCls}`} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Period</label>
-            <div className="text-sm text-white mt-1">{settings.timesheetPeriod === 2 ? '2 Weeks' : '1 Week'}</div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Period</label>
+            <div className="text-sm text-foreground mt-1">{settings.timesheetPeriod === 2 ? '2 Weeks' : '1 Week'}</div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Week Total</label>
-            <div className="text-2xl font-bold text-amber-400">{weekTotal.toFixed(2)} hrs</div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Week Total</label>
+            <div className="text-2xl font-bold text-primary font-extrabold">{weekTotal.toFixed(2)} hrs</div>
           </div>
         </div>
       </div>
 
       {/* Timesheet Table */}
-      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-slate-700/50">
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400 w-36">Day / Date</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Start</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Lunch</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Finish</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400 text-right">Hours</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Job No.</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Analysis Code</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400">Other</th>
-                <th className="py-3 px-3 text-xs font-semibold text-slate-400 w-16"></th>
+              <tr className="border-b border-border">
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80 w-36">Day / Date</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Start</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Lunch</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Finish</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80 text-right">Hours</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Job No.</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Analysis Code</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80">Other</th>
+                <th className="py-3 px-3 text-xs font-semibold text-foreground/80 w-16"></th>
               </tr>
             </thead>
             <tbody>
@@ -203,13 +203,13 @@ const TimesheetPage: React.FC = () => {
                   {d.lines.map((line, lineIdx) => {
                     const hrs = line.startTime && line.finishTime ? lineHours(line) : 0;
                     return (
-                      <tr key={line.id} className="border-b border-slate-700/20 hover:bg-slate-700/20">
+                      <tr key={line.id} className="border-b border-border/60 hover:bg-muted/60">
                         <td className="py-2 px-3">
                           {lineIdx === 0 && (
                             <div>
-                              <div className="text-xs font-bold text-white">{d.day}</div>
-                              <div className="text-[10px] text-slate-400">{format(parseISO(d.date), 'dd/MM')}</div>
-                              <div className="text-[10px] text-amber-400/70 mt-0.5">
+                              <div className="text-xs font-bold text-foreground">{d.day}</div>
+                              <div className="text-[10px] text-muted-foreground">{format(parseISO(d.date), 'dd/MM')}</div>
+                              <div className="text-[10px] text-primary font-semibold mt-0.5">
                                 Day: {dayTotal(d).toFixed(2)}h
                               </div>
                             </div>
@@ -230,7 +230,7 @@ const TimesheetPage: React.FC = () => {
                               type="checkbox"
                               checked={line.lunch}
                               onChange={e => updateLine(dayIdx, line.id, { lunch: e.target.checked })}
-                              className="w-4 h-4 rounded border-slate-500 bg-slate-700 text-amber-500"
+                              className="w-4 h-4 rounded border-border bg-muted text-primary font-extrabold"
                             />
                             {line.lunch && (
                               <select
@@ -254,7 +254,7 @@ const TimesheetPage: React.FC = () => {
                           />
                         </td>
                         <td className="py-2 px-3 text-right">
-                          <span className="text-sm font-bold text-white">{hrs > 0 ? hrs.toFixed(2) : ''}</span>
+                          <span className="text-sm font-bold text-foreground">{hrs > 0 ? hrs.toFixed(2) : ''}</span>
                         </td>
                         <td className="py-2 px-3">
                           <input
@@ -299,14 +299,14 @@ const TimesheetPage: React.FC = () => {
                     );
                   })}
                   {/* Day separator */}
-                  <tr><td colSpan={9} className="h-1 bg-slate-700/20" /></tr>
+                  <tr><td colSpan={9} className="h-1 bg-muted/60" /></tr>
                 </React.Fragment>
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t-2 border-slate-600">
-                <td colSpan={4} className="py-3 px-3 text-sm font-bold text-white">WEEK TOTAL</td>
-                <td className="py-3 px-3 text-right text-lg font-bold text-amber-400">{weekTotal.toFixed(2)}</td>
+              <tr className="border-t-2 border-border">
+                <td colSpan={4} className="py-3 px-3 text-sm font-bold text-foreground">WEEK TOTAL</td>
+                <td className="py-3 px-3 text-right text-lg font-bold text-primary font-extrabold">{weekTotal.toFixed(2)}</td>
                 <td colSpan={4}></td>
               </tr>
             </tfoot>
@@ -316,8 +316,8 @@ const TimesheetPage: React.FC = () => {
 
       {/* Messages & Sign-off */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-          <label className="block text-xs font-semibold text-slate-400 mb-2">Messages</label>
+        <div className="bg-card border border-border rounded-xl p-4">
+          <label className="block text-xs font-semibold text-foreground/80 mb-2">Messages</label>
           <textarea
             value={messages}
             onChange={e => setMessages(e.target.value)}
@@ -326,35 +326,35 @@ const TimesheetPage: React.FC = () => {
             placeholder="Any messages or notes..."
           />
           <div className="mt-3">
-            <label className="block text-xs font-semibold text-slate-400 mb-1">No. Nights Away</label>
+            <label className="block text-xs font-semibold text-foreground/80 mb-1">No. Nights Away</label>
             <input value={nightsAway} onChange={e => setNightsAway(e.target.value)} className={`w-full ${inputCls}`} />
           </div>
         </div>
 
         <div className="space-y-3">
-          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-            <h4 className="text-xs font-bold text-white mb-2">Staff Sign-off</h4>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <h4 className="text-xs font-bold text-foreground mb-2">Staff Sign-off</h4>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Name</label>
+                <label className="block text-[10px] text-primary mb-1">Name</label>
                 <input value={staffSignOff.name} onChange={e => setStaffSignOff({ ...staffSignOff, name: e.target.value })} className={`w-full ${inputCls}`} />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Date</label>
+                <label className="block text-[10px] text-primary mb-1">Date</label>
                 <input type="date" value={staffSignOff.date} onChange={e => setStaffSignOff({ ...staffSignOff, date: e.target.value })} className={`w-full ${inputCls}`} />
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-            <h4 className="text-xs font-bold text-white mb-2">Site Manager Sign-off</h4>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <h4 className="text-xs font-bold text-foreground mb-2">Site Manager Sign-off</h4>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Name</label>
+                <label className="block text-[10px] text-primary mb-1">Name</label>
                 <input value={managerSignOff.name} onChange={e => setManagerSignOff({ ...managerSignOff, name: e.target.value })} className={`w-full ${inputCls}`} />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Date</label>
+                <label className="block text-[10px] text-primary mb-1">Date</label>
                 <input type="date" value={managerSignOff.date} onChange={e => setManagerSignOff({ ...managerSignOff, date: e.target.value })} className={`w-full ${inputCls}`} />
               </div>
             </div>
@@ -366,6 +366,18 @@ const TimesheetPage: React.FC = () => {
 };
 
 export default TimesheetPage;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
