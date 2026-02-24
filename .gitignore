@@ -31,3 +31,4 @@ scripts/*.bak*
 
 package.json.bak_*
 
+.env
