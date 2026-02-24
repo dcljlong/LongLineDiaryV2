@@ -34,11 +34,13 @@ const AppLayout: React.FC = () => {
   const [overdueBadge, setOverdueBadge] = useState(0);
 
   const userRole = (profile?.role as UserRole) || null;
-
   // Load overdue count for sidebar badge
   useEffect(() => {
-    fetchDashboardStats().then(s => setOverdueBadge(s.totalOverdue)).catch(() => {});
-  }, [currentPage]);
+    if (!user) { setOverdueBadge(0); return; }
+    fetchDashboardStats()
+      .then(s => setOverdueBadge(s.totalOverdue))
+      .catch(() => {});
+  }, [user?.id, currentPage]);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -47,8 +49,7 @@ const AppLayout: React.FC = () => {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, [showUserMenu]);
-
-  const handleNavigate = useCallback((page: string, data?: any) => {
+const handleNavigate = useCallback((page: string, data?: any) => {
     const p = page as PageKey;
     // Check role access
     if (userRole && !ROLE_ACCESS[userRole].includes(p)) return;
@@ -93,6 +94,32 @@ const AppLayout: React.FC = () => {
   const displayEmail = user?.email || '';
   const RoleIcon = userRole ? roleIcons[userRole] : User;
   const roleLabel = userRole ? USER_ROLES.find(r => r.value === userRole)?.label || '' : '';
+
+
+  
+
+
+
+  // AUTH_GATE_ACTIVE
+  if (authLoading) {
+    return <div className='min-h-screen flex items-center justify-center text-muted-foreground'>Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className='min-h-screen flex flex-col items-center justify-center gap-6 bg-background'>
+        <div className='text-2xl font-semibold'>Long Line Diary</div>
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className='px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold'
+        >
+          Sign In
+        </button>
+        <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -259,6 +286,10 @@ const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+
+
+
+
 
 
 

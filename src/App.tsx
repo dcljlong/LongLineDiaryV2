@@ -23,7 +23,7 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <AppProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <BrowserRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/*" element={<DesktopLayout />} />
@@ -39,6 +39,7 @@ const App = () => (
 );
 
 export default App;
+
 
 
 

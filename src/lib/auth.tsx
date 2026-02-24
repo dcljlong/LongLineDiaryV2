@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { UserProfile, UserRole } from '@/lib/sitecommand-types';
@@ -39,8 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', userId)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
       if (error) {
         console.error('Profile fetch error:', error);
         return null;
@@ -52,6 +52,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Ensure a profile row exists (DB trigger fallback)
+  const ensureProfile = useCallback(async (u: User) => {
+    const existing = await fetchProfile(u.id);
+    if (existing) return existing;
+
+    const meta: any = (u.user_metadata ?? {});
+    const row: any = {
+      id: u.id,
+      full_name: meta.full_name ?? '',
+      role: (meta.role as UserRole) ?? 'foreman',
+    };
+
+    try {
+      const { error: insErr } = await supabase.from('profiles').insert(row);
+      if (insErr) {
+        console.error('Profile insert error:', insErr);
+        return null;
+      }
+      return await fetchProfile(u.id);
+    } catch (e) {
+      console.error('Profile insert exception:', e);
+      return null;
+    }
+  }, [fetchProfile]);
+
   // Initialize auth state
   useEffect(() => {
     const initAuth = async () => {
@@ -60,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         if (currentSession?.user) {
-          const p = await fetchProfile(currentSession.user.id);
+          const p = await ensureProfile(currentSession.user);
           setProfile(p);
         }
       } catch (e) {
@@ -79,18 +104,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Small delay to allow trigger to create profile
         if (event === 'SIGNED_IN') {
           setTimeout(async () => {
-            const p = await fetchProfile(newSession.user.id);
+            const p = await ensureProfile(newSession.user);
             setProfile(p);
           }, 500);
         } else {
-          const p = await fetchProfile(newSession.user.id);
+          const p = await ensureProfile(newSession.user);
           setProfile(p);
         }
       } else {
         setProfile(null);
+
+        // Clear local draft data on logout
+        try {
+          localStorage.removeItem('sc_timesheet');
+        } catch {}
+
       }
     });
-
     return () => {
       subscription.unsubscribe();
     };
@@ -138,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase
         .from('profiles')
         .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id);
+        .eq('id', user.id);
       if (error) return { error: error.message };
       // Refresh profile
       const p = await fetchProfile(user.id);
@@ -155,3 +185,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
+
+
+
+
+
+
+

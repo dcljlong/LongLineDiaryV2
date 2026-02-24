@@ -39,32 +39,14 @@ server: {
 
   plugins: [
     react(),
-    VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: [BRAND_CONFIG.logoFile],
-      manifest: {
-        name: BRAND_CONFIG.appName,
-        short_name: BRAND_CONFIG.shortName,
-        description: BRAND_CONFIG.description,
-        theme_color: "#0f172a",
-        background_color: "#0f172a",
-        display: "standalone",
-        start_url: BRAND_CONFIG.base,
-        scope: BRAND_CONFIG.base,
-        icons: [
-          { src: "/LongLineDiaryV2/icons/lld-icon-192.png", sizes: "192x192", type: "image/png" },
-          { src: "/LongLineDiaryV2/icons/lld-icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-          { src: "/LongLineDiaryV2/icons/lld-icon-512.png", sizes: "512x512", type: "image/png" },
-        ]
-      }
-    })
-  ],
+    ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
 }));
+
 
 
 
