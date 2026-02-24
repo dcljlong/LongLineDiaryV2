@@ -102,7 +102,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 
   // AUTH_GATE_ACTIVE
   if (authLoading) {
-    return <div className='min-h-screen flex items-center justify-center text-muted-foreground'>Loading...</div>;
+    return <div className='min-h-screen flex items-center justify-center text-foreground'>Loading...</div>;
   }
 
   if (!user) {
@@ -167,16 +167,16 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-card text-muted-foreground"
+                className="lg:hidden p-2 rounded-lg hover:bg-card text-foreground"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-              <h2 className="text-sm font-bold text-primary capitalize">
+              <h2 className="text-sm font-bold text-foreground dark:text-primary capitalize">
                 {currentPage.replace('-', ' ')}
               </h2>
             </div>
 
-            <div className="flex items-center gap-3"><span className="text-xs text-muted-foreground hidden sm:inline">
+            <div className="flex items-center gap-3"><span className="text-xs text-foreground hidden sm:inline">
                 {new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
 
@@ -196,10 +196,10 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                       </span>
                     </div>
                     <div className="hidden sm:block text-left">
-                      <p className="text-xs font-medium text-white leading-none">{displayName}</p>
+                      <p className="text-xs font-medium text-foreground dark:text-primary leading-none">{displayName}</p>
                       <p className="text-[10px] text-foreground leading-none mt-0.5">{roleLabel}</p>
                     </div>
-                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                    <ChevronDown className="w-3 h-3 text-foreground" />
                   </button>
 
                   {/* Dropdown */}
@@ -216,8 +216,8 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">{displayName}</p>
-                            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+                            <p className="text-sm font-semibold text-foreground dark:text-primary truncate">{displayName}</p>
+                            <p className="text-xs text-foreground truncate">{displayEmail}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg bg-card/50 w-fit">
@@ -263,7 +263,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         {/* Page content */}
         <div className="p-4 lg:p-6">
           <Suspense fallback={
-  <div className="p-6 text-muted-foreground text-sm">Loading…</div>
+  <div className="p-6 text-foreground text-sm">Loading…</div>
 }>
   {renderPage()}</Suspense>
         </div>
@@ -286,6 +286,10 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
+
+
 
 
 
