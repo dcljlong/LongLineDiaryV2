@@ -7,7 +7,7 @@ import {
 
 import type { Project, DailyLog } from '@/lib/sitecommand-types';
 import { calculatePriority, getPriorityDot, formatDate, todayStr } from '@/lib/sitecommand-utils';
-import { fetchProjects, fetchDailyLogs, fetchDashboardStats, fetchAllIncompleteItems } from '@/lib/sitecommand-store';
+import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems } from '@/lib/sitecommand-store';
 import PriorityBadge from './PriorityBadge';
 
 interface DashboardPageProps {
@@ -55,7 +55,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       ]);
       setProjects(p);
       setTodayLogs(tl);
-      setStats(s);
       setIncomplete(inc);
     } catch (e) {
       console.error(e);
@@ -356,6 +355,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
+
+
 
 
 
