@@ -26,7 +26,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
   const [projects, setProjects] = useState<Project[]>([]);
   const [showAddNote, setShowAddNote] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [addErr, setAddErr] = useState<string | null>(null);
   // Note form
   const [noteForm, setNoteForm] = useState({
     title: '', description: '', note_type: 'note', priority: 'low', project_id: '',
@@ -43,12 +43,23 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
       setNotes(n);
       setLogs(l);
       setProjects(p);
-    } catch (e) { console.error(e); }
-    setLoading(false);
+        } catch (e: any) {
+      console.error(e);
+      setAddErr(e?.message || "Failed to add note");
+    }    setLoading(false);
   };
 
   useEffect(() => { loadData(); }, [month]);
 
+  // Sync month with selectedDate (so notes created on another month appear immediately)
+  useEffect(() => {
+    try {
+      const d = parseISO(selectedDate);
+      if (d.getFullYear() !== month.getFullYear() || d.getMonth() !== month.getMonth()) {
+        setMonth(d);
+      }
+    } catch {}
+  }, [selectedDate]);
   const grid = getCalendarGrid(month.getFullYear(), month.getMonth());
 
   // Get items for a specific date
@@ -62,6 +73,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 
   const handleAddNote = async () => {
     try {
+      setAddErr(null);
       await store.createCalendarNote({
         ...noteForm,
         note_date: selectedDate,
@@ -71,8 +83,10 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
       setNoteForm({ title: '', description: '', note_type: 'note', priority: 'low', project_id: '' });
       setShowAddNote(false);
       loadData();
-    } catch (e) { console.error(e); }
-  };
+        } catch (e: any) {
+      console.error(e);
+      setAddErr(e?.message || "Failed to add note");
+    }  };
 
   const handleToggleNote = async (id: string, completed: boolean) => {
     await store.updateCalendarNote(id, { is_completed: completed });
@@ -107,7 +121,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Calendar</h1>
         <button
-          onClick={() => setShowAddNote(true)}
+          onClick={() => { setAddErr(null); setShowAddNote(true); }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -265,7 +279,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
             <div className="text-center py-8">
               <CalIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">Nothing scheduled</p>
-              <button onClick={() => setShowAddNote(true)} className="mt-2 text-xs text-primary hover:text-primary/90">
+              <button onClick={() => { setAddErr(null); setShowAddNote(true); }} className="mt-2 text-xs text-primary hover:text-primary/90">
                 Add a note or reminder
               </button>
             </div>
@@ -275,15 +289,20 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 
       {/* Add Note Dialog */}
       {showAddNote && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowAddNote(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setAddErr(null); setShowAddNote(false); }}>
           <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-lg font-bold text-foreground">Add Note</h2>
-              <button onClick={() => setShowAddNote(false)} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
+              <button onClick={() => { setAddErr(null); setShowAddNote(false); }} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-3">
+              {addErr && (
+                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                  {addErr}
+                </div>
+              )}
               <div>
                 <label className={labelCls}>Date</label>
                 <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className={inputCls} />
@@ -320,7 +339,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowAddNote(false)} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
+                <button onClick={() => { setAddErr(null); setShowAddNote(false); }} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
                 <button onClick={handleAddNote} disabled={!noteForm.title.trim()} className="flex-1 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold disabled:opacity-50">Add Note</button>
               </div>
             </div>
@@ -332,6 +351,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
 };
 
 export default CalendarPage;
+
 
 
 
