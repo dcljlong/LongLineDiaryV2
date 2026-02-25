@@ -175,8 +175,7 @@ export async function saveSettings(_: AppSettings) {
 // ─── Aggregation helpers (re-implemented to use existing tables only) ───
 export async function fetchAllIncompleteItems() {
   const { data, error } = await supabase
-    .from('v_command_center')
-    .select('id,title,details,category,priority,status,due_date,created_at,updated_at,project_id,site_name,bucket');
+    .rpc('get_command_center_rows');
 
   if (error) throw error;
 
@@ -252,6 +251,7 @@ export async function fetchDashboardStats() {
     totalOverdue,
   };
 }
+
 
 
 
