@@ -3,16 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-
 import { AuthProvider } from "@/lib/auth";
 import { AppProvider } from "@/contexts/AppContext";
-
-import DesktopLayout from "@/components/DesktopLayout";
-import NotFound from "./pages/NotFound";
-import SettingsPage from '@/components/sc/SettingsPage';
-
+import AppGate from '@/components/AppGate';
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,14 +17,7 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <AppProvider>
-            <BrowserRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/*" element={<DesktopLayout />} />
-                <Route path="*" element={<NotFound />} />
-                <Route path='/settings' element={<SettingsPage />} />
-</Routes>
-            </BrowserRouter>
+            <AppGate />
           </AppProvider>
         </AuthProvider>
       </TooltipProvider>
@@ -39,6 +26,8 @@ const App = () => (
 );
 
 export default App;
+
+
 
 
 

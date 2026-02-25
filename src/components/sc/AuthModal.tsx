@@ -101,12 +101,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           </button>
 
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/15">
-              <HardHat className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-foreground">{BRAND.appName}</h2>
+          <div className="flex items-center gap-5 mb-4">
+            <img
+              src={`${import.meta.env.BASE_URL}icons/ll-developer-logo-v2.png`}
+              alt="Long Line Diary"
+              className="w-16 h-16 object-contain flex-shrink-0"
+            />
+            <div className="ml-2">
+              <h2 className="text-lg font-bold text-foreground leading-tight">{BRAND.appName}</h2>
               <p className="text-xs text-muted-foreground">Construction Management Platform</p>
             </div>
           </div>
@@ -320,14 +322,4 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 };
 
 export default AuthModal;
-
-
-
-
-
-
-
-
-
-
 

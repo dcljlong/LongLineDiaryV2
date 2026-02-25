@@ -62,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: u.id,
       full_name: meta.full_name ?? '',
       role: (meta.role as UserRole) ?? 'foreman',
+      onboarded: false,
     };
 
     try {
@@ -132,7 +133,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          data: {
+          emailRedirectTo: (window.location.origin + import.meta.env.BASE_URL),
+data: {
             full_name: fullName,
             role: role,
           },
@@ -185,6 +187,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
+
 
 
 

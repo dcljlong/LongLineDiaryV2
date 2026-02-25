@@ -216,10 +216,16 @@ export type UserRole = 'site_manager' | 'foreman' | 'safety_officer';
 
 export interface UserProfile {
   id: string;
-  user_id: string;
+  user_id?: string;
   full_name: string;
   role: UserRole;
-  avatar_url: string | null;
+
+  // onboarding / org context
+  onboarded?: boolean;
+  company_name?: string | null;
+  site_name?: string | null;
+
+  avatar_url?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -236,5 +242,3 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'daily-logs', 'calendar', 'reports'],
 };
-
-

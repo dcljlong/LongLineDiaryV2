@@ -31,6 +31,8 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
   const [profileName, setProfileName] = useState('');
   const [profileRole, setProfileRole] = useState<UserRole>('foreman');
+  const [profileCompany, setProfileCompany] = useState('');
+  const [profileSite, setProfileSite] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
 
@@ -42,8 +44,10 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
   useEffect(() => {
     if (profile) {
-      setProfileName(profile.full_name);
-      setProfileRole(profile.role);
+      setProfileName(profile.full_name ?? '');
+      setProfileRole(profile.role ?? 'foreman');
+      setProfileCompany((profile as any).company_name ?? '');
+      setProfileSite((profile as any).site_name ?? '');
     }
   }, [profile]);
 
@@ -63,7 +67,12 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
   const handleProfileSave = async () => {
     setProfileSaving(true);
     try {
-      await updateProfile({ full_name: profileName, role: profileRole });
+      await updateProfile({
+        full_name: profileName,
+        role: profileRole,
+        company_name: profileCompany,
+        site_name: profileSite,
+      } as any);
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2000);
     } catch (e) {
@@ -166,6 +175,27 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                 value={user.email || ''}
                 disabled
                 className={`${inputCls} opacity-60 cursor-not-allowed`}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className={labelCls}>Company Name</label>
+              <input
+                value={profileCompany}
+                onChange={e => setProfileCompany(e.target.value)}
+                className={inputCls}
+                placeholder="Your company"
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Primary Site</label>
+              <input
+                value={profileSite}
+                onChange={e => setProfileSite(e.target.value)}
+                className={inputCls}
+                placeholder="Main site"
               />
             </div>
           </div>
