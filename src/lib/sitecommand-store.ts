@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+﻿import { supabase } from '@/lib/supabase';
 import type { Project, DailyLog, CrewAttendance, WorkActivity, Material, EquipmentLog, Visitor, CalendarNote, AppSettings } from './sitecommand-types';
 import { DEFAULT_SETTINGS } from './sitecommand-types';
 
@@ -8,29 +8,48 @@ async function getUserId(): Promise<string | null> {
   return user?.id ?? null;
 }
 
-// Attach user_id to an object if user is logged in
+// Attach owner_id for tables that use owner_id
+async function withOwnerId<T extends Record<string, any>>(obj: T): Promise<T & { owner_id?: string }> {
+  const uid = await getUserId();
+  if (uid) return { ...obj, owner_id: uid };
+  return obj;
+}
+
+// Attach user_id for tables that use user_id
 async function withUserId<T extends Record<string, any>>(obj: T): Promise<T & { user_id?: string }> {
   const uid = await getUserId();
   if (uid) return { ...obj, user_id: uid };
   return obj;
 }
 
-// ─── Projects ───
+// Pick only allowed DB columns to avoid "column does not exist" insert/update errors
+function pick<T extends Record<string, any>>(obj: T, keys: string[]) {
+  const out: any = {};
+  for (const k of keys) if (k in obj) out[k] = (obj as any)[k];
+  return out;
+}
+
+// ─── Projects (public.projects: id, owner_id, name, status, created_at, updated_at) ───
 export async function fetchProjects() {
-  const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []) as Project[];
 }
 
 export async function createProject(p: Partial<Project>) {
-  const payload = await withUserId(p);
+  const base = pick(p as any, ['name', 'status']);
+  const payload = await withOwnerId(base);
   const { data, error } = await supabase.from('projects').insert(payload).select().single();
   if (error) throw error;
   return data as Project;
 }
 
 export async function updateProject(id: string, p: Partial<Project>) {
-  const { data, error } = await supabase.from('projects').update(p).eq('id', id).select().single();
+  const patch = pick(p as any, ['name', 'status']);
+  const { data, error } = await supabase.from('projects').update(patch).eq('id', id).select().single();
   if (error) throw error;
   return data as Project;
 }
@@ -40,7 +59,7 @@ export async function deleteProject(id: string) {
   if (error) throw error;
 }
 
-// ─── Daily Logs ───
+// ─── Daily Logs (public.daily_logs: id, owner_id, project_id, log_date, notes, created_at, updated_at) ───
 export async function fetchDailyLogs(filters?: { date?: string; project_id?: string }) {
   let q = supabase.from('daily_logs').select('*, projects(*)').order('log_date', { ascending: false });
   if (filters?.date) q = q.eq('log_date', filters.date);
@@ -50,39 +69,35 @@ export async function fetchDailyLogs(filters?: { date?: string; project_id?: str
   return (data || []).map((d: any) => ({ ...d, project: d.projects })) as DailyLog[];
 }
 
+// In your current DB there are no child tables (crew_attendance/work_activities/materials/equipment_logs/visitors).
+// Provide a compatible shape so UI can render without runtime errors.
 export async function fetchDailyLogFull(id: string) {
-  const [logRes, crewRes, actRes, matRes, eqRes, visRes] = await Promise.all([
-    supabase.from('daily_logs').select('*, projects(*)').eq('id', id).single(),
-    supabase.from('crew_attendance').select('*').eq('daily_log_id', id).order('created_at'),
-    supabase.from('work_activities').select('*').eq('daily_log_id', id).order('created_at'),
-    supabase.from('materials').select('*').eq('daily_log_id', id).order('created_at'),
-    supabase.from('equipment_logs').select('*').eq('daily_log_id', id).order('created_at'),
-    supabase.from('visitors').select('*').eq('daily_log_id', id).order('created_at'),
-  ]);
+  const logRes = await supabase.from('daily_logs').select('*, projects(*)').eq('id', id).single();
   if (logRes.error) throw logRes.error;
   const log = logRes.data as any;
   return {
     ...log,
     project: log.projects,
-    crew: (crewRes.data || []) as CrewAttendance[],
-    activities: (actRes.data || []) as WorkActivity[],
-    materials: (matRes.data || []) as Material[],
-    equipment: (eqRes.data || []) as EquipmentLog[],
-    visitors: (visRes.data || []) as Visitor[],
+    crew: [],
+    activities: [],
+    materials: [],
+    equipment: [],
+    visitors: [],
   } as DailyLog;
 }
 
 export async function createDailyLog(log: Partial<DailyLog>) {
-  const { project, crew, activities, materials, equipment, visitors, ...rest } = log as any;
-  const payload = await withUserId(rest);
+  // Only DB columns are allowed; everything else is ignored for now.
+  const base = pick(log as any, ['project_id', 'log_date', 'notes']);
+  const payload = await withOwnerId(base);
   const { data, error } = await supabase.from('daily_logs').insert(payload).select('*, projects(*)').single();
   if (error) throw error;
   return { ...data, project: (data as any).projects } as DailyLog;
 }
 
 export async function updateDailyLog(id: string, log: Partial<DailyLog>) {
-  const { project, crew, activities, materials, equipment, visitors, ...rest } = log as any;
-  const { data, error } = await supabase.from('daily_logs').update(rest).eq('id', id).select('*, projects(*)').single();
+  const patch = pick(log as any, ['project_id', 'log_date', 'notes']);
+  const { data, error } = await supabase.from('daily_logs').update(patch).eq('id', id).select('*, projects(*)').single();
   if (error) throw error;
   return { ...data, project: (data as any).projects } as DailyLog;
 }
@@ -92,102 +107,28 @@ export async function deleteDailyLog(id: string) {
   if (error) throw error;
 }
 
-// ─── Crew ───
-export async function createCrew(c: Partial<CrewAttendance>) {
-  const payload = await withUserId(c);
-  const { data, error } = await supabase.from('crew_attendance').insert(payload).select().single();
-  if (error) throw error;
-  return data as CrewAttendance;
-}
+// ─── Missing tables in current DB: provide safe stubs to prevent crashes ───
+export async function createCrew(_: Partial<CrewAttendance>) { throw new Error("crew_attendance table does not exist in this Supabase project."); }
+export async function updateCrew(_: string, __: Partial<CrewAttendance>) { throw new Error("crew_attendance table does not exist in this Supabase project."); }
+export async function deleteCrew(_: string) { throw new Error("crew_attendance table does not exist in this Supabase project."); }
 
-export async function updateCrew(id: string, c: Partial<CrewAttendance>) {
-  const { data, error } = await supabase.from('crew_attendance').update(c).eq('id', id).select().single();
-  if (error) throw error;
-  return data as CrewAttendance;
-}
+export async function createActivity(_: Partial<WorkActivity>) { throw new Error("work_activities table does not exist in this Supabase project."); }
+export async function updateActivity(_: string, __: Partial<WorkActivity>) { throw new Error("work_activities table does not exist in this Supabase project."); }
+export async function deleteActivity(_: string) { throw new Error("work_activities table does not exist in this Supabase project."); }
 
-export async function deleteCrew(id: string) {
-  const { error } = await supabase.from('crew_attendance').delete().eq('id', id);
-  if (error) throw error;
-}
+export async function createMaterial(_: Partial<Material>) { throw new Error("materials table does not exist in this Supabase project."); }
+export async function updateMaterial(_: string, __: Partial<Material>) { throw new Error("materials table does not exist in this Supabase project."); }
+export async function deleteMaterial(_: string) { throw new Error("materials table does not exist in this Supabase project."); }
 
-// ─── Work Activities ───
-export async function createActivity(a: Partial<WorkActivity>) {
-  const payload = await withUserId(a);
-  const { data, error } = await supabase.from('work_activities').insert(payload).select().single();
-  if (error) throw error;
-  return data as WorkActivity;
-}
+export async function createEquipment(_: Partial<EquipmentLog>) { throw new Error("equipment_logs table does not exist in this Supabase project."); }
+export async function updateEquipment(_: string, __: Partial<EquipmentLog>) { throw new Error("equipment_logs table does not exist in this Supabase project."); }
+export async function deleteEquipment(_: string) { throw new Error("equipment_logs table does not exist in this Supabase project."); }
 
-export async function updateActivity(id: string, a: Partial<WorkActivity>) {
-  const { data, error } = await supabase.from('work_activities').update(a).eq('id', id).select().single();
-  if (error) throw error;
-  return data as WorkActivity;
-}
+export async function createVisitor(_: Partial<Visitor>) { throw new Error("visitors table does not exist in this Supabase project."); }
+export async function updateVisitor(_: string, __: Partial<Visitor>) { throw new Error("visitors table does not exist in this Supabase project."); }
+export async function deleteVisitor(_: string) { throw new Error("visitors table does not exist in this Supabase project."); }
 
-export async function deleteActivity(id: string) {
-  const { error } = await supabase.from('work_activities').delete().eq('id', id);
-  if (error) throw error;
-}
-
-// ─── Materials ───
-export async function createMaterial(m: Partial<Material>) {
-  const payload = await withUserId(m);
-  const { data, error } = await supabase.from('materials').insert(payload).select().single();
-  if (error) throw error;
-  return data as Material;
-}
-
-export async function updateMaterial(id: string, m: Partial<Material>) {
-  const { data, error } = await supabase.from('materials').update(m).eq('id', id).select().single();
-  if (error) throw error;
-  return data as Material;
-}
-
-export async function deleteMaterial(id: string) {
-  const { error } = await supabase.from('materials').delete().eq('id', id);
-  if (error) throw error;
-}
-
-// ─── Equipment ───
-export async function createEquipment(e: Partial<EquipmentLog>) {
-  const payload = await withUserId(e);
-  const { data, error } = await supabase.from('equipment_logs').insert(payload).select().single();
-  if (error) throw error;
-  return data as EquipmentLog;
-}
-
-export async function updateEquipment(id: string, e: Partial<EquipmentLog>) {
-  const { data, error } = await supabase.from('equipment_logs').update(e).eq('id', id).select().single();
-  if (error) throw error;
-  return data as EquipmentLog;
-}
-
-export async function deleteEquipment(id: string) {
-  const { error } = await supabase.from('equipment_logs').delete().eq('id', id);
-  if (error) throw error;
-}
-
-// ─── Visitors ───
-export async function createVisitor(v: Partial<Visitor>) {
-  const payload = await withUserId(v);
-  const { data, error } = await supabase.from('visitors').insert(payload).select().single();
-  if (error) throw error;
-  return data as Visitor;
-}
-
-export async function updateVisitor(id: string, v: Partial<Visitor>) {
-  const { data, error } = await supabase.from('visitors').update(v).eq('id', id).select().single();
-  if (error) throw error;
-  return data as Visitor;
-}
-
-export async function deleteVisitor(id: string) {
-  const { error } = await supabase.from('visitors').delete().eq('id', id);
-  if (error) throw error;
-}
-
-// ─── Calendar Notes ───
+// ─── Calendar Notes (public.calendar_notes uses user_id for RLS) ───
 export async function fetchCalendarNotes(month?: number, year?: number) {
   let q = supabase.from('calendar_notes').select('*').order('note_date');
   if (month !== undefined && year !== undefined) {
@@ -203,14 +144,16 @@ export async function fetchCalendarNotes(month?: number, year?: number) {
 }
 
 export async function createCalendarNote(n: Partial<CalendarNote>) {
-  const payload = await withUserId(n);
+  const base = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'is_completed']);
+  const payload = await withOwnerId(base);
   const { data, error } = await supabase.from('calendar_notes').insert(payload).select().single();
   if (error) throw error;
   return data as CalendarNote;
 }
 
 export async function updateCalendarNote(id: string, n: Partial<CalendarNote>) {
-  const { data, error } = await supabase.from('calendar_notes').update(n).eq('id', id).select().single();
+  const patch = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'is_completed']);
+  const { data, error } = await supabase.from('calendar_notes').update(patch).eq('id', id).select().single();
   if (error) throw error;
   return data as CalendarNote;
 }
@@ -220,64 +163,84 @@ export async function deleteCalendarNote(id: string) {
   if (error) throw error;
 }
 
-// ─── Settings ───
+// ─── Settings (app_settings table does not exist in current DB) ───
 export async function fetchSettings(): Promise<AppSettings> {
-  const uid = await getUserId();
-  let q = supabase.from('app_settings').select('*').eq('setting_key', 'main');
-  if (uid) q = q.eq('user_id', uid);
-  const { data } = await q;
-  if (data && data.length > 0 && data[0].setting_value) {
-    return { ...DEFAULT_SETTINGS, ...data[0].setting_value } as AppSettings;
-  }
   return DEFAULT_SETTINGS;
 }
 
-export async function saveSettings(settings: AppSettings) {
-  const uid = await getUserId();
-  const payload: any = {
-    setting_key: 'main',
-    setting_value: settings,
-    updated_at: new Date().toISOString(),
-  };
-  if (uid) payload.user_id = uid;
-  const { error } = await supabase.from('app_settings').upsert(payload, { onConflict: 'setting_key' });
-  if (error) throw error;
+export async function saveSettings(_: AppSettings) {
+  // no-op until app_settings exists
 }
 
-// ─── Aggregation helpers ───
+// ─── Aggregation helpers (re-implemented to use existing tables only) ───
 export async function fetchAllIncompleteItems() {
-  const [actRes, matRes, eqRes, crewRes] = await Promise.all([
-    supabase.from('work_activities').select('*, daily_logs(*, projects(*))').eq('is_completed', false).order('due_date'),
-    supabase.from('materials').select('*, daily_logs(*, projects(*))').eq('is_completed', false).order('required_date'),
-    supabase.from('equipment_logs').select('*, daily_logs(*, projects(*))').eq('is_completed', false).order('due_date'),
-    supabase.from('crew_attendance').select('*, daily_logs(*, projects(*))').eq('is_completed', false).order('due_date'),
-  ]);
-  return {
-    activities: (actRes.data || []) as any[],
-    materials: (matRes.data || []) as any[],
-    equipment: (eqRes.data || []) as any[],
-    crew: (crewRes.data || []) as any[],
-  };
+  const { data, error } = await supabase
+    .from('v_command_center')
+    .select('id,title,details,category,priority,status,due_date,created_at,updated_at,project_id,site_name,bucket');
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as any[];
+
+  const mapRow = (r: any) => ({
+    id: r.id,
+    title: r.title,
+    description: r.details ?? '',
+    priority: r.priority ?? 'medium',
+    due_date: r.due_date ?? null,
+    status: r.status,
+    category: r.category,
+    project_id: r.project_id ?? null,
+    site_name: r.site_name ?? null,
+    bucket: r.bucket,
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+  });
+
+  const activities: any[] = [];
+  const materials: any[] = [];
+  const equipment: any[] = [];
+  const crew: any[] = [];
+
+  for (const r of rows) {
+    const item = mapRow(r);
+    const cat = (r.category ?? '').toLowerCase();
+
+    if (cat.includes('material')) materials.push(item);
+    else if (cat.includes('equip')) equipment.push(item);
+    else if (cat.includes('crew')) crew.push(item);
+    else activities.push(item);
+  }
+
+  return { activities, materials, equipment, crew };
 }
 
 export async function fetchDashboardStats() {
-  const [projRes, logsRes, actRes, matRes] = await Promise.all([
+  const today = new Date().toISOString().split('T')[0];
+
+  const [projRes, logsRes, notesRes] = await Promise.all([
     supabase.from('projects').select('id, status').eq('status', 'active'),
-    supabase.from('daily_logs').select('id, priority, safety_incidents, is_completed'),
-    supabase.from('work_activities').select('id, is_completed, due_date'),
-    supabase.from('materials').select('id, is_completed, required_date, status'),
+    supabase.from('daily_logs').select('id, log_date').eq('log_date', today),
+    supabase.from('calendar_notes').select('id, priority, is_completed, note_date'),
   ]);
-  
+
+  if (projRes.error) throw projRes.error;
+  if (logsRes.error) throw logsRes.error;
+  if (notesRes.error) throw notesRes.error;
+
   const activeProjects = (projRes.data || []).length;
   const totalLogs = (logsRes.data || []).length;
-  const highPriorityLogs = (logsRes.data || []).filter((l: any) => l.priority === 'high').length;
-  const safetyIncidents = (logsRes.data || []).filter((l: any) => l.safety_incidents && l.safety_incidents.trim()).length;
-  
-  const today = new Date().toISOString().split('T')[0];
-  const overdueActivities = (actRes.data || []).filter((a: any) => !a.is_completed && a.due_date && a.due_date < today).length;
-  const overdueMaterials = (matRes.data || []).filter((m: any) => !m.is_completed && m.required_date && m.required_date < today).length;
-  const pendingMaterials = (matRes.data || []).filter((m: any) => m.status === 'pending').length;
-  
+
+  const openNotes = (notesRes.data || []).filter((n: any) => n.is_completed === false);
+  const highPriorityLogs = openNotes.filter((n: any) => n.priority === 'high').length;
+
+  // Not available in current schema
+  const safetyIncidents = 0;
+  const overdueActivities = 0;
+  const overdueMaterials = 0;
+  const pendingMaterials = 0;
+  const totalOverdue = 0;
+
   return {
     activeProjects,
     totalLogs,
@@ -286,6 +249,9 @@ export async function fetchDashboardStats() {
     overdueActivities,
     overdueMaterials,
     pendingMaterials,
-    totalOverdue: overdueActivities + overdueMaterials,
+    totalOverdue,
   };
 }
+
+
+
