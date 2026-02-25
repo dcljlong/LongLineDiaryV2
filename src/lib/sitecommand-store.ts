@@ -181,21 +181,29 @@ export async function fetchAllIncompleteItems() {
 
   const rows = (data ?? []) as any[];
 
-  const mapRow = (r: any) => ({
-    id: r.id,
-    title: r.title,
-    description: r.details ?? '',
-    priority: r.priority ?? 'medium',
-    due_date: r.due_date ?? null,
-    status: r.status,
-    category: r.category,
-    project_id: r.project_id ?? null,
-    site_name: r.site_name ?? null,
-    bucket: r.bucket,
-    created_at: r.created_at,
-    updated_at: r.updated_at,
-  });
+    const mapRow = (r: any) => {
+    const title = (r.title ?? '').toString();
+    const details = (r.details ?? '').toString();
 
+    return {
+      id: r.id,
+      title,
+      description: details || title,       // Dashboard expects description
+      notes: details || null,              // Dashboard renders notes if present
+      equipment_name: title || null,       // legacy fallback paths
+      worker_name: title || null,
+
+      priority: r.priority ?? 'medium',
+      due_date: r.due_date ?? null,
+      status: r.status,
+      category: r.category,
+      project_id: r.project_id ?? null,
+      site_name: r.site_name ?? null,
+      bucket: r.bucket,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+    };
+  };
   const activities: any[] = [];
   const materials: any[] = [];
   const equipment: any[] = [];
@@ -251,6 +259,7 @@ export async function fetchDashboardStats() {
     totalOverdue,
   };
 }
+
 
 
 
