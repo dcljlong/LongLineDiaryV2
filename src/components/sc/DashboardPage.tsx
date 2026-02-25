@@ -48,10 +48,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const loadData = async () => {
     setLoading(true);
     try {
-      const [p, tl, s, inc] = await Promise.all([
+      const [p, tl, inc] = await Promise.all([
         fetchProjects(),
         fetchDailyLogs({ date: todayStr() }),
-        fetchDashboardStats(),
         fetchAllIncompleteItems(),
       ]);
       setProjects(p);
@@ -357,6 +356,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
+
 
 
 
