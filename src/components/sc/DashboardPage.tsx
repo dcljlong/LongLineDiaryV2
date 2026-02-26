@@ -1,12 +1,12 @@
 ﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
-  HardHat, Users, Package, AlertTriangle, Clock, CheckCircle2,
-  Plus, ArrowRight, Briefcase, Shield, TrendingUp, Activity,
+  HardHat, Package, AlertTriangle, Clock, CheckCircle2,
+  Plus, ArrowRight, Briefcase, Shield, Activity,
   Wrench, UserCheck, Truck, Eye, ClipboardList
 } from 'lucide-react';
 
 import type { Project, DailyLog } from '@/lib/sitecommand-types';
-import { calculatePriority, getPriorityDot, formatDate, todayStr } from '@/lib/sitecommand-utils';
+import { formatDate, todayStr } from '@/lib/sitecommand-utils';
 import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems } from '@/lib/sitecommand-store';
 import PriorityBadge from './PriorityBadge';
 
@@ -33,12 +33,85 @@ interface IncompleteItems {
   crew: any[];
 }
 
+type BucketKey = 'overdue' | 'due_today' | 'upcoming' | 'no_due_date';
+
+const BUCKETS: Array<{
+  key: BucketKey;
+  title: string;
+  pillClass: string;
+  cardLeftBorderClass: string;
+}> = [
+  {
+    key: 'overdue',
+    title: 'Overdue',
+    pillClass: 'bg-danger/15 text-danger border border-danger/30',
+    cardLeftBorderClass: 'border-l-4 border-l-danger/70',
+  },
+  {
+    key: 'due_today',
+    title: 'Due Today',
+    pillClass: 'bg-primary/15 text-primary border border-primary/30',
+    cardLeftBorderClass: 'border-l-4 border-l-primary/70',
+  },
+  {
+    key: 'upcoming',
+    title: 'Upcoming',
+    pillClass: 'bg-muted text-foreground border border-border',
+    cardLeftBorderClass: 'border-l-4 border-l-border',
+  },
+  {
+    key: 'no_due_date',
+    title: 'No Due Date',
+    pillClass: 'bg-muted/60 text-muted-foreground border border-border',
+    cardLeftBorderClass: 'border-l-4 border-l-muted',
+  },
+];
+
+function toDateOnlyStr(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function computeBucketFallback(dueDate: any): BucketKey {
+  if (!dueDate) return 'no_due_date';
+
+  // dueDate can be YYYY-MM-DD or ISO; normalize to date-only comparisons
+  const due = new Date(dueDate);
+  if (Number.isNaN(due.getTime())) return 'no_due_date';
+
+  const today = new Date();
+  const todayStrLocal = toDateOnlyStr(today);
+
+  // compare by local date-only strings
+  const dueStrLocal = toDateOnlyStr(due);
+
+  if (dueStrLocal < todayStrLocal) return 'overdue';
+  if (dueStrLocal === todayStrLocal) return 'due_today';
+  return 'upcoming';
+}
+
+function priorityRank(p?: string | null): number {
+  // higher priority should sort first
+  // accept common variants: high/medium/low
+  if (!p) return 2;
+  const v = String(p).toLowerCase();
+  if (v === 'high') return 0;
+  if (v === 'medium') return 1;
+  if (v === 'low') return 2;
+  return 2;
+}
+
+function safeBool(v: any): boolean {
+  return v === true;
+}
+
 const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [todayLogs, setTodayLogs] = useState<DailyLog[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [incomplete, setIncomplete] = useState<IncompleteItems | null>(null);
-  const [priorityFilter, setPriorityFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,38 +135,106 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     setLoading(false);
   };
 
-  const allIncompleteFlat = useMemo(() => {
+  const allActionItems = useMemo(() => {
     if (!incomplete) return [];
-    const items: any[] = [];
-    incomplete.activities.forEach(a => items.push({
-      ...a, _type: 'activity', _dueDate: a.due_date,
-      _project: a.daily_logs?.projects?.name || 'Unknown',
-      _jobNumber: a.daily_logs?.projects?.job_number || '',
-    }));
-    incomplete.materials.forEach(m => items.push({
-      ...m, _type: 'material', _dueDate: m.required_date,
-      _project: m.daily_logs?.projects?.name || 'Unknown',
-      _jobNumber: m.daily_logs?.projects?.job_number || '',
-    }));
-    incomplete.equipment.forEach(e => items.push({
-      ...e, _type: 'equipment', _dueDate: e.due_date,
-      _project: e.daily_logs?.projects?.name || 'Unknown',
-      _jobNumber: e.daily_logs?.projects?.job_number || '',
-    }));
-    incomplete.crew.forEach(c => items.push({
-      ...c, _type: 'crew', _dueDate: c.due_date,
-      _project: c.daily_logs?.projects?.name || 'Unknown',
-      _jobNumber: c.daily_logs?.projects?.job_number || '',
-    }));
 
-    return items
-      .map(i => ({ ...i, _priority: calculatePriority(i._dueDate) }))
-      .filter(i => priorityFilter === 'all' || i._priority === priorityFilter)
-      .sort((a, b) => {
-        const order = { high: 0, medium: 1, low: 2 };
-        return order[a._priority] - order[b._priority];
-      });
-  }, [incomplete, priorityFilter]);
+    // flatten legacy buckets into a single unified list
+    const items: any[] = [
+      ...incomplete.activities,
+      ...incomplete.materials,
+      ...incomplete.equipment,
+      ...incomplete.crew,
+    ];
+
+    return items.map((raw) => {
+      // best-effort normalize due date field
+      const due = raw.due_date ?? raw.required_date ?? null;
+
+      // prefer RPC bucket if present, else compute fallback
+      const bucket: BucketKey =
+        (raw.bucket as BucketKey) ||
+        computeBucketFallback(due);
+
+      const projectName =
+        raw.daily_logs?.projects?.name ||
+        raw.project?.name ||
+        raw.projects?.name ||
+        raw._project ||
+        'Unknown';
+
+      const jobNumber =
+        raw.daily_logs?.projects?.job_number ||
+        raw.project?.job_number ||
+        raw.projects?.job_number ||
+        raw._jobNumber ||
+        '';
+
+      // title fallbacks (RPC mapping injected legacy fields; keep robust)
+      const title =
+        raw.title ||
+        raw.description ||
+        raw.equipment_name ||
+        raw.worker_name ||
+        'Unnamed';
+
+      const details =
+        raw.details ||
+        raw.notes ||
+        raw.note ||
+        '';
+
+      const pinned = safeBool(raw.pinned);
+
+      // priority should be enum from action_items; fallback to medium
+      const priority = (raw.priority || raw._priority || 'medium');
+
+      return {
+        ...raw,
+        _bucket: bucket,
+        _due: due,
+        _project: projectName,
+        _jobNumber: jobNumber,
+        _title: title,
+        _details: details,
+        _pinned: pinned,
+        _priority: priority,
+      };
+    });
+  }, [incomplete]);
+
+  const bucketed = useMemo(() => {
+    const byBucket: Record<BucketKey, any[]> = {
+      overdue: [],
+      due_today: [],
+      upcoming: [],
+      no_due_date: [],
+    };
+
+    for (const item of allActionItems) {
+      byBucket[item._bucket as BucketKey].push(item);
+    }
+
+    const sortFn = (a: any, b: any) => {
+      // 1) pinned DESC
+      if (a._pinned !== b._pinned) return a._pinned ? -1 : 1;
+
+      // 2) priority high -> low
+      const pa = priorityRank(a._priority);
+      const pb = priorityRank(b._priority);
+      if (pa !== pb) return pa - pb;
+
+      // 3) due_date ASC (nulls last)
+      const ad = a._due ? new Date(a._due).getTime() : Number.POSITIVE_INFINITY;
+      const bd = b._due ? new Date(b._due).getTime() : Number.POSITIVE_INFINITY;
+      return ad - bd;
+    };
+
+    (Object.keys(byBucket) as BucketKey[]).forEach((k) => {
+      byBucket[k] = byBucket[k].sort(sortFn);
+    });
+
+    return byBucket;
+  }, [allActionItems]);
 
   const statCards = stats ? [
     { label: 'Active Projects', value: stats.activeProjects, icon: Briefcase, color: 'from-blue-500 to-blue-600', textColor: 'text-blue-400' },
@@ -113,20 +254,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     { label: 'Delivery', icon: Truck, color: 'bg-rose-500/20 text-rose-600 border-rose-500/30', action: () => onNavigate('calendar', { type: 'delivery' }) },
   ];
 
-  const typeIcons: Record<string, React.ElementType> = {
-    activity: Activity,
-    material: Package,
-    equipment: Wrench,
-    crew: UserCheck,
-  };
-
-  const typeLabels: Record<string, string> = {
-    activity: 'Activity',
-    material: 'Material',
-    equipment: 'Equipment',
-    crew: 'Crew',
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -134,6 +261,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       </div>
     );
   }
+
+  const totalOpen = allActionItems.length;
 
   return (
     <div className="space-y-6">
@@ -152,7 +281,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         </button>
       </div>
 
-      {/* Stat Cards */}
+      {/* Stat Cards (unchanged; stats may be null currently) */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {statCards.map((s, i) => {
           const Icon = s.icon;
@@ -242,79 +371,88 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
           </div>
         </div>
 
-        {/* Priority Items Feed */}
+        {/* Command Center v2 (Lifecycle Buckets) */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Priority Items</h2>
-            <div className="flex gap-1">
-              {(['all', 'high', 'medium', 'low'] as const).map(f => (
-                <button
-                  key={f}
-                  onClick={() => setPriorityFilter(f)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    priorityFilter === f
-                      ? f === 'high' ? 'bg-danger/15 text-danger border border-danger/30'
-                        : f === 'medium' ? 'bg-primary/20 text-primary border border-primary/30'
-                        : f === 'low' ? 'bg-success/15 text-success border border-success/30'
-                        : 'bg-muted text-foreground border border-border'
-                      : 'text-muted-foreground hover:text-foreground border border-transparent'
-                  }`}
-                >
-                  {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
-                  {f !== 'all' && incomplete && (
-                    <span className="ml-1">
-                      ({[...incomplete.activities, ...incomplete.materials, ...incomplete.equipment, ...incomplete.crew]
-                        .filter(i => calculatePriority(i.due_date || i.required_date) === f).length})
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Command Center</h2>
+            <span className="text-xs text-muted-foreground">{totalOpen} open item{totalOpen !== 1 ? 's' : ''}</span>
           </div>
 
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-            {allIncompleteFlat.length === 0 ? (
-              <div className="bg-card border border-border rounded-xl p-8 text-center">
-                <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
-                <p className="text-sm text-foreground font-medium">All clear!</p>
-                <p className="text-xs text-muted-foreground mt-1">No outstanding items to show</p>
-              </div>
-            ) : (
-              allIncompleteFlat.slice(0, 20).map((item, i) => {
-                const TypeIcon = typeIcons[item._type] || Activity;
+          {totalOpen === 0 ? (
+            <div className="bg-card border border-border rounded-xl p-8 text-center">
+              <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
+              <p className="text-sm text-foreground font-medium">All clear!</p>
+              <p className="text-xs text-muted-foreground mt-1">No outstanding items to show</p>
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+              {BUCKETS.map((b) => {
+                const rows = bucketed[b.key] || [];
+                if (rows.length === 0) return null;
+
                 return (
-                  <div
-                    key={`${item._type}-${item.id}-${i}`}
-                    className="bg-card border border-border rounded-xl p-3 hover:border-border/50 transition-colors"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getPriorityDot(item._priority)}`} />
-                      <TypeIcon className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-foreground truncate">
-                            {item.description || item.equipment_name || item.worker_name || 'Unnamed'}
-                          </span>
-                          <PriorityBadge priority={item._priority} size="sm" showIcon={false} />
-                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                            {typeLabels[item._type]}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                          <span>{item._project}</span>
-                          {item._jobNumber && <span className="font-mono text-primary/60">#{item._jobNumber}</span>}
-                          {item._dueDate && <span>Due: {formatDate(item._dueDate)}</span>}
-                        </div>
-                        {item.notes && (
-                          <p className="text-xs text-muted-foreground mt-1 truncate">{item.notes}</p>
-                        )}
+                  <div key={b.key} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[11px] font-semibold px-2 py-1 rounded-lg ${b.pillClass}`}>
+                          {b.title}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{rows.length}</span>
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      {rows.slice(0, 50).map((item: any, i: number) => (
+                        <button
+                          key={`${item.id || 'x'}-${b.key}-${i}`}
+                          type="button"
+                          // Click-through not implemented yet (Phase 2 remaining). Keep intentional no-op.
+                          onClick={() => {}}
+                          className={`w-full text-left bg-card border border-border rounded-xl p-3 hover:border-border/50 transition-colors ${b.cardLeftBorderClass}`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {item._pinned && (
+                                  <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/20">
+                                    Pinned
+                                  </span>
+                                )}
+                                <span className="text-sm font-medium text-foreground truncate">
+                                  {item._title}
+                                </span>
+                                <PriorityBadge priority={String(item._priority).toLowerCase()} size="sm" showIcon={false} />
+                                {item.category && (
+                                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                                    {String(item.category)}
+                                  </span>
+                                )}
+                                {item.status && (
+                                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                                    {String(item.status)}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                <span className="truncate">{item._project}</span>
+                                {item._jobNumber && <span className="font-mono text-primary/60">#{item._jobNumber}</span>}
+                                {item._due && <span>Due: {formatDate(item._due)}</span>}
+                              </div>
+
+                              {item._details && (
+                                <p className="text-xs text-muted-foreground mt-1 truncate">{item._details}</p>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 );
-              })
-            )}
-          </div>
+              })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -355,18 +493,3 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
