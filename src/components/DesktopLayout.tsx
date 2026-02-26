@@ -11,6 +11,8 @@ const DailyLogsPage = lazy(() => import('./sc/DailyLogsPage'));
 const CalendarPage = lazy(() => import('./sc/CalendarPage'));
 const TimesheetPage = lazy(() => import('./sc/TimesheetPage'));
 const ReportsPage = lazy(() => import('./sc/ReportsPage'));
+const JobAuditReportPage = lazy(() => import('./sc/JobAuditReportPage'));
+const ArchivePage = lazy(() => import('./sc/ArchivePage'));
 const SettingsPage = lazy(() => import('./sc/SettingsPage'));
 import JobFormDialog from './sc/JobFormDialog';
 import AuthModal from './sc/AuthModal';
@@ -82,6 +84,10 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         return <TimesheetPage />;
       case 'reports':
         return <ReportsPage onNavigate={handleNavigate} />;
+      case 'job-audit':
+        return <JobAuditReportPage />;
+      case 'archive':
+        return <ArchivePage />;
       case 'settings':
         return <SettingsPage userRole={userRole} />;
       default:
@@ -129,7 +135,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
       )}
 
       {/* Sidebar - hidden on mobile unless menu open */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block print:hidden">
         <Sidebar
           currentPage={currentPage}
           onNavigate={(page) => { handleNavigate(page); }}
@@ -142,7 +148,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
       </div>
 
       {/* Mobile sidebar */}
-      <div className={`lg:hidden fixed inset-y-0 left-0 z-40 transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`lg:hidden fixed inset-y-0 left-0 z-40 transition-transform duration-300 print:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <Sidebar
           currentPage={currentPage}
           onNavigate={(page) => { handleNavigate(page); }}
@@ -155,12 +161,12 @@ const handleNavigate = useCallback((page: string, data?: any) => {
       </div>
 
       <main
-        className={`transition-all duration-300 min-h-screen ${
+        className={`transition-all duration-300 min-h-screen print:ml-0 ${
           sidebarCollapsed ? 'ml-16' : 'ml-60'
         }`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3">
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ThemeToggle />
@@ -286,6 +292,13 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
+
+
+
+
+
 
 
 
