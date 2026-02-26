@@ -23,6 +23,22 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/og.jpg" />
+      <!-- spa-github-pages: decode redirected deep links -->
+    <script>
+      (function () {
+        var l = window.location;
+        // If redirected from 404.html, we will have ?/route in the querystring.
+        if (l.search && l.search.startsWith('?/')) {
+          var newPath = l.search.slice(2); // remove '?/'
+          // split on '&' to preserve any original query params
+          var parts = newPath.split('&');
+          var route = parts.shift() || '';
+          var query = parts.length ? ('?' + parts.join('&')) : '';
+          var repoBase = '/LongLineDiaryV2';
+          window.history.replaceState(null, '', repoBase + '/' + route + query + l.hash);
+        }
+      })();
+    </script>
   </head>
 
   <body>
@@ -30,6 +46,7 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
 
 
 
