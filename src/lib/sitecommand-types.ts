@@ -1,29 +1,48 @@
 ﻿export interface Project {
   id: string;
+  owner_id?: string;
+
   name: string;
-  job_number: string;
-  location: string;
-  client: string;
-  status: 'active' | 'on-hold' | 'completed';
-  start_date: string;
-  end_date: string;
+
+  // DB currently only guarantees: name, status (+ owner_id)
+  status?: 'active' | 'on-hold' | 'completed' | string;
+
+  // UI wants these, but DB may not have them yet
+  job_number?: string;
+  location?: string;
+  client?: string;
+  start_date?: string;
+  end_date?: string;
+
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface DailyLog {
   id: string;
-  project_id: string;
+
+  // DB uses owner_id
+  owner_id?: string;
+
+  project_id?: string;
   log_date: string;
-  weather: string;
-  temperature: string;
-  wind: string;
-  site_conditions: string;
-  safety_incidents: string;
-  critical_items: string;
-  priority: 'high' | 'medium' | 'low';
-  notes: string;
-  is_completed: boolean;
+
+  // DB currently guarantees: notes (nullable)
+  notes?: string;
+
+  // UI wants these, but DB may not have them yet
+  weather?: string;
+  temperature?: string;
+  wind?: string;
+  site_conditions?: string;
+  safety_incidents?: string;
+  critical_items?: string;
+  priority?: 'high' | 'medium' | 'low' | string;
+  is_completed?: boolean;
+
   created_at?: string;
+  updated_at?: string;
+
   // Joined
   project?: Project;
   crew?: CrewAttendance[];
@@ -36,82 +55,86 @@ export interface DailyLog {
 export interface CrewAttendance {
   id: string;
   daily_log_id: string;
-  worker_name: string;
-  trade: string;
-  start_time: string;
-  finish_time: string;
-  lunch_minutes: number;
-  hours_worked: number;
-  due_date: string;
+  worker_name?: string;
+  trade?: string;
+  start_time?: string;
+  finish_time?: string;
+  lunch_minutes?: number;
+  hours_worked?: number;
+  due_date?: string;
   is_completed: boolean;
-  notes: string;
+  notes?: string;
   created_at?: string;
 }
 
 export interface WorkActivity {
   id: string;
   daily_log_id: string;
-  description: string;
-  location: string;
-  trade: string;
-  progress_pct: number;
-  due_date: string;
+  description?: string;
+  location?: string;
+  trade?: string;
+  progress_pct?: number;
+  due_date?: string;
   is_completed: boolean;
-  notes: string;
+  notes?: string;
   created_at?: string;
 }
 
 export interface Material {
   id: string;
   daily_log_id: string;
-  description: string;
-  quantity: string;
-  unit: string;
-  supplier: string;
-  required_date: string;
-  status: 'pending' | 'ordered' | 'in-transit' | 'delivered';
+  description?: string;
+  quantity?: string;
+  unit?: string;
+  supplier?: string;
+  required_date?: string;
+  status?: 'pending' | 'ordered' | 'in-transit' | 'delivered' | string;
   is_completed: boolean;
-  notes: string;
+  notes?: string;
   created_at?: string;
 }
 
 export interface EquipmentLog {
   id: string;
   daily_log_id: string;
-  equipment_name: string;
-  equipment_type: string;
-  hours_used: number;
-  condition: 'good' | 'fair' | 'poor' | 'needs-repair';
-  due_date: string;
+  equipment_name?: string;
+  equipment_type?: string;
+  hours_used?: number;
+  condition?: 'good' | 'fair' | 'poor' | 'needs-repair' | string;
+  due_date?: string;
   is_completed: boolean;
-  notes: string;
+  notes?: string;
   created_at?: string;
 }
 
 export interface Visitor {
   id: string;
   daily_log_id: string;
-  visitor_name: string;
-  company: string;
-  purpose: string;
-  time_in: string;
-  time_out: string;
-  due_date: string;
+  visitor_name?: string;
+  company?: string;
+  purpose?: string;
+  time_in?: string;
+  time_out?: string;
+  due_date?: string;
   is_completed: boolean;
-  notes: string;
+  notes?: string;
   created_at?: string;
 }
 
 export interface CalendarNote {
   id: string;
+  user_id?: string;
+
   note_date: string;
   project_id: string | null;
   title: string;
-  description: string;
-  note_type: 'note' | 'reminder' | 'meeting' | 'deadline' | 'inspection' | 'delivery';
-  priority: 'high' | 'medium' | 'low';
+  description?: string;
+  note_type: 'note' | 'reminder' | 'meeting' | 'deadline' | 'inspection' | 'delivery' | string;
+  priority: 'high' | 'medium' | 'low' | string;
   is_completed: boolean;
+
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface AppSettings {
@@ -210,7 +233,7 @@ export const NOTE_TYPES = [
   { value: 'delivery', label: 'Delivery', color: 'bg-green-500' },
 ];
 
-export type PageKey = 'dashboard' | 'daily-logs' | 'calendar' | 'timesheets' | 'reports' | 'settings';
+export type PageKey = 'dashboard' | 'daily-logs' | 'calendar' | 'timesheets' | 'reports' | 'job-audit' | 'archive' | 'settings';
 
 export type UserRole = 'site_manager' | 'foreman' | 'safety_officer';
 
@@ -238,7 +261,9 @@ export const USER_ROLES: { value: UserRole; label: string; description: string }
 
 // Role-based feature access map
 export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
-  site_manager: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports', 'settings'],
+  site_manager: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports', 'job-audit', 'archive', 'settings'],
   foreman: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'daily-logs', 'calendar', 'reports'],
 };
+
+

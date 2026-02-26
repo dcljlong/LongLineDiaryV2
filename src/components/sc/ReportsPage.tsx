@@ -81,6 +81,22 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Reports</h1>
+<div className="mt-4 bg-card border border-border rounded-xl p-4">
+  <div className="flex items-center justify-between gap-3">
+    <div>
+      <div className="text-sm font-semibold text-foreground">Job Audit Report</div>
+      <div className="text-xs text-muted-foreground mt-1">
+        Printable full-lifecycle record for a single job.
+      </div>
+    </div>
+    <button
+      onClick={() => onNavigate('job-audit')}
+      className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition"
+    >
+      Open
+    </button>
+  </div>
+</div>
         <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium hover:bg-blue-500/20 transition-colors">
           <Download className="w-4 h-4" />
           Export
@@ -196,6 +212,9 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
 };
 
 export default ReportsPage;
+
+
+
 
 
 

@@ -9,6 +9,7 @@ import type { Project, DailyLog } from '@/lib/sitecommand-types';
 import { formatDate, todayStr } from '@/lib/sitecommand-utils';
 import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems } from '@/lib/sitecommand-store';
 import PriorityBadge from './PriorityBadge';
+import ActionItemDetailModal from './ActionItemDetailModal';
 
 interface DashboardPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -113,6 +114,18 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const [stats, setStats] = useState<Stats | null>(null);
   const [incomplete, setIncomplete] = useState<IncompleteItems | null>(null);
   const [loading, setLoading] = useState(true);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+
+  const openDetail = (item: any) => {
+    setSelectedItem(item);
+    setDetailOpen(true);
+  };
+
+  const closeDetail = () => {
+    setDetailOpen(false);
+    setSelectedItem(null);
+  };
 
   useEffect(() => {
     loadData();
@@ -146,7 +159,13 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       ...incomplete.crew,
     ];
 
-    return items.map((raw) => {
+    return items
+      .filter((raw) => {
+        if (!raw.defer_until) return true;
+        const today = new Date().toISOString().slice(0,10);
+        return raw.defer_until <= today;
+      })
+      .map((raw) => {
       // best-effort normalize due date field
       const due = raw.due_date ?? raw.required_date ?? null;
 
@@ -407,7 +426,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                           key={`${item.id || 'x'}-${b.key}-${i}`}
                           type="button"
                           // Click-through not implemented yet (Phase 2 remaining). Keep intentional no-op.
-                          onClick={() => {}}
+                          onClick={() => openDetail(item)}
                           className={`w-full text-left bg-card border border-border rounded-xl p-3 hover:border-border/50 transition-colors ${b.cardLeftBorderClass}`}
                         >
                           <div className="flex items-start gap-3">
@@ -488,8 +507,16 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
           </div>
         </div>
       )}
+      <ActionItemDetailModal
+        open={detailOpen}
+        item={selectedItem}
+        onClose={closeDetail}
+        onChanged={async () => { await loadData(); }}
+      />
     </div>
   );
 };
 
 export default DashboardPage;
+
+

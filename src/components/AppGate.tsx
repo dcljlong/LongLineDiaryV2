@@ -122,15 +122,19 @@ export default function AppGate() {
                     if (err) setErr(null);
                   }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
+                  <SelectTrigger className="h-auto min-h-10 items-start">
+                    <SelectValue
+                      placeholder="Select your role"
+                      className="whitespace-normal break-words text-left"
+                    />
                   </SelectTrigger>
-                  <SelectContent>
+
+                  <SelectContent className="max-w-[var(--radix-select-trigger-width)]">
                     {USER_ROLES.map((r) => (
                       <SelectItem key={r.value} value={r.value}>
-                        <div className="flex flex-col">
-                          <div className="text-sm">{r.label}</div>
-                          <div className="text-xs opacity-70">{r.description}</div>
+                        <div className="flex flex-col text-left whitespace-normal break-words">
+                          <div className="text-sm leading-snug whitespace-normal break-words">{r.label}</div>
+                          <div className="text-xs opacity-70 leading-snug whitespace-normal break-words">{r.description}</div>
                         </div>
                       </SelectItem>
                     ))}
@@ -138,7 +142,7 @@ export default function AppGate() {
                 </Select>
 
                 {selectedRoleMeta?.description ? (
-                  <div className="text-xs opacity-70">{selectedRoleMeta.description}</div>
+                  <div className="text-xs opacity-70 whitespace-normal break-words">{selectedRoleMeta.description}</div>
                 ) : null}
 
                 {roleErr && <div className="text-xs text-red-600">{roleErr}</div>}
@@ -219,3 +223,4 @@ export default function AppGate() {
     </BrowserRouter>
   );
 }
+

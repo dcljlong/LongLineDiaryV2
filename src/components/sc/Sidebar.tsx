@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { BRAND } from '@/lib/brand';
 import {
-  LayoutDashboard, ClipboardList, Calendar, Clock, BarChart3, Settings,
+  LayoutDashboard, ClipboardList, Calendar, Clock, BarChart3, Archive, Settings,
   ChevronLeft, ChevronRight, Plus, Lock
 } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
@@ -23,6 +23,7 @@ const NAV_ITEMS: { key: PageKey; label: string; icon: React.ElementType }[] = [
   { key: 'calendar', label: 'Calendar', icon: Calendar },
   { key: 'timesheets', label: 'Timesheets', icon: Clock },
   { key: 'reports', label: 'Reports', icon: BarChart3 },
+  { key: 'archive', label: 'Archive', icon: Archive },
   { key: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -121,5 +122,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
 };
 
 export default Sidebar;
+
 
 

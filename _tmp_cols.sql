@@ -1,0 +1,5 @@
+﻿select table_name, column_name, data_type
+from information_schema.columns
+where table_schema='public'
+and table_name in ('work_activities','materials','equipment_logs','crew_attendance','visitors','calendar_notes','action_items')
+order by table_name, ordinal_position;
