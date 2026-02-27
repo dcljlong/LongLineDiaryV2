@@ -1,8 +1,10 @@
-﻿import React, { useMemo, useState } from "react";
-import { X, CheckCircle2, Ban, PauseCircle, PlayCircle, AlertOctagon, Pin, PinOff } from "lucide-react";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { X, CheckCircle2, Ban, PauseCircle, PlayCircle, AlertOctagon } from "lucide-react";
 import type { ActionItemStatus } from "@/lib/action-item-transitions";
 import { transitionActionItem, setActionItemDeferUntil } from "@/lib/action-item-transitions";
 import { formatDate, todayStr } from "@/lib/sitecommand-utils";
+import { supabase } from "@/lib/supabase";
+import PriorityBadge from "./PriorityBadge";
 
 type BucketKey = "overdue" | "due_today" | "upcoming" | "no_due_date";
 
@@ -15,7 +17,6 @@ export type ActionItemRow = {
   status?: string | null;
   due_date?: string | null;
   defer_until?: string | null;
-  pinned?: boolean | null;
   bucket?: BucketKey | null;
   source?: string | null;
   source_ref?: any;
@@ -28,7 +29,6 @@ export type ActionItemRow = {
   _project?: string;
   _jobNumber?: string;
   _due?: string | null;
-  _pinned?: boolean;
   _priority?: string;
 };
 
@@ -38,6 +38,17 @@ interface Props {
   onClose: () => void;
   onChanged: () => Promise<void> | void; // refresh callback
 }
+
+type AuditRow = {
+  id: number;
+  action: string;
+  action_item_id: string;
+  owner_id: string;
+  changed_by: string | null;
+  changed_at: string;
+  old_row: any | null;
+  new_row: any | null;
+};
 
 function normalizeStatus(s: any): ActionItemStatus {
   const v = String(s || "open").toLowerCase();
@@ -49,23 +60,43 @@ function normalizeStatus(s: any): ActionItemStatus {
   return "open";
 }
 
-function normalizePriority(p: any): "high" | "medium" | "low" {
+function normalizePriority(p: any): "critical" | "high" | "medium" | "low" {
   const v = String(p || "medium").toLowerCase();
+  if (v === "critical") return "critical";
   if (v === "high") return "high";
   if (v === "low") return "low";
   return "medium";
 }
 
 function addDaysIso(d: string, days: number): string {
-  // d is YYYY-MM-DD
   const dt = new Date(d + "T00:00:00");
   dt.setDate(dt.getDate() + days);
   return dt.toISOString().slice(0, 10);
 }
 
+function shortId(id: string | null | undefined): string {
+  if (!id) return "—";
+  if (id.length <= 12) return id;
+  return `${id.slice(0, 8)}…${id.slice(-4)}`;
+}
+
+function fmtTs(ts: string): string {
+  try {
+    const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return ts;
+    return d.toLocaleString();
+  } catch {
+    return ts;
+  }
+}
+
 export default function ActionItemDetailModal({ open, item, onClose, onChanged }: Props) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  const [audit, setAudit] = useState<AuditRow[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditErr, setAuditErr] = useState<string | null>(null);
 
   const view = useMemo(() => {
     if (!item) return null;
@@ -83,7 +114,6 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
       due,
       status: normalizeStatus(item.status),
       priority: normalizePriority(item._priority || item.priority),
-      pinned: (item._pinned ?? item.pinned) === true,
       category: item.category ? String(item.category) : null,
       source: item.source ? String(item.source) : null,
       sourceRef: item.source_ref ?? null,
@@ -97,6 +127,33 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
     if (view?.deferUntil) return view.deferUntil;
     return todayStr();
   });
+
+  useEffect(() => {
+    if (!open || !view?.id) return;
+
+    const loadAudit = async () => {
+      setAuditLoading(true);
+      setAuditErr(null);
+      try {
+        const { data, error } = await supabase
+          .from("action_item_audit")
+          .select("id,action,action_item_id,owner_id,changed_by,changed_at,old_row,new_row")
+          .eq("action_item_id", view.id)
+          .order("changed_at", { ascending: false })
+          .limit(25);
+
+        if (error) throw error;
+        setAudit((data || []) as any);
+      } catch (e: any) {
+        setAuditErr(e?.message || "Audit load failed");
+        setAudit([]);
+      } finally {
+        setAuditLoading(false);
+      }
+    };
+
+    loadAudit();
+  }, [open, view?.id]);
 
   if (!open || !view) return null;
 
@@ -151,12 +208,13 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base font-semibold text-foreground truncate">{view.title}</h3>
+
                 <span className="text-[10px] px-2 py-0.5 rounded border border-border bg-muted text-muted-foreground">
                   {view.status}
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded border border-border bg-muted text-muted-foreground">
-                  {view.priority}
-                </span>
+
+                <PriorityBadge priority={view.priority} size="sm" showIcon />
+
                 {view.category && (
                   <span className="text-[10px] px-2 py-0.5 rounded border border-border bg-muted text-muted-foreground">
                     {view.category}
@@ -171,17 +229,25 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => (busy ? null : onClose())}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => (busy ? null : onClose())}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
 
           <div className="p-4 space-y-3">
+            {err && (
+              <div className="text-xs text-danger bg-danger/10 border border-danger/20 rounded-lg px-3 py-2">
+                {err}
+              </div>
+            )}
+
             {view.details ? (
               <div className="bg-muted/40 border border-border rounded-xl p-3">
                 <div className="text-xs font-semibold text-foreground mb-1">Details</div>
@@ -197,7 +263,6 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Status: <span className="text-foreground">{view.status}</span></div>
                   <div>Priority: <span className="text-foreground">{view.priority}</span></div>
-                  <div>Pinned: <span className="text-foreground">{view.pinned ? "yes" : "no"}</span></div>
                   {view.deferUntil && <div>Defer until: <span className="text-foreground">{formatDate(view.deferUntil)}</span></div>}
                   {view.completedAt && <div>Completed: <span className="text-foreground">{formatDate(view.completedAt)}</span></div>}
                   {view.cancelledAt && <div>Cancelled: <span className="text-foreground">{formatDate(view.cancelledAt)}</span></div>}
@@ -213,6 +278,42 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Audit history */}
+            <div className="bg-card border border-border rounded-xl p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-semibold text-foreground">History</div>
+                {auditLoading && <span className="text-[11px] text-muted-foreground">Loading…</span>}
+              </div>
+
+              {auditErr && (
+                <div className="mt-2 text-xs text-danger bg-danger/10 border border-danger/20 rounded-lg px-3 py-2">
+                  {auditErr}
+                </div>
+              )}
+
+              {!auditLoading && !auditErr && audit.length === 0 && (
+                <div className="mt-2 text-xs text-muted-foreground">No history yet</div>
+              )}
+
+              {!auditErr && audit.length > 0 && (
+                <div className="mt-2 space-y-2 max-h-56 overflow-y-auto pr-1">
+                  {audit.map((a) => (
+                    <div key={a.id} className="border border-border rounded-lg p-2 bg-muted/30">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] px-2 py-0.5 rounded border border-border bg-muted text-muted-foreground">
+                          {a.action}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">{fmtTs(a.changed_at)}</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        By: <span className="text-foreground">{shortId(a.changed_by)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Defer controls */}
@@ -253,97 +354,29 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setQuick(1)}
-                    className="px-2.5 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-xs"
-                  >
-                    +1d
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setQuick(3)}
-                    className="px-2.5 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-xs"
-                  >
-                    +3d
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setQuick(7)}
-                    className="px-2.5 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-xs"
-                  >
-                    +7d
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setQuick(14)}
-                    className="px-2.5 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-xs"
-                  >
-                    +14d
-                  </button>
+                  <button type="button" disabled={busy} onClick={() => setQuick(1)} className="text-xs px-2 py-1 rounded-lg border border-border bg-muted hover:bg-muted/60">+1d</button>
+                  <button type="button" disabled={busy} onClick={() => setQuick(3)} className="text-xs px-2 py-1 rounded-lg border border-border bg-muted hover:bg-muted/60">+3d</button>
+                  <button type="button" disabled={busy} onClick={() => setQuick(7)} className="text-xs px-2 py-1 rounded-lg border border-border bg-muted hover:bg-muted/60">+7d</button>
+                  <button type="button" disabled={busy} onClick={() => setQuick(14)} className="text-xs px-2 py-1 rounded-lg border border-border bg-muted hover:bg-muted/60">+14d</button>
                 </div>
-              </div>
-
-              <div className="mt-2 text-[11px] text-muted-foreground">
-                Deferred items stay hidden until the defer date (we’ll apply the filter in the dashboard fetch next).
               </div>
             </div>
 
-            {err && (
-              <div className="bg-danger/10 border border-danger/20 text-danger rounded-xl p-3 text-sm">
-                {err}
-              </div>
-            )}
-          </div>
-
-          <div className="p-4 border-t border-border">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => doTransition("open")}
-                className="px-3 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm flex items-center justify-center gap-2"
-              >
-                <AlertOctagon className="w-4 h-4" /> Open
+            {/* Status transitions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <button type="button" disabled={busy} onClick={() => doTransition("open")} className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-border bg-muted hover:bg-muted/60 text-sm">
+                <PlayCircle className="w-4 h-4" /> Open
               </button>
-
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => doTransition("in_progress")}
-                className="px-3 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm flex items-center justify-center gap-2"
-              >
-                <PlayCircle className="w-4 h-4" /> In Prog
+              <button type="button" disabled={busy} onClick={() => doTransition("in_progress")} className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-border bg-muted hover:bg-muted/60 text-sm">
+                <AlertOctagon className="w-4 h-4" /> In Progress
               </button>
-
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => doTransition("blocked")}
-                className="px-3 py-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm flex items-center justify-center gap-2"
-              >
+              <button type="button" disabled={busy} onClick={() => doTransition("blocked")} className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-border bg-muted hover:bg-muted/60 text-sm">
                 <PauseCircle className="w-4 h-4" /> Blocked
               </button>
-
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => doTransition("done")}
-                className="px-3 py-2 rounded-xl border border-success/30 bg-success/10 hover:bg-success/15 transition-colors text-sm flex items-center justify-center gap-2 text-success"
-              >
-                <CheckCircle2 className="w-4 h-4" /> Complete
+              <button type="button" disabled={busy} onClick={() => doTransition("done")} className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-border bg-muted hover:bg-muted/60 text-sm">
+                <CheckCircle2 className="w-4 h-4" /> Done
               </button>
-
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => doTransition("cancelled")}
-                className="px-3 py-2 rounded-xl border border-danger/30 bg-danger/10 hover:bg-danger/15 transition-colors text-sm flex items-center justify-center gap-2 text-danger"
-              >
+              <button type="button" disabled={busy} onClick={() => doTransition("cancelled")} className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-border bg-muted hover:bg-muted/60 text-sm col-span-2 md:col-span-4">
                 <Ban className="w-4 h-4" /> Cancel
               </button>
             </div>

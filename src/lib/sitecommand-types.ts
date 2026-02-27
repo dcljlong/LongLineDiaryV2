@@ -127,7 +127,8 @@ export interface CalendarNote {
 
   note_date: string;
   project_id: string | null;
-  title: string;
+    action_item_id?: string | null;
+title: string;
   description?: string;
   note_type: 'note' | 'reminder' | 'meeting' | 'deadline' | 'inspection' | 'delivery' | string;
   priority: 'high' | 'medium' | 'low' | string;
@@ -233,7 +234,7 @@ export const NOTE_TYPES = [
   { value: 'delivery', label: 'Delivery', color: 'bg-green-500' },
 ];
 
-export type PageKey = 'dashboard' | 'daily-logs' | 'calendar' | 'timesheets' | 'reports' | 'job-audit' | 'archive' | 'settings';
+export type PageKey = 'dashboard' | 'daily-logs' | 'calendar' | 'timesheets' | 'onsite-walk' | 'reports' | 'job-audit' | 'archive' | 'settings';
 
 export type UserRole = 'site_manager' | 'foreman' | 'safety_officer';
 
@@ -261,9 +262,12 @@ export const USER_ROLES: { value: UserRole; label: string; description: string }
 
 // Role-based feature access map
 export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
-  site_manager: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports', 'job-audit', 'archive', 'settings'],
-  foreman: ['dashboard', 'daily-logs', 'calendar', 'timesheets', 'reports'],
-  safety_officer: ['dashboard', 'daily-logs', 'calendar', 'reports'],
+  site_manager: ['dashboard', 'onsite-walk', 'daily-logs', 'calendar', 'timesheets', 'reports', 'job-audit', 'archive', 'settings'],
+  foreman: ['dashboard', 'onsite-walk', 'daily-logs', 'calendar', 'timesheets', 'reports'],
+  safety_officer: ['dashboard', 'onsite-walk', 'daily-logs', 'calendar', 'reports'],
 };
+
+
+
 
 

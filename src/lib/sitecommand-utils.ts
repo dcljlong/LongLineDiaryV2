@@ -143,4 +143,29 @@ export function getCalendarGrid(year: number, month: number): (Date | null)[][] 
   
   return grid;
 }
+export function relativeDayLabel(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+
+  const toDateOnly = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate());
+  const today = toDateOnly(new Date());
+  const due = toDateOnly(d);
+
+  const ms = due.getTime() - today.getTime();
+  const days = Math.round(ms / (1000 * 60 * 60 * 24));
+
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  if (days > 1) return `In ${days} days`;
+  if (days === -1) return "Yesterday";
+  return `${Math.abs(days)} days overdue`;
+}
+
+
+
+
+
+
 

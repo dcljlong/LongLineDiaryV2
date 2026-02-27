@@ -10,6 +10,7 @@ const DashboardPage = lazy(() => import('./sc/DashboardPage'));
 const DailyLogsPage = lazy(() => import('./sc/DailyLogsPage'));
 const CalendarPage = lazy(() => import('./sc/CalendarPage'));
 const TimesheetPage = lazy(() => import('./sc/TimesheetPage'));
+const OnsiteWalkPage = lazy(() => import('./sc/OnsiteWalkPage'));
 const ReportsPage = lazy(() => import('./sc/ReportsPage'));
 const JobAuditReportPage = lazy(() => import('./sc/JobAuditReportPage'));
 const ArchivePage = lazy(() => import('./sc/ArchivePage'));
@@ -82,6 +83,8 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         return <CalendarPage onNavigate={handleNavigate} initialData={pageData} />;
       case 'timesheets':
         return <TimesheetPage />;
+      case 'onsite-walk':
+        return <OnsiteWalkPage />;
       case 'reports':
         return <ReportsPage onNavigate={handleNavigate} />;
       case 'job-audit':
@@ -292,6 +295,8 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
 
 
 

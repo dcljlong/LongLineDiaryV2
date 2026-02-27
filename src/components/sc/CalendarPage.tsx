@@ -5,7 +5,9 @@ import {
 } from 'lucide-react';
 import { format, addMonths, subMonths, isSameDay, parseISO } from 'date-fns';
 import type { CalendarNote, DailyLog, Project } from '@/lib/sitecommand-types';
+import ActionItemDetailModal from './ActionItemDetailModal';
 import { NOTE_TYPES } from '@/lib/sitecommand-types';
+import ActionItemDetailModal from './ActionItemDetailModal';
 import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriority } from '@/lib/sitecommand-utils';
 import PriorityBadge from './PriorityBadge';
 import * as store from '@/lib/sitecommand-store';
@@ -22,6 +24,18 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
   const [month, setMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [notes, setNotes] = useState<CalendarNote[]>([]);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+
+  const openDetail = (item: any) => {
+    setSelectedItem(item);
+    setDetailOpen(true);
+  };
+
+  const closeDetail = () => {
+    setDetailOpen(false);
+    setSelectedItem(null);
+  };
   const [logs, setLogs] = useState<DailyLog[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [showAddNote, setShowAddNote] = useState(false);
@@ -264,6 +278,14 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                             <span className="text-[10px] text-muted-foreground capitalize">{note.note_type}</span>
                           </div>
                         </div>
+                        {note.action_item_id && (
+                          <button
+                            onClick={() => openDetail({ id: note.action_item_id } as any)}
+                            className="px-2 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 text-xs font-semibold"
+                          >
+                            Open Action
+                          </button>
+                        )}
                         <button onClick={() => handleDeleteNote(note.id)} className="p-1 rounded hover:bg-red-500/20 text-red-400">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -347,10 +369,15 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
         </div>
       )}
     </div>
-  );
-};
+);  };
 
 export default CalendarPage;
+
+
+
+
+
+
 
 
 

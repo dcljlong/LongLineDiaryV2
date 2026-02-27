@@ -4,10 +4,29 @@ import { DEFAULT_SETTINGS } from './sitecommand-types';
 
 // Helper to get current user ID for RLS-compatible inserts
 async function getUserId(): Promise<string | null> {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user?.id ?? null;
+  const { data } = await supabase.auth.getUser();
+  return data?.user?.id ?? null;
 }
 
+// Helper to get current company_id (FK to companies.id)
+async function getCompanyId(): Promise<string | null> {
+  const uid = await getUserId();
+  if (!uid) return null;
+
+  // profiles.id = auth user id (your schema uses profiles.id as uuid)
+  try {
+    const r = await supabase
+      .from('profiles')
+      .select('company_id')
+      .eq('id', uid)
+      .single();
+
+    const cid = (r as any)?.data?.company_id ?? null;
+    return cid;
+  } catch {
+    return null;
+  }
+}
 // Attach owner_id for tables that use owner_id
 async function withOwnerId<T extends Record<string, any>>(obj: T): Promise<T & { owner_id?: string }> {
   const uid = await getUserId();
@@ -42,9 +61,36 @@ export async function fetchProjects() {
 export async function createProject(p: Partial<Project>) {
   const base = pick(p as any, ['name', 'status']);
   const payload = await withOwnerId(base);
-  const { data, error } = await supabase.from('projects').insert(payload).select().single();
+  
+  console.log('createProject uid', await getUserId());
+const { data, error } = await supabase.from('projects').insert(payload).select().single();
   if (error) throw error;
-  return data as Project;
+  
+  const created = data as Project;
+
+  // Auto-create follow-up task: complete job card setup (due tomorrow)
+  try {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    const due = d.toISOString().slice(0, 10);
+
+    await createActionItem({
+      project_id: created.id,
+      title: `Complete job card setup for: ${created.name}`,
+      details: 'Fill out the job card fields when you get a chance (job number, location, client, dates, etc).',
+      category: 'admin',
+      priority: 'medium',
+      status: 'open',
+      due_date: due,
+      source: 'project_setup',
+      source_ref: { type: 'project_created_needs_setup' },
+      pinned: false,
+    });
+  } catch (e) {
+    console.warn('createProject follow-up action item failed', e);
+  }
+
+  return created;
 }
 
 export async function updateProject(id: string, p: Partial<Project>) {
@@ -144,7 +190,7 @@ export async function fetchCalendarNotes(month?: number, year?: number) {
 }
 
 export async function createCalendarNote(n: Partial<CalendarNote>) {
-  const base = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'is_completed']);
+  const base = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'action_item_id', 'is_completed']);
   const payload = await withOwnerId(base);
   const { data, error } = await supabase.from('calendar_notes').insert(payload).select().single();
   if (error) throw error;
@@ -152,7 +198,7 @@ export async function createCalendarNote(n: Partial<CalendarNote>) {
 }
 
 export async function updateCalendarNote(id: string, n: Partial<CalendarNote>) {
-  const patch = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'is_completed']);
+  const patch = pick(n as any, ['note_date', 'title', 'description', 'note_type', 'priority', 'project_id', 'action_item_id', 'is_completed']);
   const { data, error } = await supabase.from('calendar_notes').update(patch).eq('id', id).select().single();
   if (error) throw error;
   return data as CalendarNote;
@@ -259,6 +305,65 @@ export async function fetchDashboardStats() {
     totalOverdue,
   };
 }
+// ─── Action Items (public.action_items) ───
+export async function createActionItem(ai: Partial<any>) {
+  // Keep strictly to DB columns shown in your schema dump
+  let base = pick(ai as any, [
+    'company_id',
+    'project_id',
+    'site_name',
+    'title',
+    'details',
+    'category',
+    'priority',
+    'status',
+    'due_date',
+    'defer_until',
+    'pinned',
+    'source',
+    'source_ref',
+  ]);
+
+    // company_id is NOT NULL + FK to companies.id
+  if (!base.company_id) {
+    const cid = await getCompanyId();
+    if (!cid) {
+      throw new Error('No company assigned to this user (profiles.company_id is null). Set company_id in profiles, then retry.');
+    }
+    base = { ...base, company_id: cid };
+  }
+const payload = await withOwnerId(base);
+
+  const { data, error } = await supabase
+    .from('action_items')
+    .insert(payload)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data as any;
+}
+
+export async function fetchRecentActionItems(opts?: { project_id?: string; limit?: number }) {
+  const limit = Math.min(Math.max(opts?.limit ?? 10, 1), 50);
+
+  let q = supabase
+    .from('action_items')
+    .select('id, project_id, title, details, category, priority, status, due_date, defer_until, pinned, source, created_at')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (opts?.project_id) q = q.eq('project_id', opts.project_id);
+
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data || []) as any[];
+}
+
+
+
+
 
 
 
