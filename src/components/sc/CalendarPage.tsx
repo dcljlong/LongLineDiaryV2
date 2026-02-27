@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import { format, addMonths, subMonths, isSameDay, parseISO } from 'date-fns';
 import type { CalendarNote, DailyLog, Project } from '@/lib/sitecommand-types';
+import ProjectPicker from '@/components/sc/ProjectPicker';
 import ActionItemDetailModal from './ActionItemDetailModal';
 import { NOTE_TYPES } from '@/lib/sitecommand-types';
+import ProjectPicker from '@/components/sc/ProjectPicker';
 import ActionItemDetailModal from './ActionItemDetailModal';
 import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriority } from '@/lib/sitecommand-utils';
 import PriorityBadge from './PriorityBadge';
@@ -401,10 +403,14 @@ const handleToggleNote = async (id: string, completed: boolean) => {
               </div>
               <div>
                 <label className={labelCls}>Link to Project (optional)</label>
-                <select value={noteForm.project_id} onChange={e => setNoteForm({ ...noteForm, project_id: e.target.value })} className={inputCls}>
-                  <option value="">None (General)</option>
-                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+                <ProjectPicker
+                  projects={projects}
+                  value={noteForm.project_id}
+                  onChange={(id) => setNoteForm({ ...noteForm, project_id: id ?? '' })}
+                  className={inputCls}
+                  includeBlank={true}
+                  blankLabel="No project"
+/>
               </div>
               <div className="flex gap-3 pt-2">
                 <button onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
@@ -418,6 +424,7 @@ const handleToggleNote = async (id: string, completed: boolean) => {
 );  };
 
 export default CalendarPage;
+
 
 
 
