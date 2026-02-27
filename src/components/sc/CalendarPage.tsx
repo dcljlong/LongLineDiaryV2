@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
+import { toast } from '@/components/ui/use-toast';
   ChevronLeft, ChevronRight, Plus, X, Check, Trash2,
   Calendar as CalIcon, StickyNote, Bell, Users2, Target, Search, Truck
 } from 'lucide-react';
@@ -12,6 +13,7 @@ import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriorit
 import PriorityBadge from './PriorityBadge';
 import * as store from '@/lib/sitecommand-store';
 import { supabase } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface CalendarPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -48,7 +50,7 @@ async function openDetailById(id: string) {
 
     // If linked record no longer exists
     if (!data) {
-      window.alert('Linked action item not found (it may have been deleted).');
+      toast({ title: 'Action not found', description: 'Linked action item was not found (it may have been deleted).', variant: 'destructive' });
       return;
     }
 
@@ -57,7 +59,7 @@ async function openDetailById(id: string) {
     openDetail(data as any);
   } catch (e) {
     console.error('Failed to load action item', e);
-    window.alert('Could not open linked action item.');
+    toast({ title: 'Open failed', description: 'Could not open linked action item.', variant: 'destructive' });
   }
 }
 const [logs, setLogs] = useState<DailyLog[]>([]);
@@ -396,6 +398,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
 );  };
 
 export default CalendarPage;
+
 
 
 
