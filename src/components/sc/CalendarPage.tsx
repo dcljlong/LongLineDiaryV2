@@ -13,7 +13,6 @@ import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriorit
 import PriorityBadge from './PriorityBadge';
 import * as store from '@/lib/sitecommand-store';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
 
 interface CalendarPageProps {
   onNavigate: (page: string, data?: any) => void;
