@@ -26,7 +26,9 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
   const [month, setMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [notes, setNotes] = useState<CalendarNote[]>([]);
-  const [detailOpen, setDetailOpen] = useState(false);
+  
+  const [actionDoneById, setActionDoneById] = useState<Record<string, boolean>>({});
+const [detailOpen, setDetailOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
   const openDetail = (item: any) => {
@@ -293,6 +295,11 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
                             <NoteIcon className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className={`text-sm font-medium ${note.is_completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                               {note.title}
+                              {note.action_item_id && actionDoneById[note.action_item_id] && (
+  <span className="ml-2 inline-flex items-center rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 px-2 py-0.5 text-[10px] font-semibold">
+    Completed
+  </span>
+)}
                             </span>
                           </div>
                           {note.description && (
@@ -397,6 +404,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
 );  };
 
 export default CalendarPage;
+
 
 
 
