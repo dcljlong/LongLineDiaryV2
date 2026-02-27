@@ -122,14 +122,27 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
         is_completed: false,
       } as any);
       setNoteForm({ title: '', description: '', note_type: 'note', priority: 'low', project_id: '' });
-      setShowAddNote(false);
+      setShowAddNote(false); setEditNoteId(null);
       loadData();
         } catch (e: any) {
       console.error(e);
       setAddErr(e?.message || "Failed to add note");
     }  };
+function openEditNote(note: any) {
+  setAddErr(null);
+  setEditNoteId(note.id);
+  setNoteForm({
+    title: note.title || '',
+    description: note.description || '',
+    note_type: note.note_type || 'note',
+    priority: note.priority || 'med',
+    project_id: note.project_id || null,
+    action_item_id: note.action_item_id || null,
+  });
+  setShowAddNote(true);
+}
 
-  const handleToggleNote = async (id: string, completed: boolean) => {
+const handleToggleNote = async (id: string, completed: boolean) => {
     await store.updateCalendarNote(id, { is_completed: completed });
     loadData();
   };
@@ -162,7 +175,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Calendar</h1>
         <button
-          onClick={() => { setAddErr(null); setShowAddNote(true); }}
+          onClick={() => { setAddErr(null); setEditNoteId(null); setShowAddNote(true); }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -279,6 +292,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
                   return (
                     <div
                       key={note.id}
+                      onClick={() => openEditNote(note)}
                       className={`p-3 rounded-lg border transition-colors ${
                         note.is_completed ? 'bg-card/30 border-border opacity-60' : 'bg-muted/60 border-border'
                       }`}
@@ -287,7 +301,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
                         <input
                           type="checkbox"
                           checked={note.is_completed}
-                          onChange={e => handleToggleNote(note.id, e.target.checked)}
+                          onClick={e => e.stopPropagation()} onChange={e => handleToggleNote(note.id, e.target.checked)}
                           className="w-4 h-4 mt-0.5 rounded border-border bg-muted text-amber-500"
                         />
                         <div className="flex-1 min-w-0">
@@ -312,13 +326,13 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
                         </div>
                         {note.action_item_id && (
                           <button
-                            onClick={() => openDetailById(note.action_item_id!)}
+                            onClick={(e) => { e.stopPropagation(); openDetailById(note.action_item_id!); }}
                             className="px-2 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 text-xs font-semibold"
                           >
                             Open Action
                           </button>
                         )}
-                        <button onClick={() => handleDeleteNote(note.id)} className="p-1 rounded hover:bg-red-500/20 text-red-400">
+                        <button onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }} className="p-1 rounded hover:bg-red-500/20 text-red-400">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -333,7 +347,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
             <div className="text-center py-8">
               <CalIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">Nothing scheduled</p>
-              <button onClick={() => { setAddErr(null); setShowAddNote(true); }} className="mt-2 text-xs text-primary hover:text-primary/90">
+              <button onClick={() => { setAddErr(null); setEditNoteId(null); setShowAddNote(true); }} className="mt-2 text-xs text-primary hover:text-primary/90">
                 Add a note or reminder
               </button>
             </div>
@@ -343,11 +357,11 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
 
       {/* Add Note Dialog */}
       {showAddNote && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setAddErr(null); setShowAddNote(false); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }}>
           <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-lg font-bold text-foreground">Add Note</h2>
-              <button onClick={() => { setAddErr(null); setShowAddNote(false); }} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
+              <button onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -393,7 +407,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => { setAddErr(null); setShowAddNote(false); }} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
+                <button onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
                 <button onClick={handleAddNote} disabled={!noteForm.title.trim()} className="flex-1 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold disabled:opacity-50">Add Note</button>
               </div>
             </div>
@@ -404,6 +418,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
 );  };
 
 export default CalendarPage;
+
 
 
 
