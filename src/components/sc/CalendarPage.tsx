@@ -11,6 +11,7 @@ import ActionItemDetailModal from './ActionItemDetailModal';
 import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriority } from '@/lib/sitecommand-utils';
 import PriorityBadge from './PriorityBadge';
 import * as store from '@/lib/sitecommand-store';
+import { supabase } from '@/lib/supabase';
 
 interface CalendarPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -36,7 +37,24 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
     setDetailOpen(false);
     setSelectedItem(null);
   };
-  const [logs, setLogs] = useState<DailyLog[]>([]);
+
+async function openDetailById(id: string) {
+  try {
+    const { data, error } = await supabase
+      .from('action_items')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    if (!data) return;
+
+    openDetail(data as any);
+  } catch (e) {
+    console.error('Failed to load action item', e);
+  }
+}
+const [logs, setLogs] = useState<DailyLog[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [showAddNote, setShowAddNote] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -280,7 +298,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) 
                         </div>
                         {note.action_item_id && (
                           <button
-                            onClick={() => openDetail({ id: note.action_item_id } as any)}
+                            onClick={() => openDetailById(note.action_item_id!)}
                             className="px-2 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 text-xs font-semibold"
                           >
                             Open Action
