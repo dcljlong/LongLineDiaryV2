@@ -46,12 +46,18 @@ async function openDetailById(id: string) {
       .eq('id', id)
       .single();
 
+    // If linked record no longer exists
+    if (!data) {
+      window.alert('Linked action item not found (it may have been deleted).');
+      return;
+    }
+
     if (error) throw error;
-    if (!data) return;
 
     openDetail(data as any);
   } catch (e) {
     console.error('Failed to load action item', e);
+    window.alert('Could not open linked action item.');
   }
 }
 const [logs, setLogs] = useState<DailyLog[]>([]);
@@ -390,6 +396,7 @@ const [logs, setLogs] = useState<DailyLog[]>([]);
 );  };
 
 export default CalendarPage;
+
 
 
 
