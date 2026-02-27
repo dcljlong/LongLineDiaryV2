@@ -1,39 +1,23 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Redirecting…</title>
     <script>
-      // SPA redirect for GitHub Pages (BrowserRouter deep links)
-      // Source pattern: https://github.com/rafgraph/spa-github-pages
       (function () {
         var l = window.location;
         var repoBase = "/LongLineDiaryV2";
-        var path = l.pathname;
+        var path = l.pathname || "";
 
-        // If already rooted correctly, proceed; otherwise just bounce home.
         if (path.indexOf(repoBase) !== 0) {
           l.replace(repoBase + "/");
           return;
         }
 
-        // strip repo base
-        var rel = path.slice(repoBase.length);
-        if (rel === "" || rel === "/") {
-          l.replace(repoBase + "/");
-          return;
-        }
-
-        // build redirect URL: /LongLineDiaryV2/?/<route>&<query>#<hash>
-        var newUrl =
-          repoBase +
-          "/?/" +
-          rel.replace(/^\//, "") +
-          (l.search ? "&" + l.search.slice(1) : "") +
-          l.hash;
-
-        l.replace(newUrl);
+        var rel = path.slice(repoBase.length); // includes leading /
+        var target = repoBase + "/#"+ rel + (l.search || "") + (l.hash || "");
+        l.replace(target);
       })();
     </script>
   </head>
