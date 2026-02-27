@@ -35,7 +35,14 @@ export async function transitionActionItem(
     throw error;
   }
 
-  return true;
+  
+  // Sync linked calendar notes completion to action status (done = completed)
+  const isDone = targetStatus === "done";
+  await supabase
+    .from("calendar_notes")
+    .update({ is_completed: isDone })
+    .eq("action_item_id", id);
+return true;
 }
 
 // RLS-safe: caller can only update rows they own (policies enforce)
@@ -61,4 +68,5 @@ export async function setActionItemDeferUntil(
 
   return true;
 }
+
 
