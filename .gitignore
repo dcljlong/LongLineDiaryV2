@@ -34,3 +34,4 @@ package.json.bak_*
 .env
 playwright/.auth/
 test-results/
+_backups/
