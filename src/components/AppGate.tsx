@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { useAuth } from "@/lib/auth";
@@ -32,11 +32,20 @@ export default function AppGate() {
   const [siteName, setSiteName] = useState("");
   const [role, setRole] = useState<UserRole | undefined>(undefined);
 
-  const needsOnboarding = useMemo(() => {
-    return !!(profile && profile.onboarded === false);
-  }, [profile]);
+  const needsOnboarding = useMemo(() => { return !!(profile && profile.onboarded === false); }, [profile]);
 
   useEffect(() => {
+    // minimal prod diagnostics
+    console.log("[AppGate]", {
+      loading,
+      hasUser: !!user,
+      profileLoaded: !!profile,
+      onboarded: profile?.onboarded,
+      baseUrl: import.meta.env.BASE_URL,
+      href: window.location.href
+    });
+  }, [loading, user, profile]);
+useEffect(() => {
     if (!needsOnboarding) return;
 
     setCompanyName((prev) => (prev ? prev : (profile?.company_name ?? "")));
@@ -53,7 +62,17 @@ export default function AppGate() {
   }
 
   if (!user) {
-    return <LandingGate />;
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground p-6">
+        <div className="w-full max-w-md space-y-4">
+          <div className="text-xl font-semibold">Long Line Diary</div>
+          <div className="text-sm text-muted-foreground">Not signed in. If the login card does not appear below, report this screen.</div>
+          <div className="border border-border rounded-xl overflow-hidden">
+            <LandingGate />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (needsOnboarding) {
@@ -223,5 +242,6 @@ export default function AppGate() {
     </HashRouter>
   );
 }
+
 
 
