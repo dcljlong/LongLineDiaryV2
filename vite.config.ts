@@ -1,11 +1,11 @@
-﻿import { defineConfig } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 import { BRAND_CONFIG } from "./brand.config";
 
 export default defineConfig(() => ({
-  base: './',
+  base: '/LongLineDiaryV2/',
 
   define: {
     __BRAND_APP_NAME__: JSON.stringify(BRAND_CONFIG.appName),
@@ -46,6 +46,7 @@ server: {
     },
   },
 }));
+
 
 
 
