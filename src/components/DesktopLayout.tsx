@@ -1,4 +1,4 @@
-﻿import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
@@ -164,9 +164,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
       </div>
 
       <main
-        className={`transition-all duration-300 min-h-screen print:ml-0 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-60'
-        }`}
+        className={`transition-all duration-300 min-h-screen print:ml-0 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"}`}
       >
         {/* Top bar */}
         <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3 print:hidden">
@@ -272,7 +270,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         {/* Page content */}
         <div className="p-4 lg:p-6">
           <Suspense fallback={
-  <div className="p-6 text-foreground text-sm">Loading…</div>
+  <div className="p-6 text-foreground text-sm">Loading�</div>
 }>
   {renderPage()}</Suspense>
         </div>
@@ -295,6 +293,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
 
 
 
