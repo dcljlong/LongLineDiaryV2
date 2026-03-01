@@ -233,7 +233,7 @@ useEffect(() => {
   }
 
   return (
-    <HashRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <HashRouter  future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/*" element={<DesktopLayout />} />
@@ -242,6 +242,7 @@ useEffect(() => {
     </HashRouter>
   );
 }
+
 
 
 
