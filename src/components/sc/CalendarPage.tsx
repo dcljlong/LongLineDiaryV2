@@ -1,448 +1,374 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
-import { toast } from '@/components/ui/use-toast';
-import {
-  ChevronLeft, ChevronRight, Plus, X, Check, Trash2,
-  Calendar as CalIcon, StickyNote, Bell, Users2, Target, Search, Truck
-} from 'lucide-react';
-import { format, addMonths, subMonths, isSameDay, parseISO } from 'date-fns';
-import type { CalendarNote, DailyLog, Project } from '@/lib/sitecommand-types';
-import ProjectPicker from '@/components/sc/ProjectPicker';
-import ActionItemDetailModal from './ActionItemDetailModal';
-import { NOTE_TYPES } from '@/lib/sitecommand-types';
-import ProjectPicker from '@/components/sc/ProjectPicker';
-import ActionItemDetailModal from './ActionItemDetailModal';
-import { getCalendarGrid, getPriorityDot, formatDate, todayStr, calculatePriority } from '@/lib/sitecommand-utils';
-import PriorityBadge from './PriorityBadge';
-import * as store from '@/lib/sitecommand-store';
-import { supabase } from '@/lib/supabase';
+import React, { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
-interface CalendarPageProps {
-  onNavigate: (page: string, data?: any) => void;
-  initialData?: any;
+type AnyItem = any;
+
+const HOURS_START = 6;
+const HOURS_END = 18;
+
+const dateStr = (d: Date) => d.toISOString().slice(0, 10);
+
+function toTimeInput(v: any): string {
+  if (!v) return "";
+  const s = String(v);
+  if (s.length >= 5) return s.slice(0, 5);
+  return s;
 }
 
-const inputCls = 'lld-input w-full px-3 py-2 rounded-lg text-sm';
-const labelCls = 'block text-xs font-medium text-muted-foreground mb-1';
-
-const CalendarPage: React.FC<CalendarPageProps> = ({ onNavigate, initialData }) => {
-  const [month, setMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(todayStr());
-  const [notes, setNotes] = useState<CalendarNote[]>([]);
-  
-  const [actionDoneById, setActionDoneById] = useState<Record<string, boolean>>({});
-const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any | null>(null);
-
-  const openDetail = (item: any) => {
-    setSelectedItem(item);
-    setDetailOpen(true);
-  };
-
-  const closeDetail = () => {
-    setDetailOpen(false);
-    setSelectedItem(null);
-  };
-
-async function openDetailById(id: string) {
-  try {
-    const { data, error } = await supabase
-      .from('action_items')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    // If linked record no longer exists
-    if (!data) {
-      toast({ title: 'Action not found', description: 'Linked action item was not found (it may have been deleted).', variant: 'destructive' });
-      return;
-    }
-
-    if (error) throw error;
-
-    openDetail(data as any);
-  } catch (e) {
-    console.error('Failed to load action item', e);
-    toast({ title: 'Open failed', description: 'Could not open linked action item.', variant: 'destructive' });
-  }
+function normalizeTimeOrNull(v: string): string | null {
+  const t = (v || "").trim();
+  if (!t) return null;
+  // accept HH:MM
+  return t.length === 5 ? t : t;
 }
-const [logs, setLogs] = useState<DailyLog[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [showAddNote, setShowAddNote] = useState(false);
+
+const CalendarPage: React.FC = () => {
+  const today = new Date();
+  const [mode, setMode] = useState<"month" | "day">("month");
+  const [current, setCurrent] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState<Date>(today);
+  const [items, setItems] = useState<AnyItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<AnyItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [addErr, setAddErr] = useState<string | null>(null);
-  // Note form
-  const [noteForm, setNoteForm] = useState({
-    title: '', description: '', note_type: 'note', priority: 'low', project_id: '',
-  });
 
-  const loadData = async () => {
+  // edit modal state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editBusy, setEditBusy] = useState(false);
+  const [editErr, setEditErr] = useState<string | null>(null);
+
+  const [tTitle, setTTitle] = useState("");
+  const [tDetails, setTDetails] = useState("");
+  const [tDue, setTDue] = useState("");
+  const [tStart, setTStart] = useState("");
+  const [tEnd, setTEnd] = useState("");
+
+  const load = async () => {
     setLoading(true);
+    const { data, error } = await supabase
+      .from("action_items")
+      .select("*")
+      .is("deleted_at", null);
+
+    if (!error && data) setItems(data as AnyItem[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const monthLabel = current.toLocaleString("default", { month: "long", year: "numeric" });
+
+  const changeMonth = (offset: number) => {
+    setCurrent(new Date(current.getFullYear(), current.getMonth() + offset, 1));
+  };
+
+  const dayItems = useMemo(() => {
+    const key = dateStr(selectedDay);
+    return items.filter(i => i.due_date === key);
+  }, [items, selectedDay]);
+
+  const agendaItems = useMemo(() => {
+    return dayItems.filter(i => !i.start_time && !i.end_time);
+  }, [dayItems]);
+
+  const timedItems = useMemo(() => {
+    return dayItems.filter(i => !!i.start_time || !!i.end_time);
+  }, [dayItems]);
+
+  const openEdit = (it: AnyItem) => {
+    setSelectedItem(it);
+    setEditErr(null);
+    setTTitle(String(it.title || ""));
+    setTDetails(String(it.details || ""));
+    setTDue(String(it.due_date || dateStr(selectedDay)));
+    setTStart(toTimeInput(it.start_time));
+    setTEnd(toTimeInput(it.end_time));
+    setEditOpen(true);
+  };
+
+  const closeEdit = () => {
+    if (editBusy) return;
+    setEditOpen(false);
+    setSelectedItem(null);
+    setEditErr(null);
+  };
+
+  const saveEdit = async () => {
+    if (!selectedItem?.id) return;
+    setEditBusy(true);
+    setEditErr(null);
+
     try {
-      const [n, l, p] = await Promise.all([
-        store.fetchCalendarNotes(month.getMonth(), month.getFullYear()),
-        store.fetchDailyLogs(),
-        store.fetchProjects(),
-      ]);
-      setNotes(n);
-      setLogs(l);
-      setProjects(p);
-        } catch (e: any) {
-      console.error(e);
-      setAddErr(e?.message || "Failed to add note");
-    }    setLoading(false);
+      const payload: any = {
+        title: (tTitle || "").trim() || null,
+        details: (tDetails || "").trim() || null,
+        due_date: (tDue || "").trim() || null,
+        start_time: normalizeTimeOrNull(tStart),
+        end_time: normalizeTimeOrNull(tEnd),
+      };
+
+      const { error } = await supabase
+        .from("action_items")
+        .update(payload)
+        .eq("id", selectedItem.id);
+
+      if (error) throw error;
+
+      await load();
+      setEditOpen(false);
+      setSelectedItem(null);
+    } catch (e: any) {
+      setEditErr(e?.message || "Save failed");
+    } finally {
+      setEditBusy(false);
+    }
   };
 
-  useEffect(() => { loadData(); }, [month]);
-
-  // Sync month with selectedDate (so notes created on another month appear immediately)
-  useEffect(() => {
-    try {
-      const d = parseISO(selectedDate);
-      if (d.getFullYear() !== month.getFullYear() || d.getMonth() !== month.getMonth()) {
-        setMonth(d);
-      }
-    } catch {}
-  }, [selectedDate]);
-  const grid = getCalendarGrid(month.getFullYear(), month.getMonth());
-
-  // Get items for a specific date
-  const getDateItems = (dateStr: string) => {
-    const dateLogs = logs.filter(l => l.log_date === dateStr);
-    const dateNotes = notes.filter(n => n.note_date === dateStr);
-    return { logs: dateLogs, notes: dateNotes };
-  };
-
-  const selectedItems = getDateItems(selectedDate);
-
-  const handleAddNote = async () => {
-    try {
-      setAddErr(null);
-      await store.createCalendarNote({
-        ...noteForm,
-        note_date: selectedDate,
-        project_id: noteForm.project_id || null,
-        is_completed: false,
-      } as any);
-      setNoteForm({ title: '', description: '', note_type: 'note', priority: 'low', project_id: '' });
-      setShowAddNote(false); setEditNoteId(null);
-      loadData();
-        } catch (e: any) {
-      console.error(e);
-      setAddErr(e?.message || "Failed to add note");
-    }  };
-function openEditNote(note: any) {
-  setAddErr(null);
-  setEditNoteId(note.id);
-  setNoteForm({
-    title: note.title || '',
-    description: note.description || '',
-    note_type: note.note_type || 'note',
-    priority: note.priority || 'med',
-    project_id: note.project_id || null,
-    action_item_id: note.action_item_id || null,
-  });
-  setShowAddNote(true);
-}
-
-const handleToggleNote = async (id: string, completed: boolean) => {
-    await store.updateCalendarNote(id, { is_completed: completed });
-    loadData();
-  };
-
-  const handleDeleteNote = async (id: string) => {
-    await store.deleteCalendarNote(id);
-    loadData();
-  };
-
-  const noteTypeIcon: Record<string, React.ElementType> = {
-    note: StickyNote,
-    reminder: Bell,
-    meeting: Users2,
-    deadline: Target,
-    inspection: Search,
-    delivery: Truck,
-  };
-
-  const noteTypeColor: Record<string, string> = {
-    note: 'bg-blue-500',
-    reminder: 'bg-purple-500',
-    meeting: 'bg-indigo-500',
-    deadline: 'bg-red-500',
-    inspection: 'bg-primary',
-    delivery: 'bg-green-500',
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Calendar</h1>
+    <div className="p-6 space-y-4">
+
+      <div className="flex gap-2">
         <button
-          onClick={() => { setAddErr(null); setEditNoteId(null); setShowAddNote(true); }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-colors"
+          onClick={() => setMode("month")}
+          className={"px-3 py-1 border rounded " + (mode==="month" ? "bg-primary text-primary-foreground" : "")}
         >
-          <Plus className="w-4 h-4" />
-          Add Note
+          Month
+        </button>
+        <button
+          onClick={() => setMode("day")}
+          className={"px-3 py-1 border rounded " + (mode==="day" ? "bg-primary text-primary-foreground" : "")}
+        >
+          Day
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar Grid */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setMonth(subMonths(month, 1))} className="p-2 rounded-lg hover:bg-muted text-muted-foreground">
-              <ChevronLeft className="w-5 h-5" />
+      {mode === "month" && (
+        <>
+          <div className="flex justify-between items-center">
+            <button onClick={() => changeMonth(-1)} className="px-3 py-1 border rounded">?</button>
+            <div className="text-lg font-semibold">{monthLabel}</div>
+            <button onClick={() => changeMonth(1)} className="px-3 py-1 border rounded">?</button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-2 text-sm text-center text-muted-foreground">
+            {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => <div key={d}>{d}</div>)}
+          </div>
+
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: 42 }).map((_, i) => {
+              const first = new Date(current.getFullYear(), current.getMonth(), 1);
+              const startDay = first.getDay();
+              const dayNum = i - startDay + 1;
+              const daysInMonth = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+              if (dayNum < 1 || dayNum > daysInMonth) {
+                return <div key={i} className="h-24 border rounded bg-muted/20" />;
+              }
+
+              const date = new Date(current.getFullYear(), current.getMonth(), dayNum);
+              const key = dateStr(date);
+              const count = items.filter(it => it.due_date === key).length;
+
+              return (
+                <div
+                  key={i}
+                  onClick={() => { setSelectedDay(date); setMode("day"); }}
+                  className="h-24 border rounded p-1 cursor-pointer hover:bg-muted/40"
+                >
+                  <div className="text-xs">{dayNum}</div>
+                  {count > 0 && (
+                    <div className="mt-1 text-xs bg-primary/20 px-1 rounded">
+                      {count} item{count>1?"s":""}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {mode === "day" && (
+        <>
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => setSelectedDay(new Date(selectedDay.getTime() - 86400000))}
+              className="px-3 py-1 border rounded"
+            >
+              ?
             </button>
-            <h2 className="text-lg font-bold text-foreground">{format(month, 'MMMM yyyy')}</h2>
-            <button onClick={() => setMonth(addMonths(month, 1))} className="p-2 rounded-lg hover:bg-muted text-muted-foreground">
-              <ChevronRight className="w-5 h-5" />
+
+            <div className="font-semibold">
+              {selectedDay.toDateString()}
+            </div>
+
+            <button
+              onClick={() => setSelectedDay(new Date(selectedDay.getTime() + 86400000))}
+              className="px-3 py-1 border rounded"
+            >
+              ?
             </button>
           </div>
 
-          {/* Day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-              <div key={d} className="text-center text-xs font-medium text-muted-foreground py-2">{d}</div>
-            ))}
+          {agendaItems.length > 0 && (
+            <div className="border rounded p-3 space-y-2">
+              <div className="text-sm font-semibold">Agenda (no time)</div>
+              {agendaItems.map((a: AnyItem) => (
+                <button
+                  key={a.id}
+                  onClick={() => openEdit(a)}
+                  className="w-full text-left px-3 py-2 rounded border hover:bg-muted/40"
+                >
+                  {a.title || "Untitled"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="relative border rounded h-[600px] overflow-hidden">
+            {Array.from({ length: HOURS_END - HOURS_START + 1 }).map((_, i) => {
+              const hour = HOURS_START + i;
+              return (
+                <div
+                  key={hour}
+                  className="absolute left-0 right-0 border-t text-xs text-muted-foreground"
+                  style={{ top: (i / (HOURS_END - HOURS_START)) * 100 + "%" }}
+                >
+                  <span className="absolute -left-12">{hour}:00</span>
+                </div>
+              );
+            })}
+
+            {timedItems.map((n: AnyItem, idx: number) => {
+              const sh = n.start_time ? parseInt(String(n.start_time).split(":")[0]) : 8;
+              const eh = n.end_time ? parseInt(String(n.end_time).split(":")[0]) : (sh + 2);
+
+              const top = ((sh - HOURS_START) / (HOURS_END - HOURS_START)) * 100;
+              const height = ((eh - sh) / (HOURS_END - HOURS_START)) * 100;
+
+              const lane = idx % 3;
+              const leftPx = 64 + (lane * 10);
+              const rightPx = 16 + ((2 - lane) * 10);
+
+              return (
+                <div
+                  key={n.id}
+                  onClick={() => openEdit(n)}
+                  className="absolute rounded p-2 text-xs bg-primary/20 border border-primary cursor-pointer hover:bg-primary/30 overflow-hidden"
+                  style={{
+                    top: top + "%",
+                    height: Math.max(height, 6) + "%",
+                    left: leftPx + "px",
+                    right: rightPx + "px",
+                    zIndex: 10 + lane
+                  }}
+                >
+                  <div className="font-medium leading-4 truncate">{n.title || "Untitled"}</div>
+                </div>
+              );
+            })}
           </div>
+        </>
+      )}
 
-          {/* Calendar cells */}
-          {grid.map((week, wi) => (
-            <div key={wi} className="grid grid-cols-7 gap-1">
-              {week.map((day, di) => {
-                if (!day) return <div key={di} className="aspect-square" />;
-                const dateStr = format(day, 'yyyy-MM-dd');
-                const isSelected = dateStr === selectedDate;
-                const isToday = isSameDay(day, new Date());
-                const items = getDateItems(dateStr);
-                const hasLogs = items.logs.length > 0;
-                const hasNotes = items.notes.length > 0;
-
-                return (
-                  <button
-                    key={di}
-                    onClick={() => setSelectedDate(dateStr)}
-                    className={`aspect-square p-1 rounded-lg flex flex-col items-start transition-colors relative ${
-                      isSelected ? 'bg-primary/20 border-2 border-primary/50'
-                      : isToday ? 'bg-muted/70 border border-border'
-                      : 'hover:bg-muted/30 border border-transparent'
-                    }`}
-                  >
-                    <span className={`text-xs font-medium ${isSelected ? 'text-primary' : isToday ? 'text-foreground' : 'text-foreground'}`}>
-                      {day.getDate()}
-                    </span>
-                    <div className="flex gap-0.5 mt-auto flex-wrap">
-                      {hasLogs && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
-                      {items.notes.slice(0, 3).map((n, ni) => (
-                        <span key={ni} className={`w-1.5 h-1.5 rounded-full ${noteTypeColor[n.note_type] || 'bg-blue-500'}`} />
-                      ))}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-
-          {/* Legend */}
-          <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-border">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="w-2 h-2 rounded-full bg-primary" /> Jobs
-            </div>
-            {NOTE_TYPES.map(t => (
-              <div key={t.value} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className={`w-2 h-2 rounded-full ${t.color}`} /> {t.label}
+      {editOpen && (
+        <div className="fixed inset-0 z-50">
+          <button
+            type="button"
+            aria-label="Close"
+            className="absolute inset-0 bg-black/60"
+            onClick={closeEdit}
+          />
+          <div className="absolute inset-x-0 top-10 mx-auto w-[95%] max-w-xl">
+            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <div className="text-base font-semibold">Edit Item</div>
+                {editErr && <div className="mt-2 text-sm text-danger">{editErr}</div>}
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Selected Date Panel */}
-        <div className="bg-card border border-border rounded-xl p-4 overflow-y-auto max-h-[700px]">
-          <h3 className="text-sm font-bold text-foreground mb-3">
-            {format(parseISO(selectedDate), 'EEEE, dd MMMM yyyy')}
-          </h3>
-
-          {/* Jobs for this date */}
-          {selectedItems.logs.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold text-foreground/80 uppercase mb-2">Jobs</h4>
-              <div className="space-y-2">
-                {selectedItems.logs.map(log => (
-                  <button
-                    key={log.id}
-                    onClick={() => onNavigate('daily-logs', { logId: log.id })}
-                    className="w-full text-left p-3 rounded-lg bg-primary/10 border border-amber-500/20 hover:border-amber-500/40 transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-primary">#{log.project?.job_number || 'â€”'}</span>
-                      <PriorityBadge priority={log.priority} size="sm" showIcon={false} />
-                    </div>
-                    <p className="text-sm font-medium text-foreground mt-1">{log.project?.name || 'Unknown'}</p>
-                    {log.weather && <p className="text-xs text-muted-foreground mt-1">{log.weather} {log.temperature}</p>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Notes for this date */}
-          {selectedItems.notes.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold text-foreground/80 uppercase mb-2">Notes & Reminders</h4>
-              <div className="space-y-2">
-                {selectedItems.notes.map(note => {
-                  const NoteIcon = noteTypeIcon[note.note_type] || StickyNote;
-                  return (
-                    <div
-                      key={note.id}
-                      onClick={() => openEditNote(note)}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        note.is_completed ? 'bg-card/30 border-border opacity-60' : 'bg-muted/60 border-border'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2">
-                        <input
-                          type="checkbox"
-                          checked={note.is_completed}
-                          onClick={e => e.stopPropagation()} onChange={e => handleToggleNote(note.id, e.target.checked)}
-                          className="w-4 h-4 mt-0.5 rounded border-border bg-muted text-amber-500"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <NoteIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span className={`text-sm font-medium ${note.is_completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                              {note.title}
-                              {note.action_item_id && actionDoneById[note.action_item_id] && (
-  <span className="ml-2 inline-flex items-center rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 px-2 py-0.5 text-[10px] font-semibold">
-    Completed
-  </span>
-)}
-                            </span>
-                          </div>
-                          {note.description && (
-                            <p className="text-xs text-muted-foreground mt-1">{note.description}</p>
-                          )}
-                          <div className="flex items-center gap-2 mt-1">
-                            <PriorityBadge priority={note.priority} size="sm" showIcon={false} />
-                            <span className="text-[10px] text-muted-foreground capitalize">{note.note_type}</span>
-                          </div>
-                        </div>
-                        {note.action_item_id && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); openDetailById(note.action_item_id!); }}
-                            className="px-2 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 text-xs font-semibold"
-                          >
-                            Open Action
-                          </button>
-                        )}
-                        <button onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }} className="p-1 rounded hover:bg-red-500/20 text-red-400">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {selectedItems.logs.length === 0 && selectedItems.notes.length === 0 && (
-            <div className="text-center py-8">
-              <CalIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nothing scheduled</p>
-              <button onClick={() => { setAddErr(null); setEditNoteId(null); setShowAddNote(true); }} className="mt-2 text-xs text-primary hover:text-primary/90">
-                Add a note or reminder
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Add Note Dialog */}
-      {showAddNote && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-lg font-bold text-foreground">Add Note</h2>
-              <button onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-4 space-y-3">
-              {addErr && (
-                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                  {addErr}
+              <div className="p-4 space-y-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Title</label>
+                  <input
+                    className="w-full px-3 py-2 border rounded bg-background"
+                    value={tTitle}
+                    onChange={(e) => setTTitle(e.target.value)}
+                    placeholder="Title"
+                  />
                 </div>
-              )}
-              <div>
-                <label className={labelCls}>Date</label>
-                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Title *</label>
-                <input value={noteForm.title} onChange={e => setNoteForm({ ...noteForm, title: e.target.value })} className={inputCls} placeholder="e.g. Order plasterboard" />
-              </div>
-              <div>
-                <label className={labelCls}>Description</label>
-                <textarea value={noteForm.description} onChange={e => setNoteForm({ ...noteForm, description: e.target.value })} rows={2} className={`${inputCls} resize-none`} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>Type</label>
-                  <select value={noteForm.note_type} onChange={e => setNoteForm({ ...noteForm, note_type: e.target.value })} className={inputCls}>
-                    {NOTE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                  </select>
+
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Details</label>
+                  <textarea
+                    className="w-full px-3 py-2 border rounded bg-background min-h-[90px]"
+                    value={tDetails}
+                    onChange={(e) => setTDetails(e.target.value)}
+                    placeholder="Details"
+                  />
                 </div>
-                <div>
-                  <label className={labelCls}>Priority</label>
-                  <select value={noteForm.priority} onChange={e => setNoteForm({ ...noteForm, priority: e.target.value })} className={inputCls}>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Due date</label>
+                    <input
+                      type="date"
+                      className="w-full px-3 py-2 border rounded bg-background"
+                      value={tDue}
+                      onChange={(e) => setTDue(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Start</label>
+                    <input
+                      type="time"
+                      className="w-full px-3 py-2 border rounded bg-background"
+                      value={tStart}
+                      onChange={(e) => setTStart(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">End</label>
+                    <input
+                      type="time"
+                      className="w-full px-3 py-2 border rounded bg-background"
+                      value={tEnd}
+                      onChange={(e) => setTEnd(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
-              <div>
-                <label className={labelCls}>Link to Project (optional)</label>
-                <ProjectPicker
-                  projects={projects}
-                  value={noteForm.project_id}
-                  onChange={(id) => setNoteForm({ ...noteForm, project_id: id ?? '' })}
-                  className={inputCls}
-                  includeBlank={true}
-                  blankLabel="No project"
-/>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button onClick={() => { setAddErr(null); setShowAddNote(false); setEditNoteId(null); }} className="flex-1 py-2.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-sm font-medium">Cancel</button>
-                <button onClick={handleAddNote} disabled={!noteForm.title.trim()} className="flex-1 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold disabled:opacity-50">Add Note</button>
+
+              <div className="p-4 border-t border-border flex justify-end gap-2">
+                <button
+                  className="px-3 py-2 border rounded"
+                  onClick={closeEdit}
+                  disabled={editBusy}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-3 py-2 rounded bg-primary text-primary-foreground"
+                  onClick={saveEdit}
+                  disabled={editBusy}
+                >
+                  {editBusy ? "Saving..." : "Save"}
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
-);  };
+  );
+};
 
 export default CalendarPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

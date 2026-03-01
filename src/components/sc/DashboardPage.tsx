@@ -1,6 +1,5 @@
-ï»¿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  HardHat,
   Package,
   Clock,
   CheckCircle2,
@@ -86,21 +85,17 @@ function toDateOnlyStr(d: Date): string {
 
 function computeBucketFallback(dueDate: any): BucketKey {
   if (!dueDate) return 'no_due_date';
-
   const due = new Date(dueDate);
   if (Number.isNaN(due.getTime())) return 'no_due_date';
-
   const today = new Date();
   const todayStrLocal = toDateOnlyStr(today);
   const dueStrLocal = toDateOnlyStr(due);
-
   if (dueStrLocal < todayStrLocal) return 'overdue';
   if (dueStrLocal === todayStrLocal) return 'due_today';
   return 'upcoming';
 }
 
 function priorityRank(p?: string | null): number {
-  // higher priority sorts first
   if (!p) return 3;
   const v = String(p).toLowerCase();
   if (v === 'critical') return 0;
@@ -113,7 +108,6 @@ function priorityRank(p?: string | null): number {
 const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [todayLogs, setTodayLogs] = useState<DailyLog[]>([]);
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [incomplete, setIncomplete] = useState<IncompleteItems | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -125,7 +119,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     setSelectedItem(item);
     setDetailOpen(true);
   };
-
   const closeDetail = () => {
     setDetailOpen(false);
     setSelectedItem(null);
@@ -139,17 +132,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         fetchDailyLogs({ date: todayStr() }),
         fetchAllIncompleteItems(),
       ]);
-
       setProjects(p);
       setTodayLogs(tl);
       setIncomplete(inc);
 
-      const { data: m, error: mErr } = await supabase
-        .from('dashboard_metrics_v')
-        .select('*')
-        .single();
-
-      if (!mErr && m) setMetrics(m as any);
     } catch (e) {
       console.error(e);
     }
@@ -158,13 +144,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   useEffect(() => {
     loadData();
-
     const handler = () => {
       void loadData();
     };
-
     window.addEventListener('lldv2:action-items-changed', handler as EventListener);
-
     return () => {
       window.removeEventListener('lldv2:action-items-changed', handler as EventListener);
     };
@@ -173,15 +156,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const carryForwardToToday = async () => {
     const ok = window.confirm('Carry forward ALL overdue items to today?');
     if (!ok) return;
-
     setCarryBusy(true);
     setCarryNote(null);
-
     try {
       const target = todayStr();
       const { data, error } = await supabase.rpc('carry_forward_action_items', { target_date: target });
       if (error) throw error;
-
       const count = Number(data || 0);
       setCarryNote(`Carry forward complete: ${count} item${count === 1 ? '' : 's'} updated`);
       await loadData();
@@ -195,21 +175,17 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   const carryForwardProject = async (projectId: string) => {
     if (carryBusy) return;
-
     const target = todayStr();
     const ok = window.confirm('Carry forward overdue items for this project to today?');
     if (!ok) return;
-
     setCarryBusy(true);
     setCarryNote(null);
-
     try {
-      const { data, error } = await supabase.rpc(
-        'carry_forward_action_items_by_project',
-        { target_date: target, project_uuid: projectId }
-      );
+      const { data, error } = await supabase.rpc('carry_forward_action_items_by_project', {
+        target_date: target,
+        project_uuid: projectId,
+      });
       if (error) throw error;
-
       const count = Number(data || 0);
       setCarryNote(`Project carry forward complete: ${count} item${count === 1 ? '' : 's'} updated`);
       await loadData();
@@ -223,7 +199,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   const allActionItems = useMemo(() => {
     if (!incomplete) return [];
-
     const items: any[] = [
       ...incomplete.activities,
       ...incomplete.materials,
@@ -232,79 +207,51 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     ];
 
     return items
-      .filter((raw) => {
-        if (!raw.defer_until) return true;
-        const today = new Date().toISOString().slice(0, 10);
-        return raw.defer_until <= today;
-      })
+      .filter((raw) => !raw.defer_until || raw.defer_until <= new Date().toISOString().slice(0, 10))
       .map((raw) => {
         const due = raw.due_date ?? raw.required_date ?? null;
-
-        const bucket: BucketKey =
-          (raw.bucket as BucketKey) ||
-          computeBucketFallback(due);
+        const bucket: BucketKey = (raw.bucket as BucketKey) || computeBucketFallback(due);
 
         const projectName =
-          raw.daily_logs?.projects?.name ||
-          raw.project?.name ||
-          raw.projects?.name ||
-          raw._project ||
+          raw.daily_logs?.projects?.name ??
+          raw.project?.name ??
+          raw.projects?.name ??
+          raw._project ??
           'Unknown';
 
         const jobNumber =
-          raw.daily_logs?.projects?.job_number ||
-          raw.project?.job_number ||
-          raw.projects?.job_number ||
-          raw._jobNumber ||
+          raw.daily_logs?.projects?.job_number ??
+          raw.project?.job_number ??
+          raw.projects?.job_number ??
+          raw._jobNumber ??
           '';
 
-        const title =
-          raw.title ||
-          raw.description ||
-          raw.equipment_name ||
-          raw.worker_name ||
-          'Unnamed';
-
-        const details =
-          raw.details ||
-          raw.notes ||
-          raw.note ||
-          '';
-
-        const priority = (raw.priority || raw._priority || 'medium');
+        const title = raw.title ?? raw.description ?? raw.equipment_name ?? raw.worker_name ?? 'Unnamed';
+        const details = raw.details ?? raw.notes ?? raw.note ?? '';
+        const priority = raw.priority ?? raw._priority ?? 'medium';
 
         return {
           ...raw,
           _bucket: bucket,
           _due: due,
-          _project: projectName,
-          _jobNumber: jobNumber,
-          _title: title,
-          _details: details,
-          _priority: priority,
+          _project: String(projectName),
+          _jobNumber: String(jobNumber),
+          _title: String(title),
+          _details: String(details),
+          _priority: String(priority),
         };
       });
   }, [incomplete]);
 
   const bucketed = useMemo(() => {
-    const byBucket: Record<BucketKey, any[]> = {
-      overdue: [],
-      due_today: [],
-      upcoming: [],
-      no_due_date: [],
-    };
-
-    for (const item of allActionItems) {
-      byBucket[item._bucket as BucketKey].push(item);
-    }
+    const byBucket: Record<BucketKey, any[]> = { overdue: [], due_today: [], upcoming: [], no_due_date: [] };
+    for (const item of allActionItems) byBucket[item._bucket as BucketKey].push(item);
 
     const sortFn = (a: any, b: any) => {
-      // 1) priority
       const pa = priorityRank(a._priority);
       const pb = priorityRank(b._priority);
       if (pa !== pb) return pa - pb;
 
-      // 2) due_date ASC (nulls last)
       const ad = a._due ? new Date(a._due).getTime() : Number.POSITIVE_INFINITY;
       const bd = b._due ? new Date(b._due).getTime() : Number.POSITIVE_INFINITY;
       return ad - bd;
@@ -317,29 +264,35 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     return byBucket;
   }, [allActionItems]);
 
-  const activeProjectsCount = projects.filter(p => p.status === 'active').length;
+  const activeProjects = useMemo(() => projects.filter((p) => p.status === 'active'), [projects]);
+  const activeProjectsCount = activeProjects.length;
 
-  const mOpen = metrics?.open_total ?? 0;
-  const mOverdue = metrics?.overdue_total ?? 0;
-  const mDeferred = metrics?.deferred_total ?? 0;
-  const mDone7 = metrics?.completed_last_7_days ?? 0;
+  const mOpen = allActionItems.length;
+  const mOverdue = bucketed.overdue.length;
+  const mDeferred = 0;
+  const mDone7 = 0;
 
-  const statCards: Array<{ label: string; value: number; icon: any; color: string; textColor: string; }> = [
-    { label: 'Active Projects', value: activeProjectsCount, icon: Briefcase, color: 'from-blue-500 to-blue-600', textColor: 'text-blue-400' },
-    { label: 'Open Items', value: mOpen, icon: ClipboardList, color: 'from-indigo-500 to-indigo-600', textColor: 'text-indigo-400' },
-    { label: 'Overdue', value: mOverdue, icon: Clock, color: 'from-red-500 to-red-600', textColor: 'text-danger' },
-    { label: 'Deferred', value: mDeferred, icon: Clock, color: 'from-purple-500 to-purple-600', textColor: 'text-purple-400' },
-    { label: 'Done (7d)', value: mDone7, icon: CheckCircle2, color: 'from-emerald-500 to-emerald-600', textColor: 'text-emerald-400' },
+  const statCards = [
+    { label: 'Active Projects', value: activeProjectsCount, icon: Briefcase },
+    { label: 'Open Items', value: mOpen, icon: ClipboardList },
+    { label: 'Overdue', value: mOverdue, icon: Clock },
+    { label: 'Deferred', value: mDeferred, icon: Clock },
+    { label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
   ];
 
   const quickActions = [
-    { label: 'Work Activity', icon: Activity, color: 'bg-blue-500/20 text-blue-600 border-blue-500/30', action: () => onNavigate('daily-logs', { tab: 'activities' }) },
-    { label: 'Materials', icon: Package, color: 'bg-purple-500/20 text-purple-600 border-purple-500/30', action: () => onNavigate('daily-logs', { tab: 'materials' }) },
-    { label: 'Equipment', icon: Wrench, color: 'bg-primary/20 text-primary border-primary/30', action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
-    { label: 'Crew', icon: UserCheck, color: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/30', action: () => onNavigate('daily-logs', { tab: 'crew' }) },
-    { label: 'Visitor', icon: Eye, color: 'bg-indigo-500/20 text-indigo-600 border-indigo-500/30', action: () => onNavigate('daily-logs', { tab: 'visitors' }) },
-    { label: 'Delivery', icon: Truck, color: 'bg-rose-500/20 text-rose-600 border-rose-500/30', action: () => onNavigate('calendar', { type: 'delivery' }) },
+    { label: 'Work Activity', icon: Activity, action: () => onNavigate('daily-logs', { tab: 'activities' }) },
+    { label: 'Materials', icon: Package, action: () => onNavigate('daily-logs', { tab: 'materials' }) },
+    { label: 'Equipment', icon: Wrench, action: () => onNavigate('daily-logs', { tab: 'equipment' }) },
+    { label: 'Crew', icon: UserCheck, action: () => onNavigate('daily-logs', { tab: 'crew' }) },
+    { label: 'Visitor', icon: Eye, action: () => onNavigate('daily-logs', { tab: 'visitors' }) },
+    { label: 'Delivery', icon: Truck, action: () => onNavigate('calendar', { type: 'delivery' }) },
   ];
+
+  const todayLabel = useMemo(() => {
+    const t = todayStr();
+    return `${formatDate(t)} (${relativeDayLabel(t)})`;
+  }, []);
 
   if (loading) {
     return (
@@ -349,294 +302,174 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     );
   }
 
-  const totalOpen = allActionItems.length;
+  const renderItem = (it: any) => {
+    const dueLabel = it._due ? `${formatDate(it._due)} (${relativeDayLabel(it._due)})` : 'No due date';
+    return (
+      <button
+        key={it.id}
+        type="button"
+        onClick={() => openDetail(it)}
+        className="w-full rounded-md border p-3 text-left hover:bg-muted/50"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="truncate font-medium">{it._title}</div>
+            {it._details ? (
+              <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{it._details}</div>
+            ) : null}
+            <div className="mt-2 text-xs text-muted-foreground">
+              {it._project}
+              {it._jobNumber ? ` • ${it._jobNumber}` : ''}
+              {it._due ? ` • Due ${dueLabel}` : ' • No due date'}
+            </div>
+          </div>
+          <div className="shrink-0 flex items-center gap-2">
+            <PriorityBadge priority={it._priority} />
+          </div>
+        </div>
+      </button>
+    );
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Command Center</h1>
-          <p className="text-muted-foreground text-sm mt-1">{formatDate(todayStr())} â€” {todayLogs.length} job{todayLogs.length !== 1 ? 's' : ''} logged today</p>
+      <div className="rounded-lg border bg-card p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-lg font-semibold">Command Center</div>
+            <div className="text-sm text-muted-foreground">Today: {todayLabel}</div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Projects: {projects.length} • Today logs: {todayLogs.length} • Items: {allActionItems.length}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onQuickAdd}
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"
+            >
+              <Plus className="h-4 w-4" />
+              Quick Add
+            </button>
+
+            <button
+              type="button"
+              onClick={carryForwardToToday}
+              disabled={carryBusy}
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50"
+              title="Carry forward overdue items to today"
+            >
+              <ArrowRight className="h-4 w-4" />
+              Carry Forward
+            </button>
+          </div>
         </div>
-        <button
-          onClick={onQuickAdd}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          New Job
-        </button>
+
+        {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
+
+        {/* Stats */}
+        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+          {statCards.map((s) => (
+            <div key={s.label} className="rounded-md border p-3">
+              <div className="flex items-center gap-2">
+                <s.icon className="h-4 w-4 text-muted-foreground" />
+                <div className="text-xs text-muted-foreground">{s.label}</div>
+              </div>
+              <div className="mt-2 text-2xl font-semibold">{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-6">
+          {quickActions.map((a) => (
+            <button
+              key={a.label}
+              type="button"
+              onClick={a.action}
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"
+            >
+              <a.icon className="h-4 w-4" />
+              <span className="truncate">{a.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {statCards.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <div key={i} className="bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-4 hover:border-primary/40/50 transition-colors">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center`}>
-                  <Icon className="w-4 h-4 text-foreground" />
+      {/* Active Projects */}
+      <div className="rounded-lg border bg-card p-4">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-semibold">Active Projects</div>
+          <div className="text-xs text-muted-foreground">{activeProjectsCount} active</div>
+        </div>
+
+        {activeProjectsCount === 0 ? (
+          <div className="mt-3 text-sm text-muted-foreground">
+            No active projects found (projects table currently empty for this user).
+          </div>
+        ) : (
+          <div className="mt-3 space-y-2">
+            {activeProjects.slice(0, 8).map((p: any) => (
+              <div key={p.id} className="rounded-md border p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">{p.name || 'Unnamed Project'}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {p.job_number ? `Job ${p.job_number}` : ''} {p.site_name ? `• ${p.site_name}` : ''}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => carryForwardProject(String(p.id))}
+                    disabled={carryBusy}
+                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs hover:bg-muted disabled:opacity-50"
+                    title="Carry forward overdue items for this project"
+                  >
+                    <ArrowRight className="h-3 w-3" />
+                    Carry
+                  </button>
                 </div>
               </div>
-              <div className="text-2xl font-bold text-foreground">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Buckets */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {BUCKETS.map((b) => {
+          const items = bucketed[b.key] || [];
+          return (
+            <div key={b.key} className={`rounded-lg border bg-card p-4 ${b.cardLeftBorderClass}`}>
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold">{b.title}</div>
+                <div className={`text-xs px-2 py-1 rounded-full ${b.pillClass}`}>{items.length}</div>
+              </div>
+
+              {items.length === 0 ? (
+                <div className="mt-3 text-sm text-muted-foreground">No items.</div>
+              ) : (
+                <div className="mt-3 space-y-2">{items.slice(0, 10).map(renderItem)}</div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Quick Add</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-          {quickActions.map((a, i) => {
-            const Icon = a.icon;
-            return (
-              <button
-                key={i}
-                onClick={a.action}
-                className={`flex flex-col items-center gap-2 p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 border ${a.color} hover:scale-105 transition-transform`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-xs font-medium">{a.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Projects */}
-        <div className="lg:col-span-1">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Active Projects</h2>
-            <button onClick={() => onNavigate('daily-logs')} className="text-xs text-primary hover:text-primary/90 flex items-center gap-1">
-              View All <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-            {projects.filter(p => p.status === 'active').length === 0 ? (
-              <div className="bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-6 text-center">
-                <HardHat className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No active projects</p>
-                <button onClick={onQuickAdd} className="mt-2 text-xs text-primary hover:text-primary/90">
-                  Create your first job
-                </button>
-              </div>
-            ) : (
-              projects.filter(p => p.status === 'active').map(p => {
-                const projectLogs = todayLogs.filter(l => l.project_id === p.id);
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => onNavigate('daily-logs', { project_id: p.id })}
-                    className="w-full text-left bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-4 hover:border-primary/30 transition-colors"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                            {p.job_number || '#'}
-                          </span>
-                        </div>
-                        <h3 className="text-sm font-semibold text-foreground mt-1 truncate">{p.name}</h3>
-                        <p className="text-xs text-muted-foreground truncate">{p.location || p.client || 'No location'}</p>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-1 ml-2">
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); void carryForwardProject(p.id); }}
-                          className="mt-1 text-[10px] px-2 py-1 rounded border border-primary/40 bg-muted hover:bg-muted/70"
-                          title="Carry forward overdue items for this project to today"
-                        >
-                          Carry
-                        </button>
-
-                        {projectLogs.length > 0 && (
-                          <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
-                            Logged today
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        {/* Command Center */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Command Center</h2>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => void carryForwardToToday()}
-                disabled={carryBusy}
-                className="text-xs px-2.5 py-1.5 rounded-lg border border-primary/40 bg-muted hover:bg-muted/70 text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Carry forward overdue items to today"
-              >
-                {carryBusy ? 'Carryingâ€¦' : 'Carry Forward to Today'}
-              </button>
-              <span className="text-xs text-muted-foreground">{totalOpen} open item{totalOpen !== 1 ? 's' : ''}</span>
-            </div>
-          </div>
-
-          {carryNote && (
-            <div className="mb-2 text-xs text-muted-foreground">
-              {carryNote}
-            </div>
-          )}
-
-          {totalOpen === 0 ? (
-            <div className="bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-8 text-center">
-              <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
-              <p className="text-sm text-foreground font-medium">All clear!</p>
-              <p className="text-xs text-muted-foreground mt-1">No outstanding items to show</p>
-            </div>
-          ) : (
-            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-              {BUCKETS.map((b) => {
-                const rows = bucketed[b.key] || [];
-                if (rows.length === 0) return null;
-
-                return (
-                  <div key={b.key} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[11px] font-semibold px-2 py-1 rounded-lg ${b.pillClass}`}>
-                          {b.title}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{rows.length}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      {rows.slice(0, 50).map((item: any, i: number) => (
-                        <button
-                          key={`${item.id || 'x'}-${b.key}-${i}`}
-                          type="button"
-                          onClick={() => openDetail(item)}
-                          className={`w-full text-left bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-3 hover:border-primary/40/50 transition-colors ${b.cardLeftBorderClass}`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm font-medium text-foreground truncate">
-                                  {item._title}
-                                </span>
-                                <PriorityBadge priority={String(item._priority).toLowerCase()} size="sm" showIcon={false} />
-                                {item.category && (
-                                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                                    {String(item.category)}
-                                  </span>
-                                )}
-                                {item.status && (
-                                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                                    {String(item.status)}
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                                <span className="truncate">{item._project}</span>
-                                {item._jobNumber && <span className="font-mono text-primary/60">#{item._jobNumber}</span>}
-                                {item._due && (
-  <span className="flex items-center gap-2">
-    <span>Due: {formatDate(item._due)}</span>
-    {(() => {
-      const rel = relativeDayLabel(item._due);
-      if (!rel) return null;
-
-      const isOverdue = rel.includes("overdue");
-      const isToday = rel === "Today";
-      const isTomorrow = rel === "Tomorrow";
-
-      const cls = isOverdue
-        ? "bg-danger/20 text-danger border-danger/50"
-        : isToday
-          ? "bg-primary/20 text-primary border-primary/50"
-          : isTomorrow
-            ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
-            : "bg-muted text-muted-foreground border-border";
-
-      return (
-        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${cls}`}>
-          {rel}
-        </span>
-      );
-    })()}
-  </span>
-)}
-                              </div>
-
-                              {item._details && (
-                                <p className="text-xs text-muted-foreground mt-1 truncate">{item._details}</p>
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Today's Jobs */}
-      {todayLogs.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Today's Jobs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {todayLogs.map(log => (
-              <button
-                key={log.id}
-                onClick={() => onNavigate('daily-logs', { logId: log.id })}
-                className="text-left bg-card border border-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 shadow-md hover:shadow-lg transition-all duration-150 p-4 hover:border-primary/30 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                    {log.project?.job_number || '#'}
-                  </span>
-                  <PriorityBadge priority={log.priority} size="sm" />
-                </div>
-                <h3 className="text-sm font-semibold text-foreground">{log.project?.name || 'Unknown Project'}</h3>
-                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                  {log.weather && <span>{log.weather}</span>}
-                  {log.temperature && <span>{log.temperature}</span>}
-                </div>
-                {log.critical_items && (
-                  <div className="mt-2 p-2 rounded-lg bg-danger/10 border border-danger/20">
-                    <p className="text-xs text-danger line-clamp-2">{log.critical_items}</p>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       <ActionItemDetailModal
         open={detailOpen}
         item={selectedItem}
         onClose={closeDetail}
-        onChanged={async () => { await loadData(); }}
+        onChanged={async () => {
+          await loadData();
+        }}
       />
     </div>
   );
 };
 
 export default DashboardPage;
-
-
-
 
 

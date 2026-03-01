@@ -5,7 +5,7 @@ import path from "path";
 import { BRAND_CONFIG } from "./brand.config";
 
 export default defineConfig(() => ({
-  base: BRAND_CONFIG.base,
+  base: './',
 
   define: {
     __BRAND_APP_NAME__: JSON.stringify(BRAND_CONFIG.appName),
@@ -46,6 +46,9 @@ server: {
     },
   },
 }));
+
+
+
 
 
 
