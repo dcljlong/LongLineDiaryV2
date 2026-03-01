@@ -132,12 +132,10 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 
   return (
     <div className="min-h-screen bg-background">
+      <div style={{position:'fixed',top:8,left:8,zIndex:99999,background:'#00ff66',color:'#000',padding:'6px 10px',borderRadius:8,fontWeight:700,fontSize:12}}>PROD DIAG: DesktopLayout mounted</div>
+      <div style={{position:'fixed',top:8,left:8,zIndex:99999,background:'#00ff66',color:'#000',padding:'6px 10px',borderRadius:8,fontWeight:700,fontSize:12}}>PROD DIAG: DesktopLayout mounted</div>
       {/* Mobile overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
-      )}
-
-      {/* Sidebar - hidden on mobile unless menu open */}
+{/* Sidebar - hidden on mobile unless menu open */}
       <div className="hidden lg:block print:hidden">
         <Sidebar
           currentPage={currentPage}
@@ -293,6 +291,10 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
+
+
 
 
 
