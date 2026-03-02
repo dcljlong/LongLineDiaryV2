@@ -81,7 +81,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Reports</h1>
-<div className="mt-4 bg-card border border-border rounded-xl p-4">
+<div className="mt-4 bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-4 shadow-[var(--shadow-1)]">
   <div className="flex items-center justify-between gap-3">
     <div>
       <div className="text-sm font-semibold text-foreground">Job Audit Report</div>
@@ -104,7 +104,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Filters */}
-      <div className="bg-card border border-border rounded-xl p-4">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-4 shadow-[var(--shadow-1)]">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-2 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -149,7 +149,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
         ].map((s, i) => {
           const Icon = s.icon;
           return (
-            <div key={i} className="bg-card border border-border rounded-xl p-3 text-center">
+            <div key={i} className="bg-[hsl(var(--surface-2))] border border-border/60 rounded-xl p-3 shadow-[var(--shadow-1)] text-center">
               <Icon className={`w-5 h-5 mx-auto mb-1 ${s.color}`} />
               <div className="text-xl font-bold text-foreground">{s.value}</div>
               <div className="text-[10px] text-muted-foreground">{s.label}</div>
@@ -159,7 +159,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Logs Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl overflow-hidden shadow-[var(--shadow-1)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -186,7 +186,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
                   <tr
                     key={log.id}
                     onClick={() => onNavigate('daily-logs', { logId: log.id })}
-                    className="border-b border-border/60 hover:bg-muted/60 cursor-pointer transition-colors"
+                    className="border-b border-border/60 hover:bg-[hsl(var(--surface-hover))] cursor-pointer transition-colors"
                   >
                     <td className="py-3 px-4 text-xs text-foreground font-medium">{formatDate(log.log_date)}</td>
                     <td className="py-3 px-4 text-xs text-foreground/80">{log.project?.name || 'â€”'}</td>
@@ -212,6 +212,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
 };
 
 export default ReportsPage;
+
 
 
 

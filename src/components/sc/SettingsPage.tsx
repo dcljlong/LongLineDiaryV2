@@ -126,7 +126,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Theme */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-3">
           <Settings className="w-5 h-5 text-primary" />
           <h2 className="text-sm font-bold text-foreground">Theme</h2>
@@ -153,7 +153,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
       {/* User Profile Section */}
       {user && (
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
           <div className="flex items-center gap-2 mb-4">
             <User className="w-5 h-5 text-primary" />
             <h2 className="text-sm font-bold text-foreground">Your Profile</h2>
@@ -255,7 +255,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       )}
 
       {/* Company Settings */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="w-5 h-5 text-primary" />
           <h2 className="text-sm font-bold text-foreground">Company Details</h2>
@@ -284,7 +284,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Timesheet Settings */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-4">
           <Clock className="w-5 h-5 text-primary" />
           <h2 className="text-sm font-bold text-foreground">Timesheet Configuration</h2>
@@ -298,7 +298,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                   key={p}
                   onClick={() => setSettings({ ...settings, timesheetPeriod: p })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    settings.timesheetPeriod === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
+                    settings.timesheetPeriod === p ? 'bg-primary text-primary-foreground' : 'bg-[hsl(var(--surface-2))] text-muted-foreground hover:bg-[hsl(var(--surface-hover))]'
                   }`}
                 >
                   {p} Week{p > 1 ? 's' : ''}
@@ -328,7 +328,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                   key={m}
                   onClick={() => setSettings({ ...settings, lunchDefaultMinutes: m })}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    settings.lunchDefaultMinutes === m ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
+                    settings.lunchDefaultMinutes === m ? 'bg-primary text-primary-foreground' : 'bg-[hsl(var(--surface-2))] text-muted-foreground hover:bg-[hsl(var(--surface-hover))]'
                   }`}
                 >
                   {m} min
@@ -346,7 +346,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
                 key={r}
                 onClick={() => setSettings({ ...settings, roundingMinutes: r })}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  settings.roundingMinutes === r ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'
+                  settings.roundingMinutes === r ? 'bg-primary text-primary-foreground' : 'bg-[hsl(var(--surface-2))] text-muted-foreground hover:bg-[hsl(var(--surface-hover))]'
                 }`}
               >
                 {r} min
@@ -357,7 +357,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Feature Toggles */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-4">
           <Settings className="w-5 h-5 text-primary" />
           <h2 className="text-sm font-bold text-foreground">Features</h2>
@@ -371,7 +371,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
               <div
                 key={ft.key}
                 className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
-                  enabled ? 'bg-muted border-border' : 'bg-card border-border opacity-60'
+                  enabled ? 'bg-muted border-border' : 'bg-[hsl(var(--surface-1))] border-border/60 opacity-60'
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -396,7 +396,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
       </div>
 
       {/* Role Access Info */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <h2 className="text-sm font-bold text-foreground mb-3">Role Access Levels</h2>
         <p className="text-xs text-muted-foreground mb-3">Each role has different access to features:</p>
         <div className="space-y-2">
@@ -407,7 +407,7 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
               <div
                 key={r.value}
                 className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                  isCurrent ? 'bg-primary/10 border-primary/20' : 'bg-muted/20 border-border'
+                  isCurrent ? 'bg-primary/10 border-primary/20' : 'bg-[hsl(var(--surface-2))] border-border/60'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
@@ -432,3 +432,4 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+

@@ -185,7 +185,7 @@ const [items, setItems] = useState<AnyItem[]>([]);
               const dayNum = i - startDay + 1;
               const daysInMonth = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
               if (dayNum < 1 || dayNum > daysInMonth) {
-                return <div key={i} className="h-24 border rounded bg-muted/20" />;
+                return <div key={i} className="h-24 border rounded bg-[hsl(var(--surface-1))]" />;
               }
 
               const date = new Date(current.getFullYear(), current.getMonth(), dayNum);
@@ -196,7 +196,7 @@ const [items, setItems] = useState<AnyItem[]>([]);
                 <div
                   key={i}
                   onClick={() => { setSelectedDay(date); setMode("day"); }}
-                  className="h-24 border rounded p-1 cursor-pointer hover:bg-muted/40"
+                  className="h-24 border rounded p-1 cursor-pointer hover:bg-[hsl(var(--surface-hover))]"
                 >
                   <div className="text-xs">{dayNum}</div>
                   {count > 0 && (
@@ -240,7 +240,7 @@ const [items, setItems] = useState<AnyItem[]>([]);
                 <button
                   key={a.id}
                   onClick={() => openEdit(a)}
-                  className="w-full text-left px-3 py-2 rounded border hover:bg-muted/40"
+                  className="w-full text-left px-3 py-2 rounded border hover:bg-[hsl(var(--surface-hover))]"
                 >
                   {a.title || "Untitled"}
                 </button>
@@ -303,7 +303,7 @@ const [items, setItems] = useState<AnyItem[]>([]);
             onClick={closeEdit}
           />
           <div className="absolute inset-x-0 top-10 mx-auto w-[95%] max-w-xl">
-            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-[hsl(var(--surface-3))] border border-border/60 rounded-2xl shadow-[var(--shadow-3)] overflow-hidden">
               <div className="p-4 border-b border-border">
                 <div className="text-base font-semibold">Edit Item</div>
                 {editErr && <div className="mt-2 text-sm text-danger">{editErr}</div>}
@@ -389,5 +389,6 @@ const [items, setItems] = useState<AnyItem[]>([]);
 };
 
 export default CalendarPage;
+
 
 

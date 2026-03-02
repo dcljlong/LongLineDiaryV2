@@ -309,7 +309,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         key={it.id}
         type="button"
         onClick={() => openDetail(it)}
-        className="w-full rounded-md border p-3 text-left hover:bg-muted/50"
+        className="w-full rounded-md border p-3 text-left hover:bg-[hsl(var(--surface-hover))]"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -334,7 +334,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-lg font-semibold">Command Center</div>
@@ -348,7 +348,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
             <button
               type="button"
               onClick={onQuickAdd}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))]"
             >
               <Plus className="h-4 w-4" />
               Quick Add
@@ -358,7 +358,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
               type="button"
               onClick={carryForwardToToday}
               disabled={carryBusy}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))] disabled:opacity-50"
               title="Carry forward overdue items to today"
             >
               <ArrowRight className="h-4 w-4" />
@@ -389,7 +389,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
               key={a.label}
               type="button"
               onClick={a.action}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))]"
             >
               <a.icon className="h-4 w-4" />
               <span className="truncate">{a.label}</span>
@@ -399,7 +399,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       </div>
 
       {/* Active Projects */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)]">
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold">Active Projects</div>
           <div className="text-xs text-muted-foreground">{activeProjectsCount} active</div>
@@ -424,7 +424,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                     type="button"
                     onClick={() => carryForwardProject(String(p.id))}
                     disabled={carryBusy}
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs hover:bg-muted disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs hover:bg-[hsl(var(--surface-hover))] disabled:opacity-50"
                     title="Carry forward overdue items for this project"
                   >
                     <ArrowRight className="h-3 w-3" />
@@ -442,7 +442,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {BUCKETS.map((b) => {
           const items = bucketed[b.key] || [];
           return (
-            <div key={b.key} className={`rounded-lg border bg-card p-4 ${b.cardLeftBorderClass}`}>
+            <div key={b.key} className={`rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)] ${b.cardLeftBorderClass}`}>
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold">{b.title}</div>
                 <div className={`text-xs px-2 py-1 rounded-full ${b.pillClass}`}>{items.length}</div>
@@ -471,6 +471,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
 
 
 
