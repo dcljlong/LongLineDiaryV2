@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { useAuth } from "@/lib/auth";
@@ -60,22 +60,22 @@ useEffect(() => {
       </div>
     );
   }
-
   if (!user) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground p-6">
-        <div className="w-full max-w-md space-y-4">
-          <div className="text-xl font-semibold">Long Line Diary</div>
-          <div className="text-sm text-muted-foreground">Not signed in. If the login card does not appear below, report this screen.</div>
-          <div className="border border-border rounded-xl overflow-hidden">
-            <LandingGate />
-          </div>
+      <div className="min-h-[100svh] w-full bg-[hsl(var(--surface-0))] text-foreground relative overflow-hidden">
+        {/* Desktop backdrop */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(" + loginLanding + ")" }}
+        />
+        {/* Overlay for contrast */}
+<div className="relative min-h-[100svh] w-full grid place-items-center px-4 py-10">
+          <LandingGate />
         </div>
       </div>
     );
   }
-
-  if (needsOnboarding) {
+if (needsOnboarding) {
     const selectedRoleMeta = USER_ROLES.find((r) => r.value === role);
 
     return (
@@ -84,7 +84,7 @@ useEffect(() => {
         style={{ backgroundImage: "url(" + loginLanding + ")" }}
       >
         <div className="min-h-screen w-full flex items-center justify-center bg-black/40 p-6">
-          <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-background/95">
+          <Card className="min-h-[100svh] w-full grid place-items-center px-4 py-10 bg-[hsl(var(--surface-0))]">
             <CardHeader className="relative">
               <div className="absolute right-6 top-6">
                 <Button
@@ -148,7 +148,7 @@ useEffect(() => {
                     />
                   </SelectTrigger>
 
-                  <SelectContent className="max-w-[var(--radix-select-trigger-width)]">
+                  <SelectContent className="min-h-[100svh] w-full grid place-items-center px-4 py-10 bg-[hsl(var(--surface-0))]">
                     {USER_ROLES.map((r) => (
                       <SelectItem key={r.value} value={r.value}>
                         <div className="flex flex-col text-left whitespace-normal break-words">
@@ -242,6 +242,11 @@ useEffect(() => {
     </HashRouter>
   );
 }
+
+
+
+
+
 
 
 
