@@ -164,14 +164,14 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Date</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Project</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Job #</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Weather</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Priority</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Safety</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Critical</th>
-                <th className="py-3 px-4 text-xs font-semibold text-foreground/80">Notes</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Date</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Project</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Job #</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Weather</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Priority</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Safety</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Critical</th>
+                <th className="py-3 px-4 text-xs font-semibold text-foreground/90 tracking-wide">Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -212,6 +212,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
 };
 
 export default ReportsPage;
+
 
 
 

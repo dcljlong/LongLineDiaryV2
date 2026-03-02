@@ -20,7 +20,7 @@ interface DailyLogsPageProps {
 }
 
 const inputCls = 'lld-input w-full px-3 py-2 rounded-lg text-sm';
-const labelCls = 'block text-xs font-semibold text-muted-foreground mb-1';
+const labelCls = 'block text-xs font-semibold text-foreground/80 mb-1';
 const btnPrimary = 'px-3 py-1.5 rounded-lg bg-primary hover:opacity-90 text-foreground text-xs font-semibold transition-colors';
 const btnSecondary = 'px-3 py-1.5 rounded-lg bg-muted hover:bg-[hsl(var(--surface-hover))] text-foreground text-xs font-semibold transition-colors';
 const btnDanger = 'p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors';
@@ -782,6 +782,7 @@ const VisitorsTab: React.FC<{ log: DailyLog; onRefresh: () => void }> = ({ log, 
 };
 
 export default DailyLogsPage;
+
 
 
 

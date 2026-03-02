@@ -250,7 +250,7 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
 
             {view.details ? (
               <div className="bg-muted/40 border border-border rounded-xl p-3">
-                <div className="text-xs font-semibold text-foreground mb-1">Details</div>
+                <div className="text-xs font-semibold text-foreground/80 mb-1 tracking-wide">Details</div>
                 <div className="text-sm text-foreground whitespace-pre-wrap">{view.details}</div>
               </div>
             ) : (
@@ -259,7 +259,7 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-card border border-border rounded-xl p-3">
-                <div className="text-xs font-semibold text-foreground mb-1">Operational</div>
+                <div className="text-xs font-semibold text-foreground/80 mb-1 tracking-wide">Operational</div>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Status: <span className="text-foreground">{view.status}</span></div>
                   <div>Priority: <span className="text-foreground">{view.priority}</span></div>
@@ -270,7 +270,7 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
               </div>
 
               <div className="bg-card border border-border rounded-xl p-3">
-                <div className="text-xs font-semibold text-foreground mb-1">Source</div>
+                <div className="text-xs font-semibold text-foreground/80 mb-1 tracking-wide">Source</div>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Source: <span className="text-foreground">{view.source || "—"}</span></div>
                   <div className="break-words">
@@ -283,7 +283,7 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
             {/* Audit history */}
             <div className="bg-card border border-border rounded-xl p-3">
               <div className="flex items-center justify-between gap-2">
-                <div className="text-xs font-semibold text-foreground">History</div>
+                <div className="text-xs font-semibold text-foreground/80 tracking-wide">History</div>
                 {auditLoading && <span className="text-[11px] text-muted-foreground">Loading…</span>}
               </div>
 
@@ -319,7 +319,7 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
             {/* Defer controls */}
             <div className="bg-card border border-border rounded-xl p-3">
               <div className="flex items-center justify-between gap-2">
-                <div className="text-xs font-semibold text-foreground">Defer</div>
+                <div className="text-xs font-semibold text-foreground/80 tracking-wide">Defer</div>
                 {view.deferUntil ? (
                   <button
                     type="button"
@@ -386,3 +386,4 @@ export default function ActionItemDetailModal({ open, item, onClose, onChanged }
     </div>
   );
 }
+

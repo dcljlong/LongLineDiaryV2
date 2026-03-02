@@ -121,7 +121,7 @@ const ArchivePage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
         <div className="lg:col-span-2 bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-3 shadow-[var(--shadow-1)]">
-          <div className="text-xs font-semibold text-foreground mb-2">Search</div>
+          <div className="text-xs font-semibold text-foreground/80 mb-2 tracking-wide">Search</div>
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-muted-foreground" />
             <input
@@ -134,7 +134,7 @@ const ArchivePage: React.FC = () => {
         </div>
 
         <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-3 shadow-[var(--shadow-1)]">
-          <div className="text-xs font-semibold text-foreground mb-2">Status</div>
+          <div className="text-xs font-semibold text-foreground/80 mb-2 tracking-wide">Status</div>
           <div className="flex gap-1">
             {(["all", "done", "cancelled"] as const).map((s) => (
               <button
@@ -153,7 +153,7 @@ const ArchivePage: React.FC = () => {
         </div>
 
         <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-3 shadow-[var(--shadow-1)]">
-          <div className="text-xs font-semibold text-foreground mb-2">From</div>
+          <div className="text-xs font-semibold text-foreground/80 mb-2 tracking-wide">From</div>
           <input
             type="date"
             value={from}
@@ -256,4 +256,5 @@ const ArchivePage: React.FC = () => {
 };
 
 export default ArchivePage;
+
 
