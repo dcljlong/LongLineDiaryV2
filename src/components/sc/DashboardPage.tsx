@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+ï»¿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Package,
   Clock,
@@ -53,26 +53,26 @@ const BUCKETS: Array<{
   {
     key: 'overdue',
     title: 'Overdue',
-    pillClass: 'bg-danger/15 text-danger border border-danger/30',
-    cardLeftBorderClass: 'border-l-4 border-l-danger/70',
+    pillClass: 'bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.28)]',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-danger))]',
   },
   {
     key: 'due_today',
     title: 'Due Today',
     pillClass: 'bg-primary/15 text-primary border border-primary/30',
-    cardLeftBorderClass: 'border-l-4 border-l-primary/70',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-warning))]',
   },
   {
     key: 'upcoming',
     title: 'Upcoming',
     pillClass: 'bg-muted text-foreground border border-primary/40',
-    cardLeftBorderClass: 'border-l-4 border-l-border',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-info))]',
   },
   {
     key: 'no_due_date',
     title: 'No Due Date',
     pillClass: 'bg-muted/60 text-muted-foreground border border-primary/40',
-    cardLeftBorderClass: 'border-l-4 border-l-muted',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-neutral))]',
   },
 ];
 
@@ -319,8 +319,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
             ) : null}
             <div className="mt-2 text-xs text-muted-foreground">
               {it._project}
-              {it._jobNumber ? ` • ${it._jobNumber}` : ''}
-              {it._due ? ` • Due ${dueLabel}` : ' • No due date'}
+              {it._jobNumber ? ` â€¢ ${it._jobNumber}` : ''}
+              {it._due ? ` â€¢ Due ${dueLabel}` : ' â€¢ No due date'}
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
@@ -340,7 +340,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
             <div className="text-lg font-semibold">Command Center</div>
             <div className="text-sm text-muted-foreground">Today: {todayLabel}</div>
             <div className="mt-1 text-xs text-muted-foreground">
-              Projects: {projects.length} • Today logs: {todayLogs.length} • Items: {allActionItems.length}
+              Projects: {projects.length} â€¢ Today logs: {todayLogs.length} â€¢ Items: {allActionItems.length}
             </div>
           </div>
 
@@ -417,7 +417,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
                   <div className="min-w-0">
                     <div className="truncate font-medium">{p.name || 'Unnamed Project'}</div>
                     <div className="mt-1 text-xs text-muted-foreground">
-                      {p.job_number ? `Job ${p.job_number}` : ''} {p.site_name ? `• ${p.site_name}` : ''}
+                      {p.job_number ? `Job ${p.job_number}` : ''} {p.site_name ? `â€¢ ${p.site_name}` : ''}
                     </div>
                   </div>
                   <button
@@ -471,5 +471,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
 
 

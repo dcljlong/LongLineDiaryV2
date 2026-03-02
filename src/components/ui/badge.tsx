@@ -1,4 +1,4 @@
-import * as React from "react"
+﻿import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -16,9 +16,19 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground border-border",
         success:
-          "border-transparent bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30",
+          "border-[hsl(var(--status-success)/0.28)] bg-[hsl(var(--status-success)/0.12)] text-[hsl(var(--status-success))]",
         warning:
-          "border-transparent bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-500/30",
+          "border-[hsl(var(--status-warning)/0.28)] bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))]",
+        info:
+          "border-[hsl(var(--status-info)/0.28)] bg-[hsl(var(--status-info)/0.12)] text-[hsl(var(--status-info))]",
+        danger:
+          "border-[hsl(var(--status-danger)/0.28)] bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))]",
+        neutral:
+          "border-[hsl(var(--status-neutral)/0.28)] bg-[hsl(var(--status-neutral)/0.12)] text-[hsl(var(--status-neutral))]",
+        success:
+          "border-[hsl(var(--status-success)/0.28)] bg-[hsl(var(--status-success)/0.12)] text-[hsl(var(--status-success))]",
+        warning:
+          "border-[hsl(var(--status-warning)/0.28)] bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))]",
         info:
           "border-transparent bg-primary/10 text-primary border-primary/30",
       },
@@ -46,3 +56,4 @@ function Badge({ className, variant, size, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
+

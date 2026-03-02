@@ -37,25 +37,25 @@ const PriorityBadge: React.FC<PriorityBadgeProps> = ({
       label: "Critical",
       icon: AlertOctagon,
       className:
-        "bg-red-500/15 text-red-500 border border-red-500/30",
+        "bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.28)]",
     },
     high: {
       label: "High",
       icon: AlertTriangle,
       className:
-        "bg-orange-500/15 text-orange-500 border border-orange-500/30",
+        "bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))] border border-[hsl(var(--status-warning)/0.28)]",
     },
     medium: {
       label: "Medium",
       icon: AlertCircle,
       className:
-        "bg-yellow-500/15 text-yellow-500 border border-yellow-500/30",
+        "bg-[hsl(var(--status-info)/0.12)] text-[hsl(var(--status-info))] border border-[hsl(var(--status-info)/0.28)]",
     },
     low: {
       label: "Low",
       icon: CheckCircle2,
       className:
-        "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
+        "bg-[hsl(var(--status-success)/0.12)] text-[hsl(var(--status-success))] border border-[hsl(var(--status-success)/0.28)]",
     },
   };
 
@@ -74,3 +74,4 @@ const PriorityBadge: React.FC<PriorityBadgeProps> = ({
 };
 
 export default PriorityBadge;
+

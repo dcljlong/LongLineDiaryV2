@@ -1,4 +1,4 @@
-
+﻿
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
@@ -24,10 +24,8 @@
 
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-
-  --primary: 217 91% 55%;
-  --primary-foreground: 0 0% 100%;
-
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
   --secondary: 210 35% 93%;
   --secondary-foreground: 222 47% 11%;
 
@@ -56,10 +54,8 @@
 
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
@@ -245,7 +241,7 @@
     background-color: hsl(var(--muted));
   }
 
-  /* Subtle �active� rail wherever nav uses borders */
+  /* Subtle “active” rail wherever nav uses borders */
   .border-border {
     border-color: hsl(var(--border));
   }
@@ -292,3 +288,65 @@
   background: hsla(var(--primary) / 0.14);
   border: 1px solid hsla(var(--primary) / 0.26);
 }
+
+/* =========================================================
+   Phase A â€” UI Elevation Token Layer (append-only)
+   - Derived surface tokens (map to existing shadcn tokens)
+   - Brand + status tokens (HSL triplets)
+   - Shadow tokens (strings)
+   ========================================================= */
+
+:root {
+  /* Surfaces (derived) */
+  --surface-0: var(--background);
+  --surface-1: var(--card);
+  --surface-2: var(--popover);
+  --surface-3: var(--muted);
+  --surface-hover: var(--accent);
+
+  /* Brand (Steel + Construction Green) */
+  --brand: 92 45% 52%;
+  --brand-foreground: 0 0% 100%;
+  --brand-soft: 92 45% 92%;
+  --brand-ring: 92 45% 52%;
+
+  /* Status (premium, not neon) */
+  --status-success: 142 45% 40%;
+  --status-warning: 38 85% 50%;
+  --status-danger: 0 70% 52%;
+  --status-info: 210 70% 50%;
+  --status-neutral: 215 18% 55%;
+
+  /* Shadows (strings) */
+  --shadow-1: 0 1px 2px 0 hsl(222 30% 10% / 0.08);
+  --shadow-2: 0 6px 18px -8px hsl(222 30% 10% / 0.16);
+  --shadow-3: 0 14px 34px -16px hsl(222 30% 10% / 0.22);
+}
+
+.dark {
+  /* Surfaces (derived) */
+  --surface-0: var(--background);
+  --surface-1: var(--card);
+  --surface-2: var(--popover);
+  --surface-3: var(--muted);
+  --surface-hover: var(--accent);
+
+  /* Brand (dark-tuned) */
+  --brand: 92 45% 55%;
+  --brand-foreground: 222 28% 10%;
+  --brand-soft: 92 25% 18%;
+  --brand-ring: 92 45% 55%;
+
+  /* Status (dark-tuned) */
+  --status-success: 142 45% 55%;
+  --status-warning: 38 90% 60%;
+  --status-danger: 0 75% 60%;
+  --status-info: 210 80% 60%;
+  --status-neutral: 215 18% 65%;
+
+  /* Shadows (strings) */
+  --shadow-1: 0 1px 2px 0 hsl(0 0% 0% / 0.35);
+  --shadow-2: 0 10px 24px -12px hsl(0 0% 0% / 0.55);
+  --shadow-3: 0 18px 44px -20px hsl(0 0% 0% / 0.65);
+}
+

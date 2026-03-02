@@ -1,4 +1,4 @@
-import * as React from "react"
+﻿import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
@@ -250,7 +250,7 @@ const SidebarNavItem = React.forwardRef<
     ref={ref}
     className={cn(
       "flex items-center px-3 py-2 rounded-md text-sm text-foreground/80 hover:text-foreground hover:bg-accent/50 transition-colors cursor-pointer",
-      active && "bg-accent/60 text-primary font-medium",
+      active && "bg-[hsl(var(--brand-soft))] text-[hsl(var(--brand))] font-semibold shadow-[var(--shadow-1)] ring-1 ring-[hsl(var(--brand)/0.25)]",
       className
     )}
     {...props}
@@ -736,3 +736,4 @@ export {
   SidebarSection,
   SidebarSectionTitle
 }
+

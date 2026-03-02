@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type AnyItem = any;
@@ -27,7 +27,24 @@ const CalendarPage: React.FC = () => {
   const [mode, setMode] = useState<"month" | "day">("month");
   const [current, setCurrent] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState<Date>(today);
-  const [items, setItems] = useState<AnyItem[]>([]);
+    const todayKey = dateStr(today);
+
+  const statusToneFor = (it: AnyItem) => {
+    const d = String(it?.due_date || "").trim();
+    if (!d) return "neutral";
+    if (d < todayKey) return "danger";
+    if (d === todayKey) return "warning";
+    return "info";
+  };
+
+  const chipClassFor = (it: AnyItem) => {
+    const tone = statusToneFor(it);
+    if (tone === "danger") return "bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.22)]";
+    if (tone === "warning") return "bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))] border border-[hsl(var(--status-warning)/0.22)]";
+    if (tone === "info") return "bg-[hsl(var(--status-info)/0.12)] text-[hsl(var(--status-info))] border border-[hsl(var(--status-info)/0.22)]";
+    return "bg-[hsl(var(--status-neutral)/0.10)] text-foreground border border-[hsl(var(--status-neutral)/0.25)]";
+  };
+const [items, setItems] = useState<AnyItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<AnyItem | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -183,7 +200,7 @@ const CalendarPage: React.FC = () => {
                 >
                   <div className="text-xs">{dayNum}</div>
                   {count > 0 && (
-                    <div className="mt-1 text-xs bg-primary/20 px-1 rounded">
+                    <div className={`mt-1 text-xs ${chipClassFor(dayItems[0])} px-1 rounded`}>
                       {count} item{count>1?"s":""}
                     </div>
                   )}
@@ -260,7 +277,7 @@ const CalendarPage: React.FC = () => {
                 <div
                   key={n.id}
                   onClick={() => openEdit(n)}
-                  className="absolute rounded p-2 text-xs bg-primary/20 border border-primary cursor-pointer hover:bg-primary/30 overflow-hidden"
+                  className={`absolute rounded p-2 text-xs ${chipClassFor(n)} cursor-pointer hover:bg-[hsl(var(--surface-hover))] overflow-hidden`}
                   style={{
                     top: top + "%",
                     height: Math.max(height, 6) + "%",
@@ -372,3 +389,5 @@ const CalendarPage: React.FC = () => {
 };
 
 export default CalendarPage;
+
+

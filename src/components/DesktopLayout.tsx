@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@/components/ThemeToggle';
+﻿import { ThemeToggle } from '@/components/ThemeToggle';
 import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
@@ -116,7 +116,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 
   if (!user) {
     return (
-      <div className='min-h-screen flex flex-col items-center justify-center gap-6 bg-background'>
+      <div className='min-h-screen flex flex-col items-center justify-center gap-6 bg-[hsl(var(--surface-0))]'>
         <div className='text-2xl font-semibold'>Long Line Diary</div>
         <button
           onClick={() => setShowAuthModal(true)}
@@ -131,7 +131,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[hsl(var(--surface-0))]">
       
       
       {/* Mobile overlay */}
@@ -165,14 +165,14 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         className={`transition-all duration-300 min-h-screen print:ml-0 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"}`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3 print:hidden">
+        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ThemeToggle />
 {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-card text-foreground"
+                className="lg:hidden p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -187,13 +187,13 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 
               {/* Auth section */}
               {authLoading ? (
-                <div className="w-8 h-8 rounded-full bg-card animate-pulse" />
+                <div className="w-8 h-8 rounded-full bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] animate-pulse" />
               ) : user ? (
                 /* Logged in - User menu */
                 <div className="relative">
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowUserMenu(!showUserMenu); }}
-                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-card/80 border border-border/50 hover:border-border transition-all"
+                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/80 border border-border/50 hover:border-border transition-all"
                   >
                     <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
                       <span className="text-xs font-bold text-foreground">
@@ -210,7 +210,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                   {/* Dropdown */}
                   {showUserMenu && (
                     <div
-                      className="absolute right-0 top-full mt-2 w-64 bg-card border border-border/50 rounded-xl shadow-2xl overflow-hidden"
+                      className="absolute right-0 top-full mt-2 w-64 bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] border border-border/50 rounded-xl shadow-2xl overflow-hidden"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* User info */}
@@ -225,7 +225,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                             <p className="text-xs text-foreground truncate">{displayEmail}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg bg-card/50 w-fit">
+                        <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/50 w-fit">
                           <RoleIcon className="w-3 h-3 text-primary" />
                           <span className="text-[10px] font-medium text-primary">{roleLabel}</span>
                         </div>
@@ -235,7 +235,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
                       <div className="p-1.5">
                         <button
                           onClick={() => { setShowUserMenu(false); handleNavigate('settings'); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-card/50 hover:text-foreground transition-colors"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/50 hover:text-foreground transition-colors"
                         >
                           <User className="w-4 h-4" />
                           <span>Profile & Settings</span>
@@ -268,7 +268,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         {/* Page content */}
         <div className="p-4 lg:p-6">
           <Suspense fallback={
-  <div className="p-6 text-foreground text-sm">Loading�</div>
+  <div className="p-6 text-foreground text-sm">Loading…</div>
 }>
   {renderPage()}</Suspense>
         </div>
@@ -291,6 +291,7 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
 
 
 
