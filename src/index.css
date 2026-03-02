@@ -360,3 +360,54 @@
 
 
 
+
+/* -----------------------------------------
+   UI DENSITY (compact / standard)
+   Default is set in initDensity() at boot.
+------------------------------------------ */
+:root {
+  /* vertical spacing between major sections */
+  --d-gap: 1.5rem;
+
+  /* card padding */
+  --d-card: 0.875rem; /* ~p-3.5 */
+
+  /* KPI / small tile padding */
+  --d-kpi-px: 0.75rem;
+  --d-kpi-py: 0.5rem;
+
+  /* list row vertical padding */
+  --d-row-py: 0.5rem;
+}
+
+html[data-density="compact"] {
+  --d-gap: 1rem;
+  --d-card: 0.75rem;  /* ~p-3 */
+  --d-kpi-px: 0.625rem;
+  --d-kpi-py: 0.4rem;
+  --d-row-py: 0.4rem;
+}
+
+html[data-density="standard"] {
+  --d-gap: 1.5rem;
+  --d-card: 0.875rem;
+  --d-kpi-px: 0.75rem;
+  --d-kpi-py: 0.5rem;
+  --d-row-py: 0.5rem;
+}
+
+/* -----------------------------------------
+   DENSITY UTILITIES (global foundation)
+   Use these classes instead of fixed p-* / gap-*
+------------------------------------------ */
+@layer utilities {
+  .d-gap { gap: var(--d-gap); }
+  .d-space-y > :not([hidden]) ~ :not([hidden]) { margin-top: var(--d-gap); }
+
+  .d-card-pad { padding: var(--d-card); }
+  .d-kpi-pad { padding-left: var(--d-kpi-px); padding-right: var(--d-kpi-px); padding-top: var(--d-kpi-py); padding-bottom: var(--d-kpi-py); }
+
+  .d-row-pad { padding-top: var(--d-row-py); padding-bottom: var(--d-row-py); }
+}
+
+

@@ -19,6 +19,7 @@ interface SidebarProps {
 const NAV_ITEMS: { key: PageKey; label: string; icon: React.ElementType }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'daily-logs', label: 'Daily Logs', icon: ClipboardList },
+  { key: 'action-items', label: 'Action Items', icon: ClipboardList },
   { key: 'calendar', label: 'Calendar', icon: Calendar },
   { key: 'timesheets', label: 'Timesheets', icon: Clock },
   { key: 'onsite-walk', label: 'Onsite Walk', icon: Footprints },
@@ -122,6 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, collapsed, o
 };
 
 export default Sidebar;
+
 
 
 

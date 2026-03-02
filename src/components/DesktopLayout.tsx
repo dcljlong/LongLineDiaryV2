@@ -1,6 +1,6 @@
 ﻿import { ThemeToggle } from '@/components/ThemeToggle';
 import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
-import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle, ArrowLeft } from 'lucide-react';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
 import { ROLE_ACCESS, USER_ROLES } from '@/lib/sitecommand-types';
 import { useAuth } from '@/lib/auth';
@@ -8,6 +8,8 @@ import Sidebar from './sc/Sidebar';
 
 const DashboardPage = lazy(() => import('./sc/DashboardPage'));
 const DailyLogsPage = lazy(() => import('./sc/DailyLogsPage'));
+const ActionItemsPage = lazy(() => import('./sc/ActionItemsPage'));
+const ProjectsPage = lazy(() => import('./sc/ProjectsPage'));
 const CalendarPage = lazy(() => import('./sc/CalendarPage'));
 const TimesheetPage = lazy(() => import('./sc/TimesheetPage'));
 const OnsiteWalkPage = lazy(() => import('./sc/OnsiteWalkPage'));
@@ -34,6 +36,7 @@ const AppLayout: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [pageData, setPageData] = useState<any>(null);
+  const [navStack, setNavStack] = useState<Array<{ page: PageKey; data: any }>>([]);
   const [overdueBadge, setOverdueBadge] = useState(0);
 
   const userRole = (profile?.role as UserRole) || null;
@@ -52,16 +55,29 @@ const AppLayout: React.FC = () => {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, [showUserMenu]);
-const handleNavigate = useCallback((page: string, data?: any) => {
+  const handleNavigate = useCallback((page: string, data?: any) => {
     const p = page as PageKey;
     // Check role access
     if (userRole && !ROLE_ACCESS[userRole].includes(p)) return;
+
+    setNavStack((prev) => [...prev, { page: currentPage, data: pageData }]);
     setCurrentPage(p);
     setPageData(data || null);
     setMobileMenuOpen(false);
-  }, [userRole]);
+  }, [userRole, currentPage, pageData]);
 
-  const handleJobCreated = useCallback((logId: string) => {
+  const handleBack = useCallback(() => {
+    setNavStack((prev) => {
+      if (!prev.length) return prev;
+      const last = prev[prev.length - 1];
+      setCurrentPage(last.page);
+      setPageData(last.data ?? null);
+      setMobileMenuOpen(false);
+      return prev.slice(0, -1);
+    });
+  }, []);
+
+const handleJobCreated = useCallback((logId: string) => {
     setShowJobDialog(false);
     setCurrentPage('daily-logs');
     setPageData({ logId });
@@ -79,7 +95,12 @@ const handleNavigate = useCallback((page: string, data?: any) => {
         return <DashboardPage onNavigate={handleNavigate} onQuickAdd={() => setShowJobDialog(true)} />;
       case 'daily-logs':
         return <DailyLogsPage initialData={pageData} />;
-      case 'calendar':
+      
+      case 'action-items':
+        return <ActionItemsPage initialData={pageData} />;
+      case 'projects':
+        return <ProjectsPage onNavigate={handleNavigate} />;
+case 'calendar':
         return <CalendarPage onNavigate={handleNavigate} initialData={pageData} />;
       case 'timesheets':
         return <TimesheetPage />;
@@ -176,9 +197,19 @@ const handleNavigate = useCallback((page: string, data?: any) => {
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-              <h2 className="text-sm font-bold text-foreground dark:text-primary capitalize">
-                {currentPage.replace('-', ' ')}
-              </h2>
+              <div className="flex items-center gap-2">
+  {navStack.length > 0 ? (
+    <button
+      type="button"
+      onClick={() => handleBack()}
+      className="p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
+      title="Back"
+    >
+      <ArrowLeft className="w-5 h-5" />
+    </button>
+  ) : null}
+  
+</div>
             </div>
 
             <div className="flex items-center gap-3"><span className="text-xs text-foreground hidden sm:inline">
@@ -291,6 +322,17 @@ const handleNavigate = useCallback((page: string, data?: any) => {
 };
 
 export default AppLayout;
+
+
+
+
+
+
+
+
+
+
+
 
 
 

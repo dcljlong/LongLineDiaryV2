@@ -1,4 +1,6 @@
 ﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import DashboardKpis from './dashboard/DashboardKpis';
+import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 import {
   Package,
   Clock,
@@ -26,15 +28,6 @@ interface DashboardPageProps {
   onQuickAdd: () => void;
 }
 
-interface DashboardMetrics {
-  open_total: number;
-  overdue_total: number;
-  pinned_total: number;
-  deferred_total: number;
-  completed_last_7_days: number;
-  avg_days_delta: number | null;
-}
-
 interface IncompleteItems {
   activities: any[];
   materials: any[];
@@ -53,25 +46,32 @@ const BUCKETS: Array<{
   {
     key: 'overdue',
     title: 'Overdue',
-    pillClass: 'bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.28)]',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-danger))] shadow-[0_0_0_1px_hsl(var(--status-danger)/0.15)]',
+    pillClass:
+      'text-[hsl(var(--status-danger))] bg-[hsl(var(--status-danger)/0.56)] border border-[hsl(var(--status-danger)/0.98)] font-bold shadow-[0_0_12px_currentColor/0.25]',
+    cardLeftBorderClass:
+      'border-l-4 border-l-[hsl(var(--status-danger))] shadow-[0_0_0_1px_hsl(var(--status-danger)/0.15)]',
   },
   {
     key: 'due_today',
     title: 'Due Today',
-    pillClass: 'bg-primary/15 text-primary border border-primary/30',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-warning))] shadow-[0_0_0_1px_hsl(var(--status-warning)/0.15)]',
+    pillClass:
+      'text-[hsl(var(--status-warning))] bg-[hsl(var(--status-warning)/0.56)] border border-[hsl(var(--status-warning)/0.98)] font-bold shadow-[0_0_12px_currentColor/0.25]',
+    cardLeftBorderClass:
+      'border-l-4 border-l-[hsl(var(--status-warning))] shadow-[0_0_0_1px_hsl(var(--status-warning)/0.15)]',
   },
   {
     key: 'upcoming',
     title: 'Upcoming',
-    pillClass: 'bg-muted text-foreground border border-primary/40',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-info))] shadow-[0_0_0_1px_hsl(var(--status-info)/0.12)]',
+    pillClass:
+      'text-[hsl(var(--status-info))] bg-[hsl(var(--status-info)/0.56)] border border-[hsl(var(--status-info)/0.98)] font-bold shadow-[0_0_12px_currentColor/0.25]',
+    cardLeftBorderClass:
+      'border-l-4 border-l-[hsl(var(--status-info))] shadow-[0_0_0_1px_hsl(var(--status-info)/0.12)]',
   },
   {
     key: 'no_due_date',
     title: 'No Due Date',
-    pillClass: 'bg-muted/60 text-muted-foreground border border-primary/40',
+    pillClass:
+      'text-[hsl(var(--status-neutral))] bg-[hsl(var(--status-neutral)/0.56)] border border-[hsl(var(--status-neutral)/0.98)] font-bold shadow-[0_0_12px_currentColor/0.25]',
     cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-neutral))]',
   },
 ];
@@ -106,6 +106,10 @@ function priorityRank(p?: string | null): number {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd }) => {
+  function goProject(projectId: string) {
+    onNavigate('action-items', { projectId: String(projectId) });
+  }
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [todayLogs, setTodayLogs] = useState<DailyLog[]>([]);
   const [incomplete, setIncomplete] = useState<IncompleteItems | null>(null);
@@ -135,7 +139,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       setProjects(p);
       setTodayLogs(tl);
       setIncomplete(inc);
-
     } catch (e) {
       console.error(e);
     }
@@ -173,30 +176,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     }
   };
 
-  const carryForwardProject = async (projectId: string) => {
-    if (carryBusy) return;
-    const target = todayStr();
-    const ok = window.confirm('Carry forward overdue items for this project to today?');
-    if (!ok) return;
-    setCarryBusy(true);
-    setCarryNote(null);
-    try {
-      const { data, error } = await supabase.rpc('carry_forward_action_items_by_project', {
-        target_date: target,
-        project_uuid: projectId,
-      });
-      if (error) throw error;
-      const count = Number(data || 0);
-      setCarryNote(`Project carry forward complete: ${count} item${count === 1 ? '' : 's'} updated`);
-      await loadData();
-    } catch (e: any) {
-      setCarryNote(e?.message || 'Project carry forward failed');
-    } finally {
-      setCarryBusy(false);
-      window.setTimeout(() => setCarryNote(null), 4000);
-    }
-  };
-
   const allActionItems = useMemo(() => {
     if (!incomplete) return [];
     const items: any[] = [
@@ -213,11 +192,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         const bucket: BucketKey = (raw.bucket as BucketKey) || computeBucketFallback(due);
 
         const projectName =
-          raw.daily_logs?.projects?.name ??
-          raw.project?.name ??
-          raw.projects?.name ??
-          raw._project ??
-          'Unknown';
+          raw.daily_logs?.projects?.name ?? raw.project?.name ?? raw.projects?.name ?? raw._project ?? 'Unknown';
 
         const jobNumber =
           raw.daily_logs?.projects?.job_number ??
@@ -273,12 +248,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const mDone7 = 0;
 
   const statCards = [
-  { key: 'projects', label: 'Active Projects', value: activeProjectsCount, icon: Briefcase },
-  { key: 'open', label: 'Open Items', value: mOpen, icon: ClipboardList },
-  { key: 'overdue', label: 'Overdue', value: mOverdue, icon: Clock },
-  { key: 'deferred', label: 'Deferred', value: mDeferred, icon: Clock },
-  { key: 'done7', label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
-];
+    { key: 'projects', label: 'Projects', value: activeProjectsCount, icon: Briefcase },
+    { key: 'open', label: 'Open Items', value: mOpen, icon: ClipboardList },
+    { key: 'overdue', label: 'Overdue', value: mOverdue, icon: Clock },
+    { key: 'deferred', label: 'Deferred', value: mDeferred, icon: Clock },
+    { key: 'done7', label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
+  ];
 
   const quickActions = [
     { label: 'Work Activity', icon: Activity, action: () => onNavigate('daily-logs', { tab: 'activities' }) },
@@ -314,9 +289,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="truncate font-medium">{it._title}</div>
-            {it._details ? (
-              <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{it._details}</div>
-            ) : null}
+            {it._details ? <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{it._details}</div> : null}
             <div className="mt-2 text-xs text-muted-foreground">
               {it._project}
               {it._jobNumber ? ` • ${it._jobNumber}` : ''}
@@ -332,9 +305,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   };
 
   return (
-    <div className="space-y-6">
+    <div className="d-space-y">
       {/* Header */}
-      <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)]">
+      <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-lg font-semibold">Command Center</div>
@@ -370,20 +343,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
         {/* Stats */}
-        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
-          {statCards.map((s) => (
-            <div key={s.key} onClick={() => {
-  if (s.key === "projects") onNavigate("projects");
-  else onNavigate("action-items", { filter: s.key });
-}} className={`rounded-xl border p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${s.key === "projects" ? "bg-[hsl(var(--primary)/0.24)] border-[hsl(var(--primary)/0.90)]" : ""} ${s.key === "overdue" ? "bg-[hsl(var(--status-danger)/0.28)] border-[hsl(var(--status-danger)/0.95)]" : ""} ${s.key === "open" ? "bg-[hsl(var(--status-info)/0.28)] border-[hsl(var(--status-info)/0.90)]" : ""} ${s.key === "deferred" ? "bg-[hsl(var(--status-warning)/0.28)] border-[hsl(var(--status-warning)/0.90)]" : ""} ${s.key === "done7" ? "bg-[hsl(var(--status-success)/0.28)] border-[hsl(var(--status-success)/0.90)]" : ""}`}>
-              <div className="flex items-center gap-2">
-                <s.icon className="h-4 w-4 text-muted-foreground" />
-                <div className="text-xs text-muted-foreground">{s.label}</div>
-              </div>
-              <div className="mt-2 text-3xl font-bold">{s.value}</div>
-            </div>
-          ))}
-        </div>
+        <DashboardKpis statCards={statCards} onNavigate={onNavigate} />
 
         {/* Quick Actions */}
         <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-6">
@@ -401,51 +361,22 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         </div>
       </div>
 
-      {/* Active Projects */}
-      <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)]">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold">Active Projects</div>
-          <div className="text-xs text-muted-foreground">{activeProjectsCount} active</div>
-        </div>
-
-        {activeProjectsCount === 0 ? (
-          <div className="mt-3 text-sm text-muted-foreground">
-            No active projects found (projects table currently empty for this user).
-          </div>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {activeProjects.slice(0, 8).map((p: any) => (
-              <div key={p.id} className="rounded-md border p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate font-medium">{p.name || 'Unnamed Project'}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      {p.job_number ? `Job ${p.job_number}` : ''} {p.site_name ? `• ${p.site_name}` : ''}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => carryForwardProject(String(p.id))}
-                    disabled={carryBusy}
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs hover:bg-[hsl(var(--surface-hover))] disabled:opacity-50"
-                    title="Carry forward overdue items for this project"
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                    Carry
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <DashboardJobsStrip
+        activeProjectsCount={activeProjectsCount}
+        activeProjects={activeProjects}
+        onNavigate={onNavigate}
+        onProjectClick={goProject}
+      />
 
       {/* Buckets */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {BUCKETS.map((b) => {
           const items = bucketed[b.key] || [];
           return (
-            <div key={b.key} className={`rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] p-4 shadow-[var(--shadow-1)] ${b.cardLeftBorderClass}`}>
+            <div
+              key={b.key}
+              className={`rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)] ${b.cardLeftBorderClass}`}
+            >
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold">{b.title}</div>
                 <div className={`text-xs px-2 py-1 rounded-full ${b.pillClass}`}>{items.length}</div>
@@ -474,12 +405,3 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
-
-
-
-
-
-
-
-
-

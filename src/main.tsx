@@ -1,7 +1,8 @@
 ﻿import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import "./index.css";
+import './index.css';
+import { initDensity } from '@/lib/density';
 import { initTheme } from "./lib/theme-runtime";
 
 initTheme();
@@ -53,3 +54,4 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </React.StrictMode>
 );
+
