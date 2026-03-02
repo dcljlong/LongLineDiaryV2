@@ -54,19 +54,19 @@ const BUCKETS: Array<{
     key: 'overdue',
     title: 'Overdue',
     pillClass: 'bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.28)]',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-danger))]',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-danger))] shadow-[0_0_0_1px_hsl(var(--status-danger)/0.15)]',
   },
   {
     key: 'due_today',
     title: 'Due Today',
     pillClass: 'bg-primary/15 text-primary border border-primary/30',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-warning))]',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-warning))] shadow-[0_0_0_1px_hsl(var(--status-warning)/0.15)]',
   },
   {
     key: 'upcoming',
     title: 'Upcoming',
     pillClass: 'bg-muted text-foreground border border-primary/40',
-    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-info))]',
+    cardLeftBorderClass: 'border-l-4 border-l-[hsl(var(--status-info))] shadow-[0_0_0_1px_hsl(var(--status-info)/0.12)]',
   },
   {
     key: 'no_due_date',
@@ -273,12 +273,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const mDone7 = 0;
 
   const statCards = [
-    { label: 'Active Projects', value: activeProjectsCount, icon: Briefcase },
-    { label: 'Open Items', value: mOpen, icon: ClipboardList },
-    { label: 'Overdue', value: mOverdue, icon: Clock },
-    { label: 'Deferred', value: mDeferred, icon: Clock },
-    { label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
-  ];
+  { key: 'projects', label: 'Active Projects', value: activeProjectsCount, icon: Briefcase },
+  { key: 'open', label: 'Open Items', value: mOpen, icon: ClipboardList },
+  { key: 'overdue', label: 'Overdue', value: mOverdue, icon: Clock },
+  { key: 'deferred', label: 'Deferred', value: mDeferred, icon: Clock },
+  { key: 'done7', label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
+];
 
   const quickActions = [
     { label: 'Work Activity', icon: Activity, action: () => onNavigate('daily-logs', { tab: 'activities' }) },
@@ -372,12 +372,15 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
         {/* Stats */}
         <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
           {statCards.map((s) => (
-            <div key={s.label} className="rounded-md border p-3">
+            <div key={s.key} onClick={() => {
+  if (s.key === "projects") onNavigate("projects");
+  else onNavigate("action-items", { filter: s.key });
+}} className={`rounded-xl border p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${s.key === "projects" ? "bg-[hsl(var(--primary)/0.24)] border-[hsl(var(--primary)/0.90)]" : ""} ${s.key === "overdue" ? "bg-[hsl(var(--status-danger)/0.28)] border-[hsl(var(--status-danger)/0.95)]" : ""} ${s.key === "open" ? "bg-[hsl(var(--status-info)/0.28)] border-[hsl(var(--status-info)/0.90)]" : ""} ${s.key === "deferred" ? "bg-[hsl(var(--status-warning)/0.28)] border-[hsl(var(--status-warning)/0.90)]" : ""} ${s.key === "done7" ? "bg-[hsl(var(--status-success)/0.28)] border-[hsl(var(--status-success)/0.90)]" : ""}`}>
               <div className="flex items-center gap-2">
                 <s.icon className="h-4 w-4 text-muted-foreground" />
                 <div className="text-xs text-muted-foreground">{s.label}</div>
               </div>
-              <div className="mt-2 text-2xl font-semibold">{s.value}</div>
+              <div className="mt-2 text-3xl font-bold">{s.value}</div>
             </div>
           ))}
         </div>
@@ -471,6 +474,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
+
+
+
+
 
 
 

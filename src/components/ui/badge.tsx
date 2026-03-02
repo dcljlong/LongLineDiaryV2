@@ -30,7 +30,7 @@ const badgeVariants = cva(
         warning:
           "border-[hsl(var(--status-warning)/0.28)] bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))]",
         info:
-          "border-transparent bg-primary/10 text-primary border-primary/30",
+          "bg-[hsl(var(--status-info)/0.56)] text-[hsl(var(--status-info))] border border-[hsl(var(--status-info)/0.98)] font-bold shadow-[0_0_12px_currentColor/0.20]",
       },
       size: {
         default: "px-2.5 py-0.5 text-xs",
@@ -56,4 +56,8 @@ function Badge({ className, variant, size, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
+
+
+
+
 
