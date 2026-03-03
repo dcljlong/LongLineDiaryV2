@@ -6,7 +6,6 @@ import {
   Clock,
   CheckCircle2,
   Plus,
-  ArrowRight,
   Briefcase,
   Activity,
   Wrench,
@@ -233,27 +232,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       window.removeEventListener('lldv2:action-items-changed', handler as EventListener);
     };
   }, [loadData]);
-
-  const carryForwardToToday = async () => {
-    const ok = window.confirm('Carry forward ALL overdue items to today?');
-    if (!ok) return;
-    setCarryBusy(true);
-    setCarryNote(null);
-    try {
-      const target = todayStr();
-      const { data, error } = await supabase.rpc('carry_forward_action_items', { target_date: target });
-      if (error) throw error;
-      const count = Number(data || 0);
-      setCarryNote(`Carry forward complete: ${count} item${count === 1 ? '' : 's'} updated`);
-      await loadData();
-    } catch (e: any) {
-      setCarryNote(e?.message || 'Carry forward failed');
-    } finally {
-      setCarryBusy(false);
-      window.setTimeout(() => setCarryNote(null), 4000);
-    }
-  };
-
   const allActionItems = useMemo(() => {
     if (!incomplete) return [];
     const items: any[] = [
@@ -425,17 +403,6 @@ const statCards = [
               <Plus className="h-4 w-4" />
               Quick Add
             </button>
-
-            <button
-              type="button"
-              onClick={carryForwardToToday}
-              disabled={carryBusy}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))] disabled:opacity-50"
-              title="Carry forward overdue items to today"
-            >
-              <ArrowRight className="h-4 w-4" />
-              Carry Forward
-            </button>
           </div>
         </div>
 
@@ -536,6 +503,9 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
 
 
 
