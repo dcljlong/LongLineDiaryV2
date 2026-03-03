@@ -175,6 +175,53 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     }
     setLoading(false);
   }, []);
+  // Auto-carry at midnight (runs if app is open)
+  useEffect(() => {
+    const KEY = 'lldv2:auto_carry_last_run';
+    let timer: number | null = null;
+
+    const runIfNeeded = async () => {
+      try {
+        if (!settings?.features?.autoCarryForward) return;
+
+        const today = todayStr();
+        const last = (typeof window !== 'undefined' ? localStorage.getItem(KEY) : null) || '';
+        if (last === today) return;
+
+        const { data, error } = await supabase.rpc('carry_forward_action_items', { target_date: today });
+        if (error) throw error;
+
+        localStorage.setItem(KEY, today);
+        const count = Number(data || 0);
+        setCarryNote("Auto carry complete: ${count} item${count -eq 1 ? '' : 's'} updated");
+        await loadData();
+        window.setTimeout(() => setCarryNote(null), 4000);
+      } catch (e: any) {
+        setCarryNote(e?.message || 'Auto carry failed');
+        window.setTimeout(() => setCarryNote(null), 5000);
+      }
+    };
+
+    const scheduleNext = () => {
+      if (timer) window.clearTimeout(timer);
+      const now = new Date();
+      const next = new Date(now);
+      next.setHours(24, 0, 2, 0); // 00:00:02 local time
+      const ms = Math.max(1000, next.getTime() - now.getTime());
+      timer = window.setTimeout(async () => {
+        await runIfNeeded();
+        scheduleNext();
+      }, ms);
+    };
+
+    // Also run once on mount if date changed while app was closed (e.g. opened after midnight)
+    void runIfNeeded();
+    scheduleNext();
+
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [settings?.features?.autoCarryForward, loadData]);
 
   useEffect(() => {
     loadData();
@@ -489,6 +536,8 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
 
 
 
