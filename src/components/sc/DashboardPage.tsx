@@ -20,6 +20,7 @@ import { DEFAULT_SETTINGS } from '@/lib/sitecommand-types';
 import { formatDate, todayStr, relativeDayLabel } from '@/lib/sitecommand-utils';
 import { supabase } from '@/lib/supabase';
 import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems, fetchSettings } from '@/lib/sitecommand-store';
+import { fetch7DayForecast, getBrowserCoords, type DailyForecast } from '@/lib/weather';
 import PriorityBadge from './PriorityBadge';
 import ActionItemDetailModal from './ActionItemDetailModal';
 
@@ -118,9 +119,39 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [carryBusy, setCarryBusy] = useState(false);
   const [carryNote, setCarryNote] = useState<string | null>(null);
+  const [now, setNow] = useState<Date>(() => new Date());
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
 
-  const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
+  const [forecast, setForecast] = useState<DailyForecast | null>(null);const [weatherErr, setWeatherErr] = useState<string | null>(null);
+
+  
+
+  
+  const [weatherLoading, setWeatherLoading] = useState(false);
+useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setWeatherErr(null);
+
+        const coords = await getBrowserCoords();
+        if (!coords) {
+          if (!cancelled) setWeatherErr('Location unavailable (browser permission denied)');
+          return;
+        }
+
+        const f = await fetch7DayForecast(coords.lat, coords.lon);
+        if (!cancelled) setForecast(f);
+      } catch (e: any) {
+        if (!cancelled) setWeatherErr(e?.message || 'Weather fetch failed');
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, []);const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
   const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
 
   useEffect(() => {
@@ -174,7 +205,31 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     }
     setLoading(false);
   }, []);
-  // Auto-carry at midnight (runs if app is open)
+    
+  const loadWeather = useCallback(async () => {
+    setWeatherLoading(true);
+    try {
+      setWeatherErr(null);
+      const c = await getBrowserCoords();
+      if (!c) {
+        setCoords(null);
+        setForecast(null);
+        setWeatherErr('Location blocked (allow location in browser)');
+        return;
+      }
+      setCoords(c);
+      const f = await fetch7DayForecast(c.lat, c.lon);
+      setForecast(f);
+    } catch (e: any) {
+      setForecast(null);
+      setCoords(null);
+      setWeatherErr(e?.message || 'Weather fetch failed');
+    }
+    finally {
+      setWeatherLoading(false);
+    }
+  }, []);
+// Auto-carry at midnight (runs if app is open)
   useEffect(() => {
     const KEY = 'lldv2:auto_carry_last_run';
     let timer: number | null = null;
@@ -192,7 +247,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
         localStorage.setItem(KEY, today);
         const count = Number(data || 0);
-        setCarryNote("Auto carry complete: ${count} item${count -eq 1 ? '' : 's'} updated");
+        setCarryNote(`Auto carry complete: ${count} item${count === 1 ? '' : 's'} updated`);
         await loadData();
         window.setTimeout(() => setCarryNote(null), 4000);
       } catch (e: any) {
@@ -224,15 +279,23 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   useEffect(() => {
     loadData();
-    const handler = () => {
+    void loadWeather();
+const handler = () => {
       void loadData();
-    };
+    void loadWeather();
+};
     window.addEventListener('lldv2:action-items-changed', handler as EventListener);
     return () => {
       window.removeEventListener('lldv2:action-items-changed', handler as EventListener);
     };
   }, [loadData]);
-  const allActionItems = useMemo(() => {
+  
+
+  // Live clock (updates every second)
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(t);
+  }, []);const allActionItems = useMemo(() => {
     if (!incomplete) return [];
     const items: any[] = [
       ...incomplete.activities,
@@ -408,6 +471,17 @@ const statCards = [
 
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
+        <div className="mt-3 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-sm font-semibold text-foreground">
+              {new Intl.DateTimeFormat(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' }).format(now)}
+            </div>
+            <div className="text-xs text-muted-foreground tabular-nums">
+              {new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(now)}
+            </div>
+          </div>
+        </div>
+
                 {/* Priority */}
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           <button
@@ -466,6 +540,50 @@ const statCards = [
         onProjectClick={goProject}
       />
 
+
+      {/* Weather (7-day) */}
+      {settings?.features?.weatherAlerts && (
+        <div className="mt-4 rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-sm font-semibold text-foreground">Weather</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                {weatherErr ? weatherErr : forecast ? `${forecast.timezone}${coords ? ` • ${coords.lat.toFixed(3)}, ${coords.lon.toFixed(3)}` : ''}` : 'Loading...'}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => void loadWeather()} disabled={weatherLoading}
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))]"
+              title="Refresh weather"
+            >{weatherLoading ? 'Refreshing...' : 'Refresh'}</button>
+          </div>
+
+          {!forecast ? (
+            <div className="mt-3 text-sm text-muted-foreground">No forecast available.</div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-7">
+              {forecast.days.slice(0, 7).map((d) => (
+                <div key={d.date} className="rounded-lg border border-border/60 bg-[hsl(var(--surface-2))] p-2">
+                  <div className="text-[11px] font-semibold text-foreground">{d.date.slice(5)}</div>
+                  <div className="mt-1 text-xs text-foreground">
+                    {Math.round(d.tempMaxC)}° / {Math.round(d.tempMinC)}°
+                  </div>
+                  <div className="mt-1 text-[11px] text-muted-foreground">
+                    Wind {Math.round(d.windMaxKph)} kph
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">
+                    Rain {Math.round(d.precipitationMm)} mm
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+
       {/* Buckets */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {BUCKETS.map((b) => {
@@ -503,6 +621,20 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
