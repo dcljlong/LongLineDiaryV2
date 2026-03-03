@@ -234,7 +234,26 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
         const title = raw.title ?? raw.description ?? raw.equipment_name ?? raw.worker_name ?? 'Unnamed';
         const details = raw.details ?? raw.notes ?? raw.note ?? '';
-        const priority = raw.priority ?? raw._priority ?? 'medium';
+        const rawPriority = raw.priority ?? raw._priority ?? 'medium';
+
+let priority = String(rawPriority).toLowerCase();
+
+if (priority === 'high' && bucket === 'overdue') {
+  const dueStr = due ? String(due).slice(0,10) : null;
+  const todayStrLocal = new Date().toISOString().slice(0,10);
+
+  if (dueStr && dueStr < todayStrLocal) {
+    const dueDate = new Date(dueStr + 'T00:00:00');
+    const todayDate = new Date(todayStrLocal + 'T00:00:00');
+    const diffDays = Math.floor((todayDate.getTime() - dueDate.getTime()) / 86400000);
+
+    const threshold = Number((settings as any)?.alerts?.escalateHighToCriticalDays ?? 2);
+
+    if (threshold >= 0 && diffDays >= threshold) {
+      priority = 'critical';
+    }
+  }
+}
 
         return {
           ...raw,
@@ -470,6 +489,7 @@ const statCards = [
 };
 
 export default DashboardPage;
+
 
 
 

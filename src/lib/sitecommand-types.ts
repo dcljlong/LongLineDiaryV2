@@ -159,6 +159,7 @@ export interface AppSettings {
   alerts: {
     pulseCritical: boolean;
     pulseHigh: boolean;
+      escalateHighToCriticalDays: number;
   };
 }
 
@@ -183,6 +184,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   alerts: {
     pulseCritical: true,
     pulseHigh: false,
+      escalateHighToCriticalDays: 2,
   },
 };
 
@@ -276,6 +278,7 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'reports'],
 };
+
 
 
 

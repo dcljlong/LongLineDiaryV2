@@ -413,7 +413,31 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
             );
           })}
         </div>
-      </div>
+      
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Escalate High → Critical (days overdue)</label>
+            <input
+              type="number"
+              min={0}
+              value={Number((settings.alerts as any)?.escalateHighToCriticalDays ?? 2)}
+              onChange={(e) => {
+                const v = Math.max(0, Number(e.target.value || 0));
+                setSettings(prev => ({
+                  ...prev,
+                  alerts: { ...(prev as any).alerts, escalateHighToCriticalDays: v },
+                } as any));
+              }}
+              className={inputCls}
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">If a High item is overdue by this many days, treat it as Critical on the dashboard.</p>
+          </div>
+
+          <div className="text-[10px] text-muted-foreground leading-relaxed border border-border/60 rounded-xl p-3 bg-[hsl(var(--surface-1))]">
+            <div className="font-semibold text-foreground/80 mb-1">Example</div>
+            <div>Days=2 means: High due Monday becomes Critical on Wednesday if still not done.</div>
+          </div>
+        </div></div>
 {/* Feature Toggles */}
       <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-4">
@@ -490,6 +514,8 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
+
 
 
 
