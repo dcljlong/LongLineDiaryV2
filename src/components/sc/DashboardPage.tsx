@@ -121,6 +121,28 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const [carryNote, setCarryNote] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
+  const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
+  const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SEEN_KEY);
+      if (raw) {
+        const obj = JSON.parse(raw);
+        setSeen({
+          critical: Number(obj?.critical || 0),
+          high: Number(obj?.high || 0),
+        });
+      }
+    } catch { /* ignore */ }
+  }, [SEEN_KEY]);
+
+  const markSeen = (key: 'critical' | 'high', value: number) => {
+    const next = { ...seen, [key]: value };
+    setSeen(next);
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  };
+
   const openDetail = (item: any) => {
     setSelectedItem(item);
     setDetailOpen(true);
@@ -357,9 +379,9 @@ const statCards = [
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           <button
             type="button"
-            onClick={() => onNavigate('action-items', { priority: 'critical' })}
+            onClick={() => { markSeen('critical', criticalCount); onNavigate('action-items', { priority: 'critical' }); }}
             className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-danger))] ${
-              ((settings as any)?.alerts?.pulseCritical && criticalCount > 0) ? 'lld-pulse' : ''
+              ((settings as any)?.alerts?.pulseCritical && criticalCount > (seen?.critical || 0)) ? 'lld-pulse' : ''
             }`}
             title="Critical — Do immediately"
           >
@@ -372,9 +394,9 @@ const statCards = [
 
           <button
             type="button"
-            onClick={() => onNavigate('action-items', { priority: 'high' })}
+            onClick={() => { markSeen('high', highCount); onNavigate('action-items', { priority: 'high' }); }}
             className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-warning))] ${
-              ((settings as any)?.alerts?.pulseHigh && highCount > 0) ? 'lld-pulse' : ''
+              ((settings as any)?.alerts?.pulseHigh && highCount > (seen?.high || 0)) ? 'lld-pulse' : ''
             }`}
             title="High — Do today or tomorrow"
           >
@@ -448,6 +470,8 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
 
 
 
