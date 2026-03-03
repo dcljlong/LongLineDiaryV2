@@ -16,10 +16,11 @@ import {
   ClipboardList,
 } from 'lucide-react';
 
-import type { Project, DailyLog } from '@/lib/sitecommand-types';
+import type { Project, DailyLog, AppSettings } from '@/lib/sitecommand-types';
+import { DEFAULT_SETTINGS } from '@/lib/sitecommand-types';
 import { formatDate, todayStr, relativeDayLabel } from '@/lib/sitecommand-utils';
 import { supabase } from '@/lib/supabase';
-import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems } from '@/lib/sitecommand-store';
+import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems, fetchSettings } from '@/lib/sitecommand-store';
 import PriorityBadge from './PriorityBadge';
 import ActionItemDetailModal from './ActionItemDetailModal';
 
@@ -118,6 +119,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [carryBusy, setCarryBusy] = useState(false);
   const [carryNote, setCarryNote] = useState<string | null>(null);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   const openDetail = (item: any) => {
     setSelectedItem(item);
@@ -131,14 +133,21 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, tl, inc] = await Promise.all([
+      const [p, tl, inc, s] = await Promise.all([
         fetchProjects(),
         fetchDailyLogs({ date: todayStr() }),
         fetchAllIncompleteItems(),
+        fetchSettings(),
       ]);
       setProjects(p);
       setTodayLogs(tl);
       setIncomplete(inc);
+      setSettings({
+        ...DEFAULT_SETTINGS,
+        ...(s as any),
+        features: { ...DEFAULT_SETTINGS.features, ...((s as any)?.features || {}) },
+        alerts: { ...(DEFAULT_SETTINGS as any).alerts, ...((s as any)?.alerts || {}) },
+      } as any);
     } catch (e) {
       console.error(e);
     }
@@ -247,7 +256,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   const mDeferred = 0;
   const mDone7 = 0;
 
-  const statCards = [
+  const criticalCount = useMemo(() => allActionItems.filter(i => String(i._priority || '').toLowerCase() === 'critical').length, [allActionItems]);
+  const highCount = useMemo(() => allActionItems.filter(i => String(i._priority || '').toLowerCase() === 'high').length, [allActionItems]);
+const statCards = [
     { key: 'projects', label: 'Projects', value: activeProjectsCount, icon: Briefcase },
     { key: 'open', label: 'Open Items', value: mOpen, icon: ClipboardList },
     { key: 'overdue', label: 'Overdue', value: mOverdue, icon: Clock },
@@ -342,6 +353,38 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
+                {/* Priority */}
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => onNavigate('action-items', { priority: 'critical' })}
+            className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-danger))] ${
+              ((settings as any)?.alerts?.pulseCritical && criticalCount > 0) ? 'lld-pulse' : ''
+            }`}
+            title="Critical — Do immediately"
+          >
+            <div>
+              <div className="text-xs font-semibold tracking-wide">CRITICAL</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Do immediately</div>
+            </div>
+            <div className="text-2xl font-extrabold">{criticalCount}</div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('action-items', { priority: 'high' })}
+            className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-warning))] ${
+              ((settings as any)?.alerts?.pulseHigh && highCount > 0) ? 'lld-pulse' : ''
+            }`}
+            title="High — Do today or tomorrow"
+          >
+            <div>
+              <div className="text-xs font-semibold tracking-wide">HIGH</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Do today or tomorrow</div>
+            </div>
+            <div className="text-2xl font-extrabold">{highCount}</div>
+          </button>
+        </div>
         {/* Stats */}
         <DashboardKpis statCards={statCards} onNavigate={onNavigate} />
 
@@ -405,3 +448,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 };
 
 export default DashboardPage;
+
+
+

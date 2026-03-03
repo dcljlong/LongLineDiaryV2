@@ -155,6 +155,11 @@ export interface AppSettings {
     aiSummary: boolean;
     notifications: boolean;
   };
+
+  alerts: {
+    pulseCritical: boolean;
+    pulseHigh: boolean;
+  };
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -173,6 +178,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
     autoCarryForward: true,
     aiSummary: true,
     notifications: true,
+  },
+
+  alerts: {
+    pulseCritical: true,
+    pulseHigh: false,
   },
 };
 
@@ -266,6 +276,7 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'reports'],
 };
+
 
 
 

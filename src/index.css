@@ -411,3 +411,15 @@ html[data-density="standard"] {
 }
 
 
+
+@keyframes lld-pulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; }
+  35%  { box-shadow: 0 0 18px 2px currentColor; }
+  70%  { box-shadow: 0 0 10px 1px currentColor; }
+  100% { box-shadow: 0 0 0 0 currentColor; }
+}
+
+.lld-pulse {
+  animation: lld-pulse 5s ease-in-out infinite;
+}
+

@@ -38,7 +38,10 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 
   useEffect(() => {
     fetchSettings()
-      .then(s => { setSettings(s); setLoading(false); })
+      .then(s => {
+        setSettings({ ...DEFAULT_SETTINGS, ...s, features: { ...DEFAULT_SETTINGS.features, ...(s as any).features }, alerts: { ...(DEFAULT_SETTINGS as any).alerts, ...((s as any).alerts || {}) } } as any);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -85,6 +88,13 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
     setSettings(prev => ({
       ...prev,
       features: { ...prev.features, [key]: value },
+    }));
+  };
+
+  const updateAlert = (key: keyof AppSettings['alerts'], value: boolean) => {
+    setSettings(prev => ({
+      ...prev,
+      alerts: { ...prev.alerts, [key]: value },
     }));
   };
 
@@ -356,7 +366,55 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
         </div>
       </div>
 
-      {/* Feature Toggles */}
+            {/* Priority Alerts */}
+      <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertCircle className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Priority Alerts</h2>
+          <span className="text-[10px] text-muted-foreground ml-2">Subtle pulse when items exist</span>
+        </div>
+
+        <div className="space-y-3">
+          {([
+            { key: 'pulseCritical', label: 'Pulse Critical', description: 'Pulse the Critical tab when there are critical items' },
+            { key: 'pulseHigh', label: 'Pulse High', description: 'Pulse the High tab when there are high-priority items' },
+          ] as const).map(a => {
+            const enabled = settings.alerts?.[a.key] ?? false;
+
+            const rowCls = enabled
+              ? 'flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted border-border'
+              : 'flex items-center gap-4 p-3 rounded-xl border transition-colors bg-[hsl(var(--surface-1))] border-border/60 opacity-80';
+
+            const iconCls = enabled
+              ? 'w-10 h-10 rounded-xl flex items-center justify-center bg-primary/15 text-primary'
+              : 'w-10 h-10 rounded-xl flex items-center justify-center bg-muted text-muted-foreground';
+
+            const toggleCls = enabled
+              ? 'relative w-11 h-6 rounded-full transition-colors bg-primary'
+              : 'relative w-11 h-6 rounded-full transition-colors bg-muted';
+
+            const knobCls = enabled
+              ? 'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-foreground transition-transform translate-x-5'
+              : 'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-foreground transition-transform translate-x-0';
+
+            return (
+              <div key={a.key} className={rowCls}>
+                <div className={iconCls}>
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-foreground">{a.label}</h3>
+                  <p className="text-xs text-muted-foreground">{a.description}</p>
+                </div>
+                <button type="button" onClick={() => updateAlert(a.key, !enabled)} className={toggleCls}>
+                  <span className={knobCls} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+{/* Feature Toggles */}
       <div className="bg-[hsl(var(--surface-1))] border border-border/60 rounded-xl p-5 shadow-[var(--shadow-1)]">
         <div className="flex items-center gap-2 mb-4">
           <Settings className="w-5 h-5 text-primary" />
@@ -432,4 +490,10 @@ const SettingsPage: React.FC<{ userRole?: UserRole | null }> = ({ userRole }) =>
 };
 
 export default SettingsPage;
+
+
+
+
+
+
 
