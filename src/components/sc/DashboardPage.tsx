@@ -1,4 +1,5 @@
 ﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import DashboardHeaderStrip from './DashboardHeaderStrip';
 import DashboardKpis from './dashboard/DashboardKpis';
 import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 import {
@@ -149,8 +150,7 @@ useEffect(() => {
         if (!cancelled) setWeatherErr(e?.message || 'Weather fetch failed');
       }
     })();
-
-    return () => { cancelled = true; };
+  return () => { cancelled = true; };
   }, []);const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
   const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
 
@@ -271,8 +271,7 @@ useEffect(() => {
     // Also run once on mount if date changed while app was closed (e.g. opened after midnight)
     void runIfNeeded();
     scheduleNext();
-
-    return () => {
+  return () => {
       if (timer) window.clearTimeout(timer);
     };
   }, [settings?.features?.autoCarryForward, loadData]);
@@ -280,12 +279,12 @@ useEffect(() => {
   useEffect(() => {
     loadData();
     void loadWeather();
-const handler = () => {
+    const handler = () => {
       void loadData();
-    void loadWeather();
-};
+      void loadWeather();
+    };
     window.addEventListener('lldv2:action-items-changed', handler as EventListener);
-    return () => {
+  return () => {
       window.removeEventListener('lldv2:action-items-changed', handler as EventListener);
     };
   }, [loadData]);
@@ -294,8 +293,10 @@ const handler = () => {
   // Live clock (updates every second)
   useEffect(() => {
     const t = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(t);
-  }, []);const allActionItems = useMemo(() => {
+  return () => window.clearInterval(t);
+  }, []);
+
+  const allActionItems = useMemo(() => {
     if (!incomplete) return [];
     const items: any[] = [
       ...incomplete.activities,
@@ -410,16 +411,19 @@ const statCards = [
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+  return (
+    <div className="flex items-center justify-center h-96">
+      <div className="mb-2 px-3 py-2 rounded-lg border border-[hsl(var(--destructive))] bg-[hsl(var(--destructive))/0.08] text-[hsl(var(--destructive))] text-sm font-semibold">
+        DASH_MARKER_ACTIVE (DashboardPage.tsx)
+      </div>
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
       </div>
     );
   }
 
   const renderItem = (it: any) => {
     const dueLabel = it._due ? `${formatDate(it._due)} (${relativeDayLabel(it._due)})` : 'No due date';
-    return (
+  return (
       <button
         key={it.id}
         type="button"
@@ -443,16 +447,17 @@ const statCards = [
       </button>
     );
   };
-
   return (
-    <div className="d-space-y">
-      {/* Header */}
+    <div className="d-space-y -mt-4">
+      <DashboardHeaderStrip now={now} weather={forecast} />
+      <div className="h-4"></div>
+
+{/* Header */}
       <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-lg font-semibold">Command Center</div>
-            <div className="text-sm text-muted-foreground">Today: {todayLabel}</div>
-            <div className="mt-1 text-xs text-muted-foreground">
+<div className="mt-1 text-xs text-muted-foreground">
               Projects: {projects.length} • Today logs: {todayLogs.length} • Items: {allActionItems.length}
             </div>
           </div>
@@ -472,14 +477,7 @@ const statCards = [
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
         <div className="mt-3 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-sm font-semibold text-foreground">
-              {new Intl.DateTimeFormat(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' }).format(now)}
-            </div>
-            <div className="text-xs text-muted-foreground tabular-nums">
-              {new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(now)}
-            </div>
-          </div>
+          
         </div>
 
                 {/* Priority */}
@@ -539,61 +537,20 @@ const statCards = [
         onNavigate={onNavigate}
         onProjectClick={goProject}
       />
-
-
-      {/* Weather (7-day) */}
-      {settings?.features?.weatherAlerts && (
-        <div className="mt-4 rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)]">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="text-sm font-semibold text-foreground">Weather</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">
-                {weatherErr ? weatherErr : forecast ? `${forecast.timezone}${coords ? ` • ${coords.lat.toFixed(3)}, ${coords.lon.toFixed(3)}` : ''}` : 'Loading...'}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => void loadWeather()} disabled={weatherLoading}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-[hsl(var(--surface-hover))]"
-              title="Refresh weather"
-            >{weatherLoading ? 'Refreshing...' : 'Refresh'}</button>
-          </div>
-
-          {!forecast ? (
-            <div className="mt-3 text-sm text-muted-foreground">No forecast available.</div>
-          ) : (
-            <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-7">
-              {forecast.days.slice(0, 7).map((d) => (
-                <div key={d.date} className="rounded-lg border border-border/60 bg-[hsl(var(--surface-2))] p-2">
-                  <div className="text-[11px] font-semibold text-foreground">{d.date.slice(5)}</div>
-                  <div className="mt-1 text-xs text-foreground">
-                    {Math.round(d.tempMaxC)}° / {Math.round(d.tempMinC)}°
-                  </div>
-                  <div className="mt-1 text-[11px] text-muted-foreground">
-                    Wind {Math.round(d.windMaxKph)} kph
-                  </div>
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">
-                    Rain {Math.round(d.precipitationMm)} mm
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {/* Weather (7-day) disabled (header strip in use) */}
 
 
       {/* Buckets */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {BUCKETS.map((b) => {
           const items = bucketed[b.key] || [];
-          return (
-            <div
+  return (
+    <div
               key={b.key}
               className={`rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)] ${b.cardLeftBorderClass}`}
             >
-              <div className="flex items-center justify-between">
+
+<div className="flex items-center justify-between">
                 <div className="text-sm font-semibold">{b.title}</div>
                 <div className={`text-xs px-2 py-1 rounded-full ${b.pillClass}`}>{items.length}</div>
               </div>
@@ -621,6 +578,28 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

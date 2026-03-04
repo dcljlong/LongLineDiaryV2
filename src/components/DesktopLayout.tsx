@@ -40,7 +40,6 @@ const AppLayout: React.FC = () => {
   const [overdueBadge, setOverdueBadge] = useState(0);
 
   const userRole = (profile?.role as UserRole) || null;
-
   // Load overdue count for sidebar badge
   useEffect(() => {
     if (!user) { setOverdueBadge(0); return; }
@@ -56,7 +55,6 @@ const AppLayout: React.FC = () => {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, [showUserMenu]);
-
   const handleNavigate = useCallback((page: string, data?: any) => {
     const p = page as PageKey;
     // Check role access
@@ -79,7 +77,7 @@ const AppLayout: React.FC = () => {
     });
   }, []);
 
-  const handleJobCreated = useCallback((logId: string) => {
+const handleJobCreated = useCallback((logId: string) => {
     setShowJobDialog(false);
     setCurrentPage('daily-logs');
     setPageData({ logId });
@@ -97,11 +95,12 @@ const AppLayout: React.FC = () => {
         return <DashboardPage onNavigate={handleNavigate} onQuickAdd={() => setShowJobDialog(true)} />;
       case 'daily-logs':
         return <DailyLogsPage initialData={pageData} />;
+      
       case 'action-items':
         return <ActionItemsPage initialData={pageData} />;
       case 'projects':
         return <ProjectsPage onNavigate={handleNavigate} />;
-      case 'calendar':
+case 'calendar':
         return <CalendarPage onNavigate={handleNavigate} initialData={pageData} />;
       case 'timesheets':
         return <TimesheetPage />;
@@ -126,6 +125,11 @@ const AppLayout: React.FC = () => {
   const RoleIcon = userRole ? roleIcons[userRole] : User;
   const roleLabel = userRole ? USER_ROLES.find(r => r.value === userRole)?.label || '' : '';
 
+
+  
+
+
+
   // AUTH_GATE_ACTIVE
   if (authLoading) {
     return <div className='min-h-screen flex items-center justify-center text-foreground'>Loading...</div>;
@@ -146,9 +150,13 @@ const AppLayout: React.FC = () => {
     );
   }
 
+
   return (
     <div className="min-h-screen bg-[hsl(var(--surface-0))]">
-      {/* Sidebar - hidden on mobile unless menu open */}
+      
+      
+      {/* Mobile overlay */}
+{/* Sidebar - hidden on mobile unless menu open */}
       <div className="hidden lg:block print:hidden">
         <Sidebar
           currentPage={currentPage}
@@ -178,38 +186,32 @@ const AppLayout: React.FC = () => {
         className={`transition-all duration-300 min-h-screen print:ml-0 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"}`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b border-border/50 px-4 lg:px-6 py-3 print:hidden">
+        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b-4 border-[hsl(var(--ring))] px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ThemeToggle />
-
-              {/* Mobile menu button */}
+              <ThemeToggle />{/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="lg:hidden p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-
               <div className="flex items-center gap-2">
-                {navStack.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="p-2 rounded-lg border border-border hover:bg-card transition-colors"
-                    aria-label="Back"
-                    title="Back"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-foreground" />
-                  </button>
-                ) : null}
-              </div>
+  {navStack.length > 0 ? (
+    <button
+      type="button"
+      onClick={() => handleBack()}
+      className="p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
+      title="Back"
+    >
+      <ArrowLeft className="w-5 h-5" />
+    </button>
+  ) : null}
+  
+</div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs text-foreground hidden sm:inline">
-                {new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-              </span>
 
               {/* Auth section */}
               {authLoading ? (
@@ -222,9 +224,7 @@ const AppLayout: React.FC = () => {
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/80 border border-border/50 hover:border-border transition-all"
                   >
                     <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                      <span className="text-xs font-bold text-foreground">
-                        {displayName.charAt(0).toUpperCase() || 'U'}
-                      </span>
+                      
                     </div>
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-medium text-foreground dark:text-primary leading-none">{displayName}</p>
@@ -241,8 +241,7 @@ const AppLayout: React.FC = () => {
                     >
                       {/* User info */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                        <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                             <span className="text-sm font-bold text-foreground">
                               {displayName.charAt(0).toUpperCase() || 'U'}
                             </span>
@@ -295,10 +294,9 @@ const AppLayout: React.FC = () => {
         {/* Page content */}
         <div className="p-4 lg:p-6">
           <Suspense fallback={
-            <div className="p-6 text-foreground text-sm">Loading…</div>
-          }>
-            {renderPage()}
-          </Suspense>
+  <div className="p-6 text-foreground text-sm">Loading…</div>
+}>
+  {renderPage()}</Suspense>
         </div>
       </main>
 
@@ -319,3 +317,77 @@ const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

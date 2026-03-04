@@ -33,18 +33,6 @@ export default function AppGate() {
   const [role, setRole] = useState<UserRole | undefined>(undefined);
 
   const needsOnboarding = useMemo(() => { return !!(profile && profile.onboarded === false); }, [profile]);
-
-  useEffect(() => {
-    // minimal prod diagnostics
-    console.log("[AppGate]", {
-      loading,
-      hasUser: !!user,
-      profileLoaded: !!profile,
-      onboarded: profile?.onboarded,
-      baseUrl: import.meta.env.BASE_URL,
-      href: window.location.href
-    });
-  }, [loading, user, profile]);
 useEffect(() => {
     if (!needsOnboarding) return;
 
@@ -242,6 +230,11 @@ if (needsOnboarding) {
     </HashRouter>
   );
 }
+
+
+
+
+
 
 
 

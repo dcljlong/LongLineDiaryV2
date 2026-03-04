@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
+﻿import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { VitePWA } from "vite-plugin-pwa";
+// import { VitePWA } from "vite-plugin-pwa"; // disabled
 import path from "path";
 import { BRAND_CONFIG } from "./brand.config";
 
@@ -46,6 +46,10 @@ server: {
     },
   },
 }));
+
+
+
+
 
 
 
