@@ -186,7 +186,7 @@ case 'calendar':
         className={`transition-all duration-300 min-h-screen print:ml-0 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"}`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b-4 border-[hsl(var(--ring))] px-4 lg:px-6 py-3 print:hidden">
+        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b-4 border-primary px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ThemeToggle />{/* Mobile menu button */}
@@ -317,6 +317,8 @@ case 'calendar':
 };
 
 export default AppLayout;
+
+
 
 
 

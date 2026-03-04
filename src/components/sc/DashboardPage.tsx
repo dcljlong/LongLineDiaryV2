@@ -1,5 +1,4 @@
-ï»¿import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import DashboardHeaderStrip from './DashboardHeaderStrip';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DashboardKpis from './dashboard/DashboardKpis';
 import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 import {
@@ -436,8 +435,8 @@ const statCards = [
             {it._details ? <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{it._details}</div> : null}
             <div className="mt-2 text-xs text-muted-foreground">
               {it._project}
-              {it._jobNumber ? ` â€¢ ${it._jobNumber}` : ''}
-              {it._due ? ` â€¢ Due ${dueLabel}` : ' â€¢ No due date'}
+              {it._jobNumber ? ` • ${it._jobNumber}` : ''}
+              {it._due ? ` • Due ${dueLabel}` : ' • No due date'}
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
@@ -449,7 +448,6 @@ const statCards = [
   };
   return (
     <div className="d-space-y -mt-4">
-      <DashboardHeaderStrip now={now} weather={forecast} />
       <div className="h-4"></div>
 
 {/* Header */}
@@ -458,7 +456,7 @@ const statCards = [
           <div>
             <div className="text-lg font-semibold">Command Center</div>
 <div className="mt-1 text-xs text-muted-foreground">
-              Projects: {projects.length} â€¢ Today logs: {todayLogs.length} â€¢ Items: {allActionItems.length}
+              Projects: {projects.length} • Today logs: {todayLogs.length} • Items: {allActionItems.length}
             </div>
           </div>
 
@@ -488,7 +486,7 @@ const statCards = [
             className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-danger))] ${
               ((settings as any)?.alerts?.pulseCritical && criticalCount > (seen?.critical || 0)) ? 'lld-pulse' : ''
             }`}
-            title="Critical â€” Do immediately"
+            title="Critical — Do immediately"
           >
             <div>
               <div className="text-xs font-semibold tracking-wide">CRITICAL</div>
@@ -503,7 +501,7 @@ const statCards = [
             className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-warning))] ${
               ((settings as any)?.alerts?.pulseHigh && highCount > (seen?.high || 0)) ? 'lld-pulse' : ''
             }`}
-            title="High â€” Do today or tomorrow"
+            title="High — Do today or tomorrow"
           >
             <div>
               <div className="text-xs font-semibold tracking-wide">HIGH</div>
@@ -578,6 +576,9 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
 
 
 
