@@ -1,9 +1,9 @@
-﻿export type DailyForecastDay = {
+export type DailyForecastDay = {
   date: string;          // YYYY-MM-DD
   tempMaxC: number;
   tempMinC: number;
   windMaxKph: number;
-  precipitationMm: number;
+  precipMm: number;
   weatherCode: number;
 };
 
@@ -74,7 +74,7 @@ export async function fetch7DayForecast(lat: number, lon: number): Promise<Daily
     tempMaxC: Number(max[i] ?? 0),
     tempMinC: Number(min[i] ?? 0),
     windMaxKph: Number(wind[i] ?? 0),
-    precipitationMm: Number(pr[i] ?? 0),
+    precipMm: Number(pr[i] ?? 0),
     weatherCode: Number(code[i] ?? 0),
   }));
 
@@ -85,4 +85,6 @@ export async function fetch7DayForecast(lat: number, lon: number): Promise<Daily
     days: days.slice(0, 7),
   };
 }
+
+
 

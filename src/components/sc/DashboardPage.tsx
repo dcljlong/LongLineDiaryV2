@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+ï»¿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DashboardKpis from './dashboard/DashboardKpis';
 import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 import {
@@ -23,6 +23,7 @@ import { fetchProjects, fetchDailyLogs, fetchAllIncompleteItems, fetchSettings }
 import { fetch7DayForecast, getBrowserCoords, type DailyForecast } from '@/lib/weather';
 import PriorityBadge from './PriorityBadge';
 import ActionItemDetailModal from './ActionItemDetailModal';
+import WeatherSevenDay from './WeatherSevenDay';
 
 interface DashboardPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -124,13 +125,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
 
-  const [forecast, setForecast] = useState<DailyForecast | null>(null);const [weatherErr, setWeatherErr] = useState<string | null>(null);
+  const [forecast, setForecast] = useState<DailyForecast | null>(null);
+  const [weatherErr, setWeatherErr] = useState<string | null>(null);
 
   
 
   
   const [weatherLoading, setWeatherLoading] = useState(false);
-useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
 
     (async () => {
@@ -150,9 +152,10 @@ useEffect(() => {
       }
     })();
   return () => { cancelled = true; };
-  }, []);const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
-  const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
+  }, []);
 
+  const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
+  const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SEEN_KEY);
@@ -274,7 +277,6 @@ useEffect(() => {
       if (timer) window.clearTimeout(timer);
     };
   }, [settings?.features?.autoCarryForward, loadData]);
-
   useEffect(() => {
     loadData();
     void loadWeather();
@@ -435,8 +437,8 @@ const statCards = [
             {it._details ? <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{it._details}</div> : null}
             <div className="mt-2 text-xs text-muted-foreground">
               {it._project}
-              {it._jobNumber ? ` • ${it._jobNumber}` : ''}
-              {it._due ? ` • Due ${dueLabel}` : ' • No due date'}
+              {it._jobNumber ? ` â€¢ ${it._jobNumber}` : ''}
+              {it._due ? ` â€¢ Due ${dueLabel}` : ' â€¢ No due date'}
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
@@ -454,9 +456,9 @@ const statCards = [
       <div className="rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] d-card-pad shadow-[var(--shadow-1)]">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-lg font-semibold">Command Center</div>
+            <div className="text-2xl font-extrabold tracking-tight">Command Center</div>
 <div className="mt-1 text-xs text-muted-foreground">
-              Projects: {projects.length} • Today logs: {todayLogs.length} • Items: {allActionItems.length}
+              Projects: {projects.length} â€¢ Today logs: {todayLogs.length} â€¢ Items: {allActionItems.length}
             </div>
           </div>
 
@@ -474,41 +476,101 @@ const statCards = [
 
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
-        <div className="mt-3 flex items-center justify-center">
-          
-        </div>
+        <div className="mt-3"><WeatherSevenDay forecast={forecast} /></div>
+                {/* Work Tabs (Primary Workflow) */}
+        <div className="mt-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            <button
+              type="button"
+              onClick={() => { markSeen('critical', criticalCount); onNavigate('action-items', { priority: 'critical' }); }}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Critical"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-[hsl(var(--status-danger))]">CRITICAL</div>
+                <div className="text-lg font-extrabold tabular-nums text-[hsl(var(--status-danger))]">{criticalCount}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Now</div>
+            </button>
 
-                {/* Priority */}
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => { markSeen('critical', criticalCount); onNavigate('action-items', { priority: 'critical' }); }}
-            className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-danger))] ${
-              ((settings as any)?.alerts?.pulseCritical && criticalCount > (seen?.critical || 0)) ? 'lld-pulse' : ''
-            }`}
-            title="Critical — Do immediately"
-          >
-            <div>
-              <div className="text-xs font-semibold tracking-wide">CRITICAL</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">Do immediately</div>
-            </div>
-            <div className="text-2xl font-extrabold">{criticalCount}</div>
-          </button>
+            <button
+              type="button"
+              onClick={() => { markSeen('high', highCount); onNavigate('action-items', { priority: 'high' }); }}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="High"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-[hsl(var(--status-warning))]">HIGH</div>
+                <div className="text-lg font-extrabold tabular-nums text-[hsl(var(--status-warning))]">{highCount}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Today</div>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => { markSeen('high', highCount); onNavigate('action-items', { priority: 'high' }); }}
-            className={`flex items-center justify-between rounded-xl border border-border/60 bg-[hsl(var(--surface-1))] px-4 py-3 shadow-[var(--shadow-1)] text-[hsl(var(--status-warning))] ${
-              ((settings as any)?.alerts?.pulseHigh && highCount > (seen?.high || 0)) ? 'lld-pulse' : ''
-            }`}
-            title="High — Do today or tomorrow"
-          >
-            <div>
-              <div className="text-xs font-semibold tracking-wide">HIGH</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">Do today or tomorrow</div>
-            </div>
-            <div className="text-2xl font-extrabold">{highCount}</div>
-          </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('action-items', { priority: 'medium' })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Medium"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-foreground">MED</div>
+                <div className="text-lg font-extrabold tabular-nums text-foreground">â€¢</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">This week</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('action-items', { priority: 'low' })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Low"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-foreground">LOW</div>
+                <div className="text-lg font-extrabold tabular-nums text-foreground">â€¢</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">If time</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('action-items', { state: 'deferred' })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Deferred"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-foreground">DEFER</div>
+                <div className="text-lg font-extrabold tabular-nums text-foreground">{mDeferred}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Parked</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('action-items', { overdue: true })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Overdue"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-foreground">OVERDUE</div>
+                <div className="text-lg font-extrabold tabular-nums text-foreground">{mOverdue}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Late</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('action-items', { state: 'done7' })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              title="Done (7d)"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide text-foreground">DONE</div>
+                <div className="text-lg font-extrabold tabular-nums text-foreground">{mDone7}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Review</div>
+            </button>
+          </div>
         </div>
         {/* Stats */}
         <DashboardKpis statCards={statCards} onNavigate={onNavigate} />
@@ -576,6 +638,16 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
+
+
+
+
+
+
+
 
 
 

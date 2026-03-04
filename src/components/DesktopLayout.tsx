@@ -1,6 +1,9 @@
 ﻿import { ThemeToggle } from '@/components/ThemeToggle';
+import therIcon from '@/components/sc/therIcon';
+import WeatherIcon from '@/components/sc/WeatherIcon';
 import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User, ChevronDown, Shield, HardHat, AlertCircle, ArrowLeft } from 'lucide-react';
+import { fetch7DayForecast, getBrowserCoords, type DailyForecast } from '@/lib/weather';
 import type { PageKey, UserRole } from '@/lib/sitecommand-types';
 import { ROLE_ACCESS, USER_ROLES } from '@/lib/sitecommand-types';
 import { useAuth } from '@/lib/auth';
@@ -28,7 +31,29 @@ const roleIcons: Record<UserRole, React.ElementType> = {
 };
 
 const AppLayout: React.FC = () => {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(t);
+  }, []);
   const { user, profile, loading: authLoading, signOut } = useAuth();
+
+  const [forecast, setForecast] = useState<DailyForecast | null>(null);
+  const [therErr, settherErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const coords = await getBrowserCoords();
+        if (!coords) return;
+        const data = await fetch7DayForecast(coords.lat, coords.lon);
+        setForecast(data);
+      } catch (e: any) {
+        settherErr(e?.message ?? String(e));
+      }
+    })();
+  }, []);
   const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -209,6 +234,26 @@ case 'calendar':
   ) : null}
   
 </div>
+            </div>            <div className="flex-1 flex items-center justify-center">
+              <div className="flex items-center gap-6">
+                <div className="text-center leading-none">
+                  <div className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
+                    {now.toLocaleDateString(undefined, { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
+                  </div>
+                  <div className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground tabular-nums">
+                    {now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+
+                {forecast?.days?.[0] ? (
+                  <div className="flex items-center gap-2">
+                    <WeatherIcon code={forecast.days[0].weaweatherCode} className="h-8 w-8" />
+                    <span className="text-xl font-extrabold text-foreground tabular-nums">
+                      {Math.round(forecast.days[0].tempMaxC)}°
+                    </span>
+                  </div>
+                ) : null}
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -224,8 +269,10 @@ case 'calendar':
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/80 border border-border/50 hover:border-border transition-all"
                   >
                     <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                      
-                    </div>
+  <span className="text-xs font-extrabold text-foreground">
+    {(displayName?.charAt(0) || "D").toUpperCase()}
+  </span>
+</div>
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-medium text-foreground dark:text-primary leading-none">{displayName}</p>
                       <p className="text-[10px] text-foreground leading-none mt-0.5">{roleLabel}</p>
@@ -317,6 +364,31 @@ case 'calendar':
 };
 
 export default AppLayout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
