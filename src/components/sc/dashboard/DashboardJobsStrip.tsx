@@ -36,7 +36,7 @@ export default function DashboardJobsStrip({
             </button>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+          <div className="mt-3 flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
             {activeProjects.map((p: any) => (
               <button
                 key={p.id}
@@ -57,5 +57,7 @@ export default function DashboardJobsStrip({
     </>
   );
 }
+
+
 
 

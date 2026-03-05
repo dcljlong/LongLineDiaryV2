@@ -25,14 +25,14 @@ export default function WeatherSevenDay({ forecast, className }: Props) {
           return (
             <div
               key={d.date}
-              className="flex items-center gap-2 rounded-lg border border-border/50 bg-[hsl(var(--surface-1))] px-2 py-1 shadow-[var(--shadow-1)]"
+              className="flex items-center gap-2 rounded-lg border border-border/50 bg-[hsl(var(--surface-1))] px-2 py-2 shadow-[var(--shadow-1)]"
               title={`${d.date} • ${hi}°/${lo}°`}
             >
-              <div className="flex flex-col items-center leading-none w-10">
+              <div className="flex flex-col items-center justify-center leading-none w-10">
                 <div className="text-[10px] font-semibold text-muted-foreground">
                   {weekdayShort(d.date)}
                 </div>
-                <WeatherIcon code={d.weatherCode} className="h-5 w-5" title={`WMO ${d.weatherCode}`} />
+                <WeatherIcon code={d.weatherCode} className="h-6 w-6" title={`WMO ${d.weatherCode}`} />
               </div>
 
               <div className="flex items-baseline gap-1 tabular-nums">

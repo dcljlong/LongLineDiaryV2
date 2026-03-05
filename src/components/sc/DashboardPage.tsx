@@ -173,7 +173,7 @@ const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
         fetchSettings(),
       ]);
       setProjects(p);
-      setTodayLogs(tl);
+setTodayLogs(tl);
       setIncomplete(inc);
       setSettings({
         ...DEFAULT_SETTINGS,
@@ -219,6 +219,7 @@ const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
       setCoords(c);
       const f = await fetch7DayForecast(c.lat, c.lon);
       setForecast(f);
+        console.log('WEATHER_OK', { days: f?.days?.length, lat: weatherLat ?? c?.lat, lon: weatherLon ?? c?.lon });
     } catch (e: any) {
       setForecast(null);
       setCoords(null);
@@ -374,7 +375,7 @@ if (priority === 'high' && bucket === 'overdue') {
     return byBucket;
   }, [allActionItems]);
 
-  const activeProjects = useMemo(() => projects.filter((p) => p.status === 'active'), [projects]);
+  const activeProjects = useMemo(() => projects, [projects]);
   const activeProjectsCount = activeProjects.length;
 
   const mOpen = allActionItems.length;
@@ -387,9 +388,6 @@ if (priority === 'high' && bucket === 'overdue') {
 const statCards = [
     { key: 'projects', label: 'Projects', value: activeProjectsCount, icon: Briefcase },
     { key: 'open', label: 'Open Items', value: mOpen, icon: ClipboardList },
-    { key: 'overdue', label: 'Overdue', value: mOverdue, icon: Clock },
-    { key: 'deferred', label: 'Deferred', value: mDeferred, icon: Clock },
-    { key: 'done7', label: 'Done (7d)', value: mDone7, icon: CheckCircle2 },
   ];
 
   const quickActions = [
@@ -587,12 +585,15 @@ const statCards = [
       </div>
 
       <DashboardJobsStrip
-        activeProjectsCount={activeProjectsCount}
-        activeProjects={activeProjects}
+        activeProjectsCount={projects.length}
+        activeProjects={projects}
         onNavigate={onNavigate}
         onProjectClick={goProject}
       />
-      {/* Weather (7-day) disabled (header strip in use) */}
+      {/* Weather (7-day) */}
+<div className="mt-3">
+  <WeatherSevenDay forecast={forecast} />
+</div>
 
 
       {/* Buckets */}
@@ -633,6 +634,17 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -214,31 +214,22 @@ case 'calendar':
         <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))] backdrop-blur-xl border-b-4 border-primary px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {navStack.length > 0 ? (
-
-                <button
-
-                  type="button"
-
-                  onClick={() => handleBack()}
-
-                  className="p-2 rounded-lg border border-border hover:bg-card transition-colors"
-
-                  aria-label="Back"
-
-                  title="Back"
-
-                >
-
-                  <ArrowLeft className="w-5 h-5 text-foreground" />
-
-                </button>
-
-              ) : null}
+              <button
+  type="button"
+  onClick={() => handleBack()}
+  disabled={navStack.length === 0}
+  className={`p-2 rounded-lg border border-border transition-colors ${
+    navStack.length === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-card'
+  }`}
+  aria-label="Back"
+  title={navStack.length === 0 ? 'No previous page' : 'Back'}
+>
+  <ArrowLeft className="w-5 h-5 text-foreground" />
+</button>
 
               
 
-              <ThemeToggle /><HeaderWeather />{/* Mobile menu button */}
+              <ThemeToggle /> {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="lg:hidden p-2 rounded-lg border border-border hover:bg-card transition-colors"
@@ -562,3 +553,6 @@ return (
     </div>
   );
 }
+
+
+
