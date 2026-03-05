@@ -437,7 +437,9 @@ const statCards = [
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
-            <PriorityBadge priority={it._priority} />
+            <div className="rounded-full border border-border/60 bg-[hsl(var(--surface-2))] px-1.5 py-1 shadow-[var(--shadow-1)]">
+              <PriorityBadge priority={it._priority} />
+            </div>
           </div>
         </div>
       </button>
@@ -471,17 +473,30 @@ const statCards = [
 
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
-        <div className="mt-3">
+                <div className="mt-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
             <button
               type="button"
+              onClick={() => onNavigate('action-items', { overdue: true })}
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-overdue"
+              title="Overdue"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-critical lldv2-prio-bright">OVERDUE</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">{mOverdue}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">Late</div>
+            </button>
+
+            <button
+              type="button"
               onClick={() => { markSeen('critical', criticalCount); onNavigate('action-items', { priority: 'critical' }); }}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-critical"
               title="Critical"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-[hsl(var(--status-danger))]">CRITICAL</div>
-                <div className="text-lg font-extrabold tabular-nums text-[hsl(var(--status-danger))]">{criticalCount}</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-critical lldv2-prio-bright lldv2-critical-pulse">CRITICAL</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">{criticalCount}</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">Now</div>
             </button>
@@ -489,12 +504,12 @@ const statCards = [
             <button
               type="button"
               onClick={() => { markSeen('high', highCount); onNavigate('action-items', { priority: 'high' }); }}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-high"
               title="High"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-[hsl(var(--status-warning))]">HIGH</div>
-                <div className="text-lg font-extrabold tabular-nums text-[hsl(var(--status-warning))]">{highCount}</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-high lldv2-prio-bright">HIGH</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">{highCount}</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">Today</div>
             </button>
@@ -502,12 +517,12 @@ const statCards = [
             <button
               type="button"
               onClick={() => onNavigate('action-items', { priority: 'medium' })}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-med"
               title="Medium"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-foreground">MED</div>
-                <div className="text-lg font-extrabold tabular-nums text-foreground">•</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-label lldv2-prio-bright">MED</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">•</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">This week</div>
             </button>
@@ -515,12 +530,12 @@ const statCards = [
             <button
               type="button"
               onClick={() => onNavigate('action-items', { priority: 'low' })}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-low"
               title="Low"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-foreground">LOW</div>
-                <div className="text-lg font-extrabold tabular-nums text-foreground">•</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-label lldv2-prio-bright">LOW</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">•</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">If time</div>
             </button>
@@ -528,38 +543,25 @@ const statCards = [
             <button
               type="button"
               onClick={() => onNavigate('action-items', { state: 'deferred' })}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-defer"
               title="Deferred"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-foreground">DEFER</div>
-                <div className="text-lg font-extrabold tabular-nums text-foreground">{mDeferred}</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-label lldv2-prio-bright">DEFER</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">{mDeferred}</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">Parked</div>
             </button>
 
             <button
               type="button"
-              onClick={() => onNavigate('action-items', { overdue: true })}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
-              title="Overdue"
-            >
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-foreground">OVERDUE</div>
-                <div className="text-lg font-extrabold tabular-nums text-foreground">{mOverdue}</div>
-              </div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">Late</div>
-            </button>
-
-            <button
-              type="button"
               onClick={() => onNavigate('action-items', { state: 'done7' })}
-              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)]"
+              className="rounded-lg border border-border/60 bg-[hsl(var(--surface-1))] px-3 py-2 text-left shadow-[var(--shadow-1)] lldv2-prio-tile lldv2-prio-tile-done"
               title="Done (7d)"
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-extrabold tracking-wide text-foreground">DONE</div>
-                <div className="text-lg font-extrabold tabular-nums text-foreground">{mDone7}</div>
+                <div className="text-xs font-extrabold tracking-wide lldv2-prio-label lldv2-prio-bright">DONE</div>
+                <div className="text-lg font-extrabold tabular-nums lldv2-prio-count">{mDone7}</div>
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">Review</div>
             </button>
@@ -631,6 +633,8 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
 
 
 

@@ -1,81 +1,62 @@
-﻿import React from "react";
-import { AlertOctagon, AlertTriangle, AlertCircle, CheckCircle2 } from "lucide-react";
+﻿import React from 'react'
 
-export type PriorityLevel = "critical" | "high" | "medium" | "low";
+type Priority =
+  | 'critical'
+  | 'high'
+  | 'medium'
+  | 'low'
+  | 'deferred'
+  | 'done'
+  | 'none'
+  | string
 
-interface PriorityBadgeProps {
-  priority: PriorityLevel | string | null | undefined;
-  size?: "sm" | "md";
-  showIcon?: boolean;
-}
-
-const PriorityBadge: React.FC<PriorityBadgeProps> = ({
+export default function PriorityBadge({
   priority,
-  size = "sm",
-  showIcon = true,
-}) => {
-  const normalize = (p: any): PriorityLevel => {
-    const v = String(p || "").toLowerCase();
-    if (v === "critical") return "critical";
-    if (v === "high") return "high";
-    if (v === "medium") return "medium";
-    if (v === "low") return "low";
-    return "low";
-  };
+  compact = false,
+}: {
+  priority?: Priority | null
+  compact?: boolean
+}) {
+  const p = String(priority || 'none').toLowerCase()
 
-  const p = normalize(priority);
+  // token-driven colors (works in light + dark; strong text contrast)
+  const cfg =
+    p === 'critical' ? { label: 'Critical', tone: 'danger' } :
+    p === 'high' ? { label: 'High', tone: 'warning' } :
+    p === 'medium' ? { label: 'Medium', tone: 'info' } :
+    p === 'low' ? { label: 'Low', tone: 'neutral' } :
+    p === 'deferred' ? { label: 'Deferred', tone: 'neutral' } :
+    p === 'done' ? { label: 'Done', tone: 'success' } :
+    { label: 'None', tone: 'neutral' }
 
-  const config: Record<
-    PriorityLevel,
-    {
-      label: string;
-      icon: React.ElementType;
-      className: string;
-    }
-  > = {
-    critical: {
-      label: "Critical",
-      icon: AlertOctagon,
-      className:
-        "bg-[hsl(var(--status-danger)/0.12)] text-[hsl(var(--status-danger))] border border-[hsl(var(--status-danger)/0.28)]",
-    },
-    high: {
-      label: "High",
-      icon: AlertTriangle,
-      className:
-        "bg-[hsl(var(--status-warning)/0.12)] text-[hsl(var(--status-warning))] border border-[hsl(var(--status-warning)/0.28)]",
-    },
-    medium: {
-      label: "Medium",
-      icon: AlertCircle,
-      className:
-        "bg-[hsl(var(--status-info)/0.12)] text-[hsl(var(--status-info))] border border-[hsl(var(--status-info)/0.28)]",
-    },
-    low: {
-      label: "Low",
-      icon: CheckCircle2,
-      className:
-        "bg-[hsl(var(--status-success)/0.12)] text-[hsl(var(--status-success))] border border-[hsl(var(--status-success)/0.28)]",
-    },
-  };
+  const toneVar =
+    cfg.tone === 'danger' ? 'var(--status-danger)' :
+    cfg.tone === 'warning' ? 'var(--status-warning)' :
+    cfg.tone === 'info' ? 'var(--status-info)' :
+    cfg.tone === 'success' ? 'var(--status-success)' :
+    'var(--status-neutral)'
 
-  const Icon = config[p].icon;
+  const base =
+    'inline-flex items-center justify-center rounded-full border font-extrabold tracking-wide tabular-nums select-none ' +
+    'shadow-[0_0_0_1px_hsl(var(--border)/0.35)]'
+
+  const size = compact
+    ? 'text-[10px] px-2 py-[2px]'
+    : 'text-[11px] px-2.5 py-1'
+
+  // higher contrast than before:
+  // - bg is darker/stronger in dark mode via alpha
+  // - border is vivid
+  // - text is full-intensity tone
+  const style: React.CSSProperties = {
+    color: `hsl(${toneVar} / 1)`,
+    backgroundColor: `hsl(${toneVar} / 0.22)`,
+    borderColor: `hsl(${toneVar} / 0.62)`,
+  }
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full font-semibold capitalize ${config[p].className} ${
-        size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
-      }`}
-    >
-      {showIcon && <Icon className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />}
-      {config[p].label}
+    <span className={`${base} ${size}`} style={style} title={cfg.label}>
+      {cfg.label.toUpperCase()}
     </span>
-  );
-};
-
-export default PriorityBadge;
-
-
-
-
-
+  )
+}

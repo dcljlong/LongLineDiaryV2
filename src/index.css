@@ -306,7 +306,7 @@
   --surface-1: var(--card);
   --surface-2: var(--popover);
   --surface-3: var(--muted);
-  --surface-hover: var(--accent);
+  --surface-hover: var(--muted);
 
   /* Brand (Steel + Construction Green) */
   --brand: 92 50% 46%;
@@ -335,7 +335,7 @@
   --surface-1: var(--card);
   --surface-2: var(--popover);
   --surface-3: var(--muted);
-  --surface-hover: var(--accent);
+  --surface-hover: var(--muted);
 
   /* Brand (dark-tuned) */
   --brand: 92 55% 58%;
@@ -424,3 +424,102 @@ html[data-density="standard"] {
 }
 
 
+
+/* LLDV2_PRIORITY_STYLES */
+@keyframes lldv2CriticalPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); opacity: 1; }
+  50%      { transform: scale(1.08); filter: drop-shadow(0 0 10px currentColor); opacity: 0.95; }
+}
+
+.lldv2-prio-critical {
+  color: hsl(var(--destructive));
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.lldv2-prio-high {
+  color: hsl(var(--status-warning));
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.lldv2-prio-bright {
+  text-shadow: 0 0 10px color-mix(in oklab, currentColor 22%, transparent);
+}
+
+.lldv2-critical-pulse {
+  animation: lldv2CriticalPulse 1.05s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* LLDV2_PRIORITY_TILES */
+.lldv2-prio-tile {
+border:1px solid hsl(var(--border));
+border-radius:8px;
+padding:10px;
+font-weight:600;
+transition:all .15s ease;
+}
+
+.lldv2-prio-tile:hover {
+transform:translateY(-2px);
+box-shadow:var(--shadow-2);
+}
+
+.lldv2-prio-tile-critical {
+background:hsl(var(--destructive));
+color:white;
+border-color:hsl(var(--destructive));
+}
+
+.lldv2-prio-tile-overdue {
+background:color-mix(in oklab, hsl(var(--destructive)) 70%, black);
+color:white;
+}
+
+.lldv2-prio-tile-high {
+background:hsl(var(--status-warning));
+color:black;
+}
+
+.lldv2-prio-tile-med {
+background:color-mix(in oklab, hsl(var(--status-warning)) 60%, white);
+color:black;
+}
+
+.lldv2-prio-tile-low {
+background:hsl(var(--status-info));
+color:white;
+}
+
+.lldv2-prio-tile-defer {
+background:hsl(var(--muted));
+color:hsl(var(--muted-foreground));
+}
+
+.lldv2-prio-tile-done {
+background:hsl(var(--status-success));
+color:white;
+}
+.lldv2-prio-count { color: currentColor; }
+
+ /* LLDV2_PRIORITY_HOVER_SAFE */
+button.lldv2-prio-tile:hover{
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+button.lldv2-prio-tile-defer:hover{
+  background: hsl(var(--surface-hover));
+  border-color: hsl(var(--border));
+}
+
+ 
+/* ===== LLDv2: Priority pulse (Critical) ===== */
+@keyframes lldv2PulseCritical {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--status-danger) / 0.00); }
+  50%      { box-shadow: 0 0 0 8px hsl(var(--status-danger) / 0.18); }
+}
+
+.lldv2-critical-pulse {
+  animation: lldv2PulseCritical 1.15s ease-in-out infinite;
+}

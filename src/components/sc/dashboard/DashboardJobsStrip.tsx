@@ -42,7 +42,7 @@ export default function DashboardJobsStrip({
                 key={p.id}
                 type="button"
                 onClick={() => go(p.id)}
-                className="inline-flex items-center gap-2 rounded-md border px-2 py-1 text-xs font-semibold hover:bg-[hsl(var(--surface-hover))] max-w-[260px]"
+                className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-[hsl(var(--surface-1))] px-3 py-1.5 text-sm font-bold text-foreground shadow-[var(--shadow-1)] ring-1 ring-[hsl(var(--accent)/0.18)] hover:bg-[hsl(var(--surface-2))] hover:shadow-[var(--shadow-2)] hover:ring-[hsl(var(--accent)/0.28)] transition-colors max-w-[260px]"
                 title="Filter action items to this job"
               >
                 <span className="truncate">{p.name || "Unnamed Job"}</span>
@@ -57,3 +57,5 @@ export default function DashboardJobsStrip({
     </>
   );
 }
+
+
