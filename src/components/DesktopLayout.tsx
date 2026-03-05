@@ -162,7 +162,7 @@ case 'calendar':
 
   if (!user) {
     return (
-      <div className='min-h-screen flex flex-col items-center justify-center gap-6 bg-[hsl(var(--surface-0))]'>
+      <div className='min-h-screen flex flex-col items-center justify-center gap-4 bg-[hsl(var(--surface-0))]'>
         <div className='text-2xl font-semibold'>Long Line Diary</div>
         <button
           onClick={() => setShowAuthModal(true)}
@@ -211,31 +211,41 @@ case 'calendar':
         className={`transition-all duration-300 min-h-screen print:ml-0 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"}`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))]/80 backdrop-blur-xl border-b-4 border-primary px-4 lg:px-6 py-3 print:hidden">
+        <header className="sticky top-0 z-20 bg-[hsl(var(--surface-0))] backdrop-blur-xl border-b-4 border-primary px-4 lg:px-6 py-3 print:hidden">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <ThemeToggle />{/* Mobile menu button */}
+            <div className="flex items-center gap-2">
+              {navStack.length > 0 ? (
+
+                <button
+
+                  type="button"
+
+                  onClick={() => handleBack()}
+
+                  className="p-2 rounded-lg border border-border hover:bg-card transition-colors"
+
+                  aria-label="Back"
+
+                  title="Back"
+
+                >
+
+                  <ArrowLeft className="w-5 h-5 text-foreground" />
+
+                </button>
+
+              ) : null}
+
+              
+
+              <ThemeToggle /><HeaderWeather />{/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
+                className="lg:hidden p-2 rounded-lg border border-border hover:bg-card transition-colors"
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-              <div className="flex items-center gap-2">
-  {navStack.length > 0 ? (
-    <button
-      type="button"
-      onClick={() => handleBack()}
-      className="p-2 rounded-lg hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-foreground"
-      title="Back"
-    >
-      <ArrowLeft className="w-5 h-5" />
-    </button>
-  ) : null}
-  
-</div>
-            </div>            <div className="flex-1 flex items-center justify-center">
-              <div className="flex items-center gap-6">
+                {mobileMenuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
+              </button>            </div>            <div className="flex-1 flex items-center justify-center">
+              <div className="flex items-center gap-4">
                 <div className="text-center leading-none">
                   <div className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
                     {now.toLocaleDateString(undefined, { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
@@ -247,7 +257,7 @@ case 'calendar':
 
                 {forecast?.days?.[0] ? (
                   <div className="flex items-center gap-2">
-                    <WeatherIcon code={forecast.days[0].weaweatherCode} className="h-8 w-8" />
+                    <WeatherIcon code={forecast.days[0].weatherCode} className="h-8 w-8" />
                     <span className="text-xl font-extrabold text-foreground tabular-nums">
                       {Math.round(forecast.days[0].tempMaxC)}°
                     </span>
@@ -256,7 +266,7 @@ case 'calendar':
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
 
               {/* Auth section */}
               {authLoading ? (
@@ -288,7 +298,7 @@ case 'calendar':
                     >
                       {/* User info */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                        <div className="flex items-center gap-2"><div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                             <span className="text-sm font-bold text-foreground">
                               {displayName.charAt(0).toUpperCase() || 'U'}
                             </span>
@@ -308,14 +318,14 @@ case 'calendar':
                       <div className="p-1.5">
                         <button
                           onClick={() => { setShowUserMenu(false); handleNavigate('settings'); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/50 hover:text-foreground transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)]/50 hover:text-foreground transition-colors"
                         >
                           <User className="w-4 h-4" />
                           <span>Profile & Settings</span>
                         </button>
                         <button
                           onClick={handleSignOut}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Sign Out</span>
@@ -465,3 +475,90 @@ export default AppLayout;
 
 
 
+
+function HeaderWeather() {
+  const [coords, setCoords] = React.useState<{ lat: number; lon: number } | null>(null);
+  const [forecast, setForecast] = React.useState<DailyForecast | null>(null);
+  const [err, setErr] = React.useState<string | null>(null);
+  const [loc, setLoc] = React.useState<string>('');
+
+  React.useEffect(() => {
+    let alive = true;
+
+    const load = async () => {
+      try {
+        setErr(null);
+
+        let c = coords;
+        if (!c) {
+          const got = await getBrowserCoords();
+          if (!got) {
+            if (!alive) return;
+            setErr('Location blocked');
+            setForecast(null);
+            return;
+          }
+          c = got;
+          if (!alive) return;
+          setCoords(got);
+        }
+
+        const f = await fetch7DayForecast(c.lat, c.lon);
+        setLoc(`${Math.round(c.lat * 100) / 100}, ${Math.round(c.lon * 100) / 100}`);
+if (!alive) return;
+        setForecast(f);
+      } catch (e: any) {
+        if (!alive) return;
+        setErr(e?.message || 'Weather failed');
+        setForecast(null);
+      }
+    };
+
+    void load();
+    const t = window.setInterval(() => void load(), 30 * 60 * 1000); // 30 min
+
+    return () => {
+      alive = false;
+      window.clearInterval(t);
+    };
+  }, [coords]);
+
+  const d0 = forecast?.days?.[0] ?? null;
+  const todayHi = d0 ? Math.round(Number(d0.tempMaxC)) : null;
+  const todayLo = d0 ? Math.round(Number(d0.tempMinC)) : null;
+  const todayCode = d0 ? Number(d0.weatherCode) : null;
+
+  return (
+    <div className="hidden sm:flex items-center gap-0.5" title={err ? `Weather: ${err}` : 'Weather (7-day)'}>
+      {/* Today pill (small) */}
+      <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-border/50 bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-xs">
+        <span className="text-muted-foreground font-semibold">Wx</span>
+        <WeatherIcon code={todayCode ?? undefined} className="h-3 w-3" />
+        <span className="tabular-nums font-extrabold">
+          {todayHi !== null && todayLo !== null ? `${todayHi}°/${todayLo}°` : '—'}
+        </span>
+      </div>
+
+      {/* 7-day micro strip (desktop only) */}
+      {forecast?.days?.length ? (
+        <div className="hidden md:flex items-center gap-1">
+          {forecast.days.slice(0, 7).map((d) => {
+            const hi = Math.round(Number(d.tempMaxC));
+            
+            const wk = new Date(String(d.date) + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' });
+return (
+              <div
+                key={d.date}
+                className="inline-flex items-center gap-1 px-1 py-0.5 rounded-md border border-border/40 bg-[hsl(var(--surface-1))] shadow-[var(--shadow-1)] text-[10px]"
+                title={d.date}
+              >
+                <span className="text-muted-foreground font-semibold">{wk}</span> <WeatherIcon code={d.weatherCode} className="h-3 w-3" />
+                <span className="tabular-nums font-semibold">{hi}°</span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}

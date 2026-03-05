@@ -1,8 +1,8 @@
 ﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
 import DashboardKpis from './dashboard/DashboardKpis';
-import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 import {
-  Package,
+Package,
   Clock,
   CheckCircle2,
   Plus,
@@ -24,7 +24,8 @@ import { fetch7DayForecast, getBrowserCoords, type DailyForecast } from '@/lib/w
 import PriorityBadge from './PriorityBadge';
 import ActionItemDetailModal from './ActionItemDetailModal';
 import WeatherSevenDay from './WeatherSevenDay';
-
+import WeatherIcon from './WeatherIcon';
+import DashboardJobsStrip from './dashboard/DashboardJobsStrip';
 interface DashboardPageProps {
   onNavigate: (page: string, data?: any) => void;
   onQuickAdd: () => void;
@@ -132,29 +133,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
 
   
   const [weatherLoading, setWeatherLoading] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setWeatherErr(null);
-
-        const coords = await getBrowserCoords();
-        if (!coords) {
-          if (!cancelled) setWeatherErr('Location unavailable (browser permission denied)');
-          return;
-        }
-
-        const f = await fetch7DayForecast(coords.lat, coords.lon);
-        if (!cancelled) setForecast(f);
-      } catch (e: any) {
-        if (!cancelled) setWeatherErr(e?.message || 'Weather fetch failed');
-      }
-    })();
-  return () => { cancelled = true; };
-  }, []);
-
-  const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
+const SEEN_KEY = useMemo(() => `lldv2:pulse_seen:${todayStr()}`, []);
   const [seen, setSeen] = useState<{ critical: number; high: number }>({ critical: 0, high: 0 });
   useEffect(() => {
     try {
@@ -208,15 +187,33 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
     setLoading(false);
   }, []);
     
+
+  const weatherMode = (settings as any)?.weather?.mode ?? 'auto';
+  const weatherLabel = (settings as any)?.weather?.label ?? 'Current location';
+  const weatherLat = (settings as any)?.weather?.lat ?? null;
+  const weatherLon = (settings as any)?.weather?.lon ?? null;
   const loadWeather = useCallback(async () => {
     setWeatherLoading(true);
     try {
       setWeatherErr(null);
+      if (weatherMode === 'manual') {
+        if (typeof weatherLat !== 'number' || typeof weatherLon !== 'number') {
+          setCoords(null);
+          setForecast(null);
+          setWeatherErr('Manual weather location not set (enter lat/lon in Settings)');
+          return;
+        }
+        setCoords({ lat: weatherLat, lon: weatherLon });
+        const f = await fetch7DayForecast(weatherLat, weatherLon);
+        setForecast({ ...f, latitude: weatherLat, longitude: weatherLon, timezone: f.timezone || 'auto' });
+        return;
+      }
+
       const c = await getBrowserCoords();
       if (!c) {
         setCoords(null);
         setForecast(null);
-        setWeatherErr('Location blocked (allow location in browser)');
+        setWeatherErr('Location blocked (allow location in browser)'); 
         return;
       }
       setCoords(c);
@@ -226,12 +223,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
       setForecast(null);
       setCoords(null);
       setWeatherErr(e?.message || 'Weather fetch failed');
-    }
-    finally {
+    } finally {
       setWeatherLoading(false);
     }
-  }, []);
-// Auto-carry at midnight (runs if app is open)
+  }, [weatherMode, weatherLat, weatherLon]);// Auto-carry at midnight (runs if app is open)
   useEffect(() => {
     const KEY = 'lldv2:auto_carry_last_run';
     let timer: number | null = null;
@@ -279,16 +274,16 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onQuickAdd })
   }, [settings?.features?.autoCarryForward, loadData]);
   useEffect(() => {
     loadData();
-    void loadWeather();
+    // weather moved to header
     const handler = () => {
       void loadData();
-      void loadWeather();
+      // weather moved to header
     };
     window.addEventListener('lldv2:action-items-changed', handler as EventListener);
   return () => {
       window.removeEventListener('lldv2:action-items-changed', handler as EventListener);
     };
-  }, [loadData]);
+  }, [loadData, loadWeather]);
   
 
   // Live clock (updates every second)
@@ -476,8 +471,6 @@ const statCards = [
 
         {carryNote ? <div className="mt-3 text-sm text-muted-foreground">{carryNote}</div> : null}
 
-        <div className="mt-3"><WeatherSevenDay forecast={forecast} /></div>
-                {/* Work Tabs (Primary Workflow) */}
         <div className="mt-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
             <button
@@ -638,6 +631,10 @@ const statCards = [
 };
 
 export default DashboardPage;
+
+
+
+
 
 
 

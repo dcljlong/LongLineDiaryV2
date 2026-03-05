@@ -161,6 +161,13 @@ export interface AppSettings {
     pulseHigh: boolean;
       escalateHighToCriticalDays: number;
   };
+
+  weather: {
+    mode: 'auto' | 'manual';
+    label: string;
+    lat: number | null;
+    lon: number | null;
+  };
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -179,6 +186,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
     autoCarryForward: true,
     aiSummary: true,
     notifications: true,
+  },
+
+  weather: {
+    mode: 'auto',
+    label: 'Current location',
+    lat: null,
+    lon: null,
   },
 
   alerts: {
@@ -278,6 +292,8 @@ export const ROLE_ACCESS: Record<UserRole, PageKey[]> = {
   foreman: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'timesheets', 'reports'],
   safety_officer: ['dashboard', 'projects', 'projects', 'onsite-walk', 'daily-logs', 'action-items', 'calendar', 'reports'],
 };
+
+
 
 
 
